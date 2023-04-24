@@ -86,6 +86,9 @@ wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
 # Defining the wbCorr class
 #######################################################
 #' @importFrom methods show
+#' @importFrom methods new
+#' @importFrom stats ave complete.cases cor pt qt
+#' @importFrom utils combn head
 #' @title wbCorr Class
 #'
 #' @description A class representing within- and between-cluster correlations.
