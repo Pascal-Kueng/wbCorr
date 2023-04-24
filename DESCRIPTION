@@ -4,11 +4,16 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7346-9414"))
-Description: The package separates the variance of variables passes as a dataframe into
-  their within- and between- components and calculates the respective bivariate
-  correlations for both levels separately. This is achieved by centering the variables
-  within and between cluster. This is useful to get a first understanding
-  of your data before using more elaborate multilevel analyses. 
+Description: The wbCorr package separates the variance of variables provided 
+into their within- and between-cluster components, and calculates the respective 
+bivariate correlations for both levels separately. This is especially useful
+for longitudinal analyses.
+By centering the variables within and between clusters, this package helps 
+users gain an initial understanding of their data before employing more 
+sophisticated multilevel analyses. This approach allows for a more in-depth 
+examination of relationships at both the within- and between-cluster 
+levels, which can be essential for making informed decisions based on the 
+structure of the data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
