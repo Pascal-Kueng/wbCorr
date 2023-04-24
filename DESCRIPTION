@@ -1,0 +1,15 @@
+Package: wbCorr
+Title: Calculate within- and between-cluster correlations
+Version: 0.0.0.9000
+Authors@R: 
+    person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7346-9414"))
+Description: The package separates the variance of variables passes as a dataframe into
+  their within- and between- components and calculates the respective bivariate
+  correlations for both levels separately. This is achieved by centering the variables
+  within and between cluster. This is useful to get a first understanding
+  of your data before using more elaborate multilevel analyses. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
