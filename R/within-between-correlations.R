@@ -1,3 +1,4 @@
+
 #' wbCorr
 #'
 #' Calculates within- and between-cluster correlations for a given dataset and clustering variable.
@@ -47,7 +48,7 @@ wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
                                alpha_level = alpha_level,
                                method = method)
   between_cors <- corAndPValues(centered_df$between[-1],
-                                n_clusters = unique(
+                                n_clusters_between = unique(
                                   nlevels(as.factor(
                                     centered_df$between$cluster))),
                                 alpha_level = alpha_level,
@@ -84,6 +85,7 @@ wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
 #######################################################
 # Defining the wbCorr class
 #######################################################
+#' @importFrom methods show
 #' @title wbCorr Class
 #'
 #' @description A class representing within- and between-cluster correlations.
@@ -92,8 +94,10 @@ wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
 #' and provides methods for printing and summarizing the correlations.
 #'
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
+#' @importFrom methods setMethod
+#' @importFrom methods setClass
 #' @export
-setClass("wbCorr", representation(within = "list", between = "list"))
+methods::setClass("wbCorr", representation(within = "list", between = "list"))
 
 
 # Set method for printing
@@ -108,8 +112,9 @@ setClass("wbCorr", representation(within = "list", between = "list"))
 #' # Example using the iris dataset
 #' cors <- wbCorr(iris, iris$Species)
 #' print(cors)
+#' @importFrom methods setMethod
 #' @export
-setMethod("print", "wbCorr", function(x, ...) {
+methods::setMethod("print", "wbCorr", function(x, ...) {
   cat("\n---- wbCorr Object ----\n")
   cat("Call: ", deparse(x@call), "\n")
   cat("\nAccess full tables with `get_tables(object, which = c('within', 'between'))`\n")
@@ -139,7 +144,6 @@ setMethod("print", "wbCorr", function(x, ...) {
 
 })
 
-# Set method for showing equal to printing
 #' @title Show Method for the wbCorr Class
 #'
 #' @description Shows a summary of the \code{wbCorr} object, equivalent to the print method.
@@ -153,16 +157,16 @@ setMethod("print", "wbCorr", function(x, ...) {
 #' cors <- wbCorr(iris, iris$Species)
 #' show(cors)
 #' @export
-setMethod("show", "wbCorr", function(object) {
+setMethod("show", signature("wbCorr"), function(object) {
   print(object)
 })
-
 
 #' @rdname  get_matrix
 #' @aliases get_matrices
 #' @aliases summary.wbCorr
+#' @importFrom methods setMethod
 #' @export
-setMethod("summary", "wbCorr", get_matrices)
+methods::setMethod("summary", "wbCorr", get_matrices)
 
 
 
