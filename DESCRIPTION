@@ -1,6 +1,7 @@
 Package: wbCorr
-Title: Calculate within- and between-cluster correlations
+Title: Bivariate Within- and Between-Cluster Correlations
 Version: 0.0.0.9000
+Date: 2023-04-24
 Authors@R: 
     person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7346-9414"))
