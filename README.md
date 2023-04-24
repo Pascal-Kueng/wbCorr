@@ -15,7 +15,7 @@ devtools::install_github('Pascal-Kueng/wbCorr')
 
 ## Usage
 1. Create an object using the `wbCorr()` function. Printing the object shows the head of the tables.  
-2. To access the full tables, use the `get_correlations()` function on the object. 
+2. To access the full tables, use the `get_tables()` function on the object. 
 3. To retrieve correlation matrices, use `summary()` on the object.  
 
 ### 1. wbCorr()
@@ -35,9 +35,9 @@ wbCorr(
 
 - `method`	A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').  
 
-### 2. get_correlations()
+### 2. get_tables()
 ```R
-get_correlations(
+get_tables(
   object = NULL, 
   which = c("within", "between")
 )
@@ -48,7 +48,7 @@ get_correlations(
 #### Sample Output
 ``` 
 # Sample output
-> get_correlations(wbCorrObject)
+> get_tables(wbCorrObject)
 $within
   Parameter1 Parameter2    r       95% CI t(1598)         p
 1       Var1       Var2 0.08 [0.03, 0.13]    3.25   0.001**
@@ -111,7 +111,7 @@ Var3 0.25***  0.79***     1.00
 myObject <- wbCorr(iris, iris$Species)
 print(myObject) 
 
-tables <- get_correlations(myObject)
+tables <- get_tables(myObject)
 matrices <- summary(myObject)
 
 print(tables)

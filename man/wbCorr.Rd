@@ -17,8 +17,8 @@ wbCorr(data, cluster, alpha_level = 0.95, method = "pearson")
 }
 \value{
 A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
-Use the \code{get_correlations()} function on the wbCorr object to retrieve full tables.
-Use the \code{summary()} function on the wbCorr object to retrieve correlation matrices.
+Use the \code{get_table()} function on the wbCorr object to retrieve full tables.
+Use the \code{summary()} or \code{get_matrix()} function on the wbCorr object to retrieve correlation matrices.
 }
 \description{
 The \code{wbCorr} function creates a wbCorr object containing within- and between-cluster correlations,
@@ -34,9 +34,9 @@ and between-cluster correlations for further analysis.
 # Example using the iris dataset
 cors <- wbCorr(iris, iris$Species)
 cors
-get_correlations(cors, which = c('within', 'between'))
+get_tables(cors, which = c('within', 'between'))
 summary(cors, which = c('within', 'between', 'merge'))
 }
 \seealso{
-\code{\link[=get_correlations]{get_correlations}}, \code{\link[=summary.wbCorr]{summary}}
+\code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_matrix]{get_matrix}}
 }

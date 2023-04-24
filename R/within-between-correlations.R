@@ -8,8 +8,8 @@
 #' @param method A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').
 #'
 #' @return A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
-#' Use the `get_correlations()` function on the wbCorr object to retrieve full tables.
-#' Use the `summary()` function on the wbCorr object to retrieve correlation matrices.
+#' Use the `get_table()` function on the wbCorr object to retrieve full tables.
+#' Use the `summary()` or `get_matrix()` function on the wbCorr object to retrieve correlation matrices.
 #'
 #' @description
 #' The `wbCorr` function creates a wbCorr object containing within- and between-cluster correlations,
@@ -20,17 +20,15 @@
 #' and between-cluster correlations for further analysis.
 #'
 #' @seealso
-#' \code{\link[=get_correlations]{get_correlations}}, \code{\link[=summary.wbCorr]{summary}}
-
+#' \code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_matrix]{get_matrix}}
 #'
 #' @examples
 #' # Example using the iris dataset
 #' cors <- wbCorr(iris, iris$Species)
 #' cors
-#' get_correlations(cors, which = c('within', 'between'))
+#' get_tables(cors, which = c('within', 'between'))
 #' summary(cors, which = c('within', 'between', 'merge'))
 #' @export
-
 wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
   # Input validation and error handling
   input_data <- data
@@ -114,7 +112,7 @@ setClass("wbCorr", representation(within = "list", between = "list"))
 setMethod("print", "wbCorr", function(x, ...) {
   cat("\n---- wbCorr Object ----\n")
   cat("Call: ", deparse(x@call), "\n")
-  cat("\nAccess full tables with `get_correlations(object, which = c('within', 'between'))`\n")
+  cat("\nAccess full tables with `get_tables(object, which = c('within', 'between'))`\n")
   cat("Access correlation matrices with `summary(object, which = c('within', 'between', merge')`\n")
 
   # Function for printing a section of the object
@@ -136,14 +134,16 @@ setMethod("print", "wbCorr", function(x, ...) {
   print_section("Within-Cluster Correlations:", x@within$table)
   print_section("Between-Cluster Correlations:", x@between$table)
 
-  cat("\nAccess full tables with get_correlations(object, which = c('within', 'between'))")
+  cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
   cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')\n")
 
 })
 
 # Set method for showing equal to printing
 #' @title Show Method for the wbCorr Class
+#'
 #' @description Shows a summary of the \code{wbCorr} object, equivalent to the print method.
+#'
 #' @param object A \code{wbCorr} object.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}, \code{\link[=print.wbCorr]{print.wbCorr}}
 #' @aliases show.wbCorr
@@ -158,67 +158,11 @@ setMethod("show", "wbCorr", function(object) {
 })
 
 
-
-#' Summarize within- and/or between-cluster correlations for a wbCorr object.
-#'
-#' @param object A wbCorr object, created by the `wbCorr()` function.
-#' @param which A string or a character vector indicating which summaries to return.
-#' Options are `'within'` or `'w'`, `'between'` or `'b'`, and various merge options
-#' like `'merge'`, `'m'`, `'merge_wb'`, `'wb'`, `'merge_bw'`, `'bw'`.
-#' Default is `c('within', 'between', 'merge')`.
-#' @param ... Additional arguments passed to the base summary method
-#'
-#' @return A list containing the selected summaries of within- and/or between-cluster correlations.
-#' @seealso \code{\link[=get_correlations]{get_correlations}}, \code{\link[=wbCorr]{wbCorr}}
-#' @examples
-#' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species)
-#' summaries <- summary(cors, which = c('within', 'between', 'merge'))
-#' summaries$within
-#' summaries$between
-#' summaries$merged_wb
-#'
-#' @export
+#' @rdname  get_matrix
+#' @aliases get_matrices
 #' @aliases summary.wbCorr
-#' @rdname  summary.wbCorr
-#'
-setMethod("summary", "wbCorr", function(object, which = c('within', 'between', 'merge'),...) {
-  which <- match.arg(which, choices = c('within', 'w',
-                                        'between', 'b',
-                                        'merge','m', 'merged',
-                                        'merge_bw', 'bw',
-                                        'merge_wb', 'wb'), several.ok = TRUE) # Check for valid inputs
-
-  df_summary_within <- summarize_table(
-    object@within$p_values,
-    object@within$correlations)
-
-  df_summary_between <- summarize_table(
-    object@between$p_values,
-    object@between$correlations)
-
-  combined_df_wb <- combine_matrices(as.matrix(df_summary_within),
-                                     as.matrix(df_summary_between))
-  combined_df_bw <- combine_matrices(as.matrix(df_summary_between),
-                                     as.matrix(df_summary_within))
-
-  return_list <- list()
-  if ('within' %in% which | 'w' %in% which) {
-    return_list[['within']] <- df_summary_within
-  }
-  if ('between' %in% which | 'b' %in% which) {
-    return_list[['between']] <- df_summary_between
-  }
-  if ('merge' %in% which | 'm' %in% which | 'merged' %in% which) {
-    return_list[['merged_wb']] <- combined_df_wb
-    return_list[['merged_bw']] <- combined_df_bw
-  } else if ('merge_bw' %in% which | 'bw' %in% which) {
-    return_list[['merged_bw']] <- combined_df_bw
-  } else if ('merge_wb' %in% which | 'wb' %in% which) {
-    return_list[['merged_wb']] <- combined_df_wb
-  }
-  return(return_list)
-})
+#' @export
+setMethod("summary", "wbCorr", get_matrices)
 
 
 
