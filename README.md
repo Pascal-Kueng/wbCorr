@@ -73,7 +73,7 @@ summary(
 ```
 - `object` A `wbCorr` object, created by the `wbCorr()` function.  
 
-- `which` A string or a character vector indicating which summaries to return. Options are 'within' or 'w', 'between' or 'b', and various merge options like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'. Default is c('within', 'between', 'merge').  
+- `which` A string or a character vector indicating which summaries to return. Options are 'within' or 'w', 'between' or 'b', and various merge options like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'. Default is c('within', 'between', 'merge'). The 'merge_wb' option returns a correlation matrix with within-correlations above the diagonal and between-correlations below the diagonal, while the 'merge_bw' option does the opposite, displaying between-correlations above the diagonal and within-correlations below the diagonal.
 
 - `...` Additional arguments passed to the base summary method.  
 
