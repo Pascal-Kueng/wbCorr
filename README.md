@@ -35,9 +35,10 @@ wbCorr(
 
 - `method`	A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').  
 
-### 2. get_tables()
+### 2. get_table()
+equivalent alias: `get_tables()`
 ```R
-get_tables(
+get_table(
   object = NULL, 
   which = c("within", "between")
 )
@@ -48,7 +49,7 @@ get_tables(
 #### Sample Output
 ``` 
 # Sample output
-> get_tables(wbCorrObject)
+> get_table(wbCorrObject)
 $within
   Parameter1 Parameter2    r       95% CI t(1598)         p
 1       Var1       Var2 0.08 [0.03, 0.13]    3.25   0.001**
@@ -63,6 +64,7 @@ $between
 ```
 
 ### 3. summary()
+equivalent alias: `get_matrix()` or `get_matrices()`
 ```R
 ## S4 method for signature 'wbCorr'
 summary(
@@ -111,7 +113,7 @@ Var3 0.25***  0.79***     1.00
 myObject <- wbCorr(iris, iris$Species)
 print(myObject) 
 
-tables <- get_tables(myObject)
+tables <- get_table(myObject)
 matrices <- summary(myObject)
 
 print(tables)
