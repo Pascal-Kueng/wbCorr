@@ -1,10 +1,11 @@
 Package: wbCorr
 Title: Bivariate Within- and Between-Cluster Correlations
-Version: 0.0.0.9000
+Version: 0.1.0
 Date: 2023-04-24
 Authors@R: 
-    person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7346-9414"))
+    c(person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", 
+             role = c("aut", "cre", "cph"),
+             comment = c(ORCID = "0000-0001-7346-9414")))
 cph: Pascal Küng
 Description: The wbCorr package separates the variance of variables
     provided into their within- and between-cluster components, and
@@ -27,3 +28,5 @@ Imports:
     methods
 Config/testthat/edition: 3
 Language: en-US
+URL: https://github.com/Pascal-Kueng/wbCorr
+BugReports: https://github.com/Pascal-Kueng/wbCorr/issues
