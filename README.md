@@ -18,7 +18,7 @@ devtools::install_github('Pascal-Kueng/wbCorr')
 2. To access the full tables, use the `get_correlations()` function on the object. 
 3. To retrieve correlation matrices, use `summary()` on the object.  
 
-## 1. wbCorr()
+### 1. wbCorr()
 ```R
 ?wbCorr # view documentation
 wbCorr(
@@ -35,7 +35,7 @@ wbCorr(
 
 - `method`	A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').  
 
-## 2. get_correlations()
+### 2. get_correlations()
 ```R
 get_correlations(
   object = NULL, 
@@ -45,24 +45,24 @@ get_correlations(
 - `object` A `wbCorr` object, created by the `wbCorr()` function.  
 
 - `which` A character vector indicating which correlation table to return. Options are 'within' or 'w', and 'between' or 'b'.
-### Sample Output
+#### Sample Output
 ``` 
 # Sample output
 > get_correlations(wbCorrObject)
 $within
-  Parameter1 Parameter2    r       95% CI   t(1598)         p
-1       Var1       Var2 0.08 [0.03, 0.13]  3.251844   0.001**
-2       Var1       Var3 0.25 [0.21, 0.30] 10.438107 < .001***
-3       Var2       Var3 0.79 [0.76, 0.82] 50.889133 < .001***
+  Parameter1 Parameter2    r       95% CI t(1598)         p
+1       Var1       Var2 0.08 [0.03, 0.13]    3.25   0.001**
+2       Var1       Var3 0.25 [0.21, 0.30]   10.44 < .001***
+3       Var2       Var3 0.79 [0.76, 0.82]   50.89 < .001***
 
 $between
-  Parameter1 Parameter2     r         95% CI      t(78)         p
-1       Var1       Var2 -0.59 [-0.77, -0.41] -6.4767399 < .001***
-2       Var1       Var3 -0.38 [-0.59, -0.17] -3.6463919 < .001***
-3       Var2       Var3 -0.03  [-0.25, 0.20] -0.2355061     0.814
+  Parameter1 Parameter2     r         95% CI t(78)         p
+1       Var1       Var2 -0.59 [-0.77, -0.41] -6.48 < .001***
+2       Var1       Var3 -0.38 [-0.59, -0.17] -3.65 < .001***
+3       Var2       Var3 -0.03  [-0.25, 0.20] -0.24     0.814
 ```
 
-## 3. summary()
+### 3. summary()
 ```R
 ## S4 method for signature 'wbCorr'
 summary(
@@ -77,7 +77,7 @@ summary(
 
 - `...` Additional arguments passed to the base summary method.  
 
-### Sample Output
+#### Sample Output
 ```
 > summary(wbCorrObject)
 $within
