@@ -18,19 +18,22 @@ update_wbCorr <- function() {
                                    github_username, "/",
                                    github_repository, "/main/DESCRIPTION")
 
+  remote_description_conn <- url(remote_description_url, "r")
   remote_description <- tryCatch({
-    readLines(url(remote_description_url, "r"))
+    readLines(remote_description_conn)
   }, error = function(e) {
     message("Error: Unable to check for updates. Check your internet connection.")
     NULL
   })
 
   if (!is.null(remote_description)) {
+    close(remote_description_conn) # Close the connection
     # Extract the remote package's version number
     remote_version <- sub("^Version: (.*)", "\\1", remote_description[grepl("^Version: ", remote_description)])
 
     if (length(remote_version) > 0 && nchar(remote_version) > 0) {
-      local_version <- packageVersion(pkgname)
+      local_version <- as.package_version(getNamespaceVersion(pkgname))
+
 
       if (package_version(remote_version) > local_version) {
         cat("Update available for package '", pkgname, "'.\n")
@@ -60,22 +63,21 @@ update_wbCorr <- function() {
   invisible(NULL)
 }
 
-
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
 # Load required packages
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
 
 .onAttach <- function(libname, pkgname) {
-  # Call the original .onAttach function if it exists
-  if (exists(".onAttach.original", mode = "function", envir = parent.env(environment()))) {
-    .onAttach.original(libname, pkgname)
+  onAttach_env <- parent.env(environment())
+
+  # Call the original .onLoad function if it exists
+  if (exists(".onAttach.original", mode = "function", envir = onAttach_env)) {
+    onLoad_original_fn <- get(".onLoad.original", envir = onAttach_env)
+    onLoad_original_fn(libname, pkgname)
   }
 
   # Run the update checker function
   update_wbCorr()
-
-  # Add a message to inform users that the package has been loaded
-  packageStartupMessage("Package '", pkgname, "' loaded. Run 'check_for_updates()' to check for updates manually.")
 }
-
