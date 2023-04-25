@@ -4,6 +4,10 @@
 #' the version numbers in the local and remote DESCRIPTION files. It prints the current package
 #' version, the new version available on GitHub, and a message indicating whether an update is
 #' available.
+#' @param ask Logical, if set to TRUE, the function checks for updates and prompts
+#' the user to confirm the update when a newer version is found. If set to FALSE,
+#' the function automatically attempts to install the latest version without
+#' prompting when an update is available.
 #' @return An integer: 1 if there's a newer version available, 0 if the current version is the latest,
 #'         or NULL if there was an error accessing the remote DESCRIPTION file.
 #' @importFrom utils packageVersion

@@ -4,7 +4,13 @@
 \alias{update_wbCorr}
 \title{Check for updates of wbCorr}
 \usage{
-update_wbCorr()
+update_wbCorr(ask = FALSE)
+}
+\arguments{
+\item{ask}{Logical, if set to TRUE, the function checks for updates and prompts
+the user to confirm the update when a newer version is found. If set to FALSE,
+the function automatically attempts to install the latest version without
+prompting when an update is available.}
 }
 \value{
 An integer: 1 if there's a newer version available, 0 if the current version is the latest,
