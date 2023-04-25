@@ -5,18 +5,18 @@
 #'
 #' @return Returns TRUE if an update is available, FALSE otherwise.
 #' @export
-update_wbCorr() <- function() {
+update_wbCorr <- function() {
   pkgname <- parent.env(environment())$pkgname
   cat("\nChecking for package updates...\n")
 
   # Replace these with your GitHub username and repository name
-  github_username <- "your_github_username"
-  github_repository <- "your_github_repository"
+  github_username <- "Pascal-Kueng"
+  github_repository <- "wbCorr"
 
   # Get the remote package's DESCRIPTION content
   remote_description_url <- paste0("https://raw.githubusercontent.com/",
                                    github_username, "/",
-                                   github_repository, "/master/DESCRIPTION")
+                                   github_repository, "/main/DESCRIPTION")
 
   remote_description <- tryCatch({
     readLines(url(remote_description_url, "r"))
