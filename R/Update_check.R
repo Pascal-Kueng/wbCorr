@@ -8,7 +8,7 @@
 #'         or NULL if there was an error accessing the remote DESCRIPTION file.
 #' @importFrom utils packageVersion
 #' @export
-update_wbCorr <- function() {
+update_wbCorr <- function(ask = FALSE) {
 
   local_version <- packageVersion('wbCorr')
   # URL to check newest build
@@ -35,7 +35,12 @@ update_wbCorr <- function() {
     if (remote_version > local_version) {
       cat("There is a newer version available on GitHub.\n")
 
-      response <- readline("\n\nDo you want to update the package? (y/n): ")
+      if (ask == TRUE) {
+        response <- readline("\n\nDo you want to update the package? (y/n): ")
+      } else if (ask == FALSE) {
+        response <- 'y'
+      }
+
       if (tolower(response) == "y") {
         detach("package:wbCorr", unload = TRUE)
         unloadNamespace("wbCorr")
@@ -54,6 +59,6 @@ update_wbCorr <- function() {
 }
 
 .onAttach <- function(libname, pkgname) {
-  update_wbCorr()
+  update_wbCorr(ask = TRUE)
   packageStartupMessage("\nwbCorr Loaded\n")
 }
