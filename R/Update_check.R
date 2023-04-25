@@ -56,7 +56,7 @@ update_wbCorr <- function(ask = FALSE) {
       }
       return(1)
     } else {
-      cat("Latest version installed.\n")
+      cat("Latest version already installed.\n")
       return(0)
     }
   }
