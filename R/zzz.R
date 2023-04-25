@@ -6,7 +6,7 @@
 #' @return Returns TRUE if an update is available, FALSE otherwise.
 #' @export
 update_wbCorr <- function() {
-  pkgname <- parent.env(environment())$pkgname
+  pkgname <- "wbCorr"
   cat("\nChecking for package updates...\n")
 
   # Replace these with your GitHub username and repository name
