@@ -5,23 +5,59 @@
 #'
 #' @return Returns TRUE if an update is available, FALSE otherwise.
 #' @export
-update_wbCorr <- function() {
+update_wbCorr() <- function() {
   pkgname <- parent.env(environment())$pkgname
   cat("\nChecking for package updates...\n")
 
-  # Repo
-  github_username <- "Pascal-Kueng"
-  github_repository <- "wbCorr"
+  # Replace these with your GitHub username and repository name
+  github_username <- "your_github_username"
+  github_repository <- "your_github_repository"
 
-  # Check for updates and update the package if necessary
-  is_update_available <- devtools::install_github(
-    paste0(github_username, "/", github_repository),
-    upgrade = "ask",
-    quiet = FALSE,
-    force = FALSE
-  )
+  # Get the remote package's DESCRIPTION content
+  remote_description_url <- paste0("https://raw.githubusercontent.com/",
+                                   github_username, "/",
+                                   github_repository, "/master/DESCRIPTION")
 
-  invisible(is_update_available)
+  remote_description <- tryCatch({
+    readLines(url(remote_description_url, "r"))
+  }, error = function(e) {
+    message("Error: Unable to check for updates. Check your internet connection.")
+    NULL
+  })
+
+  if (!is.null(remote_description)) {
+    # Extract the remote package's version number
+    remote_version <- sub("^Version: (.*)", "\\1", remote_description[grepl("^Version: ", remote_description)])
+
+    if (length(remote_version) > 0 && nchar(remote_version) > 0) {
+      local_version <- packageVersion(pkgname)
+
+      if (package_version(remote_version) > local_version) {
+        cat("Update available for package '", pkgname, "'.\n")
+        cat("Local version: ", local_version, "\n", "Remote version: ", remote_version, "\n", sep = "")
+
+        update_decision <- readline(prompt = "Do you want to update the package? (y/n): ")
+
+        if (tolower(update_decision) %in% c("y", "yes")) {
+          devtools::install_github(
+            paste0(github_username, "/", github_repository),
+            upgrade = "never",
+            quiet = FALSE,
+            force = TRUE
+          )
+          cat("Package updated successfully.\n")
+        } else {
+          cat("Package update skipped.\n")
+        }
+      } else {
+        cat("Your package '", pkgname, "' is up-to-date.\n")
+      }
+    } else {
+      cat("Error: Unable to retrieve the remote package version.\n")
+    }
+  }
+
+  invisible(NULL)
 }
 
 
