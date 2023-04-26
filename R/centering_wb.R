@@ -4,7 +4,8 @@
 #######################################################
 
 # This function centers the data within and between clusters.
-wbCenter <- function(input_data, cluster) {
+#' @importFrom stats aggregate
+wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
   # Checks
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
@@ -28,6 +29,7 @@ wbCenter <- function(input_data, cluster) {
   df_within <- data.frame(cluster = cluster_var)
   df_between <- data.frame(cluster = cluster_var)
 
+
   for (name in colnames(input_data)) {
     col <- input_data[[name]]
 
@@ -50,7 +52,15 @@ wbCenter <- function(input_data, cluster) {
     df_within[[name]] <- within
 
     # When there was an NA we set NA in the between centered Variable too to make sure we have a weighted score in the end.
-    df_between[is.na(df_within[name]), name] <- NA
+    if (weighted_between_statistics) {
+      df_between[is.na(df_within[name]), name] <- NA
+    }
+  }
+
+  if (weighted_between_statistics == FALSE) {
+    df_between <- suppressWarnings(aggregate(df_between, by = list(cluster_var), FUN = mean))
+    df_between$cluster <- df_between$Group.1
+    df_between$Group.1 <- NULL
   }
 
   return(list(between = df_between, within = df_within))

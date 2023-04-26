@@ -1,0 +1,39 @@
+#' Simulated Intensive Longitudinal Dataset
+#'
+#' A simulated intensive longitudinal dataset to test the package capabilities.
+#' This dataset contains 80 participants, day, and three variables (var1, var2, and var3)
+#' that are all correlated on both within- and between-levels.
+#'
+#' The within-person correlations are all positive:
+#' \itemize{
+#'   \item var1 & var2: 0.1
+#'   \item var1 & var3: 0.3
+#'   \item var2 & var3: 0.8
+#' }
+#'
+#' The between-person correlations are all negative:
+#' \itemize{
+#'   \item var1 & var2: -0.5
+#'   \item var1 & var3: -0.4
+#'   \item var2 & var3: -0.2
+#' }
+#'
+#' Time trends (within):
+#' \itemize{
+#'   \item var1 & time: 0.0
+#'   \item var2 & time: 0.0
+#'   \item var3 & time: 0.4
+#' }
+#'
+#' @format A data frame with the following columns:
+#' \describe{
+#'   \item{participantID}{Identifier for each participant (integer)}
+#'   \item{day}{Day variable varying only within-person (integer)}
+#'   \item{var1}{Variable 1 (numerical)}
+#'   \item{var2}{Variable 2 (numerical)}
+#'   \item{var3}{Variable 3 (numerical)}
+#' }
+#' @source A simulated dataset by P. Küng
+#' @name simdat_intensive_longitudinal
+#' @docType data
+NULL

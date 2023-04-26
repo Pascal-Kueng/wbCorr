@@ -7,7 +7,10 @@
 #' @param cluster A vector representing the clustering variable or a string with the name of the column in `data` that contains the clustering variable.
 #' @param alpha_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
 #' @param method A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').
-#'
+#' @param weighted_between_statistics A logical value. If False, Variables are centered between-persons by
+#' simply taking the mean for each person and weighting them all the same, even if some
+#' contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalen in datasets
+#' without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE)
 #' @return A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
 #' Use the `get_table()` function on the wbCorr object to retrieve full tables.
 #' Use the `summary()` or `get_matrix()` function on the wbCorr object to retrieve correlation matrices.
@@ -25,12 +28,14 @@
 #'
 #' @examples
 #' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species)
+#' cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
 #' cors
 #' get_tables(cors, which = c('within', 'between'))
 #' summary(cors, which = c('within', 'between', 'merge'))
 #' @export
-wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
+wbCorr <- function(data, cluster,
+                   alpha_level = 0.95, method = "pearson",
+                   weighted_between_statistics = FALSE) {
   # Input validation and error handling
   input_data <- data
   if (!is.data.frame(input_data)) {
@@ -41,16 +46,15 @@ wbCorr <- function(data, cluster, alpha_level = 0.95, method = "pearson") {
   }
   cluster <- as.factor(cluster)
   # Split variance into between- and within
-  centered_df <- wbCenter(input_data, cluster)
+  centered_df <- wbCenter(input_data, cluster, weighted_between_statistics)
 
   # Calculate correlations, p-values, and confidence intervals.
   within_cors <- corAndPValues(centered_df$within[-1],
                                alpha_level = alpha_level,
                                method = method)
   between_cors <- corAndPValues(centered_df$between[-1],
-                                n_clusters_between = unique(
-                                  nlevels(as.factor(
-                                    centered_df$between$cluster))),
+                                n_clusters_between = nlevels(as.factor(
+                                    centered_df$between$cluster)),
                                 alpha_level = alpha_level,
                                 method = method)
 
@@ -113,7 +117,7 @@ methods::setClass("wbCorr", representation(within = "list", between = "list"))
 #' @rdname print.wbCorr
 #' @examples
 #' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species)
+#' cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
 #' print(cors)
 #' @importFrom methods setMethod
 #' @export
@@ -157,7 +161,7 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
 #' @rdname show.wbCorr
 #' @examples
 #' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species)
+#' cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
 #' show(cors)
 #' @export
 setMethod("show", signature("wbCorr"), function(object) {
