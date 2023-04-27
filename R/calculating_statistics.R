@@ -78,7 +78,6 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
       upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
     } else if (method == 'spearman') {
-      message('spearman CIs and p-Values approximated. Use bootstraping for exact values')
       # Fisher Z-transformation
       degrees_freedom_z <- degrees_freedom - 1
       z_score <- atanh(r)
@@ -92,13 +91,14 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       upper_bound <- tanh(z_score_upper)
 
       # p-values
-      z_statistic <- z_score / se
-      p_value <- 2 * (1 - pnorm(abs(z_statistic), lower.tail = TRUE))
+      test_statistic <- z_score / se
+      p_value <- 2 * (1 - pnorm(abs(test_statistic), lower.tail = TRUE))
       }
 
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- r
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
+    diag(p_matrix) <- 0
     conf_int_matrix[i, j, "lower"] <- conf_int_matrix[j, i, "lower"] <- lower_bound
     conf_int_matrix[i, j, "upper"] <- conf_int_matrix[j, i, "upper"] <- upper_bound
 
@@ -117,7 +117,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   conf_int_df <- array2table(conf_int_matrix)
 
   # rename columns and formatting main table
-  names(result_table)[5] <- c(sprintf('t(%d)', degrees_freedom))
+  if (method == 'pearson') {
+    names(result_table)[5] <- c(sprintf('t(%d)', degrees_freedom))
+  } else if (method == 'spearman') {
+    names(result_table)[5] <- c(sprintf('z(%d)', degrees_freedom))
+  }
+
   names(result_table)[4] <- c('95% CI')
 
   result_table$p <- ifelse(result_table$p < .001, "< .001***",

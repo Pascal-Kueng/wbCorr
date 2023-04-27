@@ -23,10 +23,10 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
 
 
 
-test_that("correlation coefficients are equal to statsBy implementation", {
+test_that("correlations are equal to statsBy implementation", {
   # function to compare coefficients!
   compare <- function(cors_weighted, statsby) {
-    # between correlation pearson
+    # between correlation
     df_statsby <- round(as.data.frame(statsby$rbg), 8)
     df_wbcorr <- round(cors_weighted@between$correlations, 8)
 
@@ -34,13 +34,32 @@ test_that("correlation coefficients are equal to statsBy implementation", {
 
     expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
 
-    # within correlation pearson
+    # between p-values
+    df_statsby <- round(as.data.frame(statsby$pbg), 3)
+    df_statsby
+    df_wbcorr <- round(cors_weighted@between$p_values, 3)
+
+    compare_within <- df_wbcorr == df_statsby
+
+    expect_equal(!any(compare_within == FALSE), TRUE)
+
+    # within correlation
     df_statsby <- round(as.data.frame(statsby$rwg), 8)
     df_wbcorr <- round(cors_weighted@within$correlations, 8)
 
     compare_within <- df_statsby == df_wbcorr
 
     expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
+
+    # within p-values
+    df_statsby <- round(as.data.frame(statsby$pwg), 3)
+    df_statsby
+    df_wbcorr <- round(cors_weighted@within$p_values, 3)
+
+    compare_within <- df_wbcorr == df_statsby
+
+    expect_equal(!any(compare_within == FALSE), TRUE)
+
   }
 
 
@@ -55,8 +74,16 @@ test_that("correlation coefficients are equal to statsBy implementation", {
   compare(cors_weighted, statsby)
 
   # run with spearman.
+  cors_weighted <- wbCorr(simdat_intensive_longitudinal,
+                          cluster = 'participantID',
+                          weighted_between_statistics = TRUE,
+                          method = 'spearman')
 
+  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,
+                                             group = 'participantID',
+                                             method = 'spearman'))
 
+  compare(cors_weighted, statsby)
 })
 
 # on other data

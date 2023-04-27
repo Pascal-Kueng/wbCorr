@@ -14,16 +14,16 @@ p_value_to_asterisks <- function(p_value) {
   } else if (p_value < 0.05) {
     return("*")
   } else {
-    return(NULL) 
+    return(NULL)
   }
 }
 
 # format the p-values in the matrix and add the stars
 summarize_table <- function(p_values, correlations) {
-  df_asterisks <- apply(p_values, 
-                        MARGIN = c(1, 2), 
+  df_asterisks <- apply(p_values,
+                        MARGIN = c(1, 2),
                         FUN = p_value_to_asterisks)
-  
+
   df_summary <- mapply(function(x, y) paste0(sprintf("%.2f", x), y),  # <- Use sprintf to ensure 2 decimal places
                        as.matrix(correlations),
                        as.matrix(df_asterisks),
@@ -31,7 +31,7 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
-  
+  diag(df_summary) <- "1.00"
   return(as.data.frame(df_summary))
 }
 
@@ -39,7 +39,7 @@ summarize_table <- function(p_values, correlations) {
 # placing within- and between correlations above and below diagonal
 combine_matrices <- function(within_matrix, between_matrix) {
   combined_matrix <- within_matrix
-  
+
   for (i in 1:nrow(combined_matrix)) {
     for (j in 1:ncol(combined_matrix)) {
       if (i > j) {
