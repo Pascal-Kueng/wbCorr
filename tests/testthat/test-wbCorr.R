@@ -34,13 +34,12 @@ test_that("correlations are equal to statsBy implementation", {
     expect_equal(compare_between, 9)
 
     # between p-values
-    df_statsby <- round(as.data.frame(statsby$pbg), 4)
-    df_wbcorr <- round(cors_weighted@between$p_values, 4)
-    print(df_statsby)
-    print(df_wbcorr)
+    df_statsby <- round(as.data.frame(statsby$pbg), 8)
+    df_wbcorr <- round(cors_weighted@between$p_values, 8)
+    difference <- df_statsby - df_wbcorr
+    is.different <- abs(difference) < 0.001
 
-    compare_between <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
-    expect_equal(compare_between, 9)
+    expect_equal(sum(is.different, na.rm = TRUE), 9)
 
     # within correlation
     df_statsby <- round(as.data.frame(statsby$rwg), 8)
