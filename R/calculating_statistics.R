@@ -10,18 +10,14 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   n_numeric <- ncol(input_data)
   p_matrix <- matrix(0,
                      ncol = n_numeric, nrow = n_numeric,
-                     dimnames = list(names(input_data), names(input_data))
-  )
+                     dimnames = list(names(input_data), names(input_data)))
   cor_matrix <- matrix(1,
                        ncol = n_numeric, nrow = n_numeric,
-                       dimnames = list(names(input_data), names(input_data))
-  )
-  conf_int_matrix <- array(NA,
-                           dim = c(n_numeric, n_numeric, 2),
-                           dimnames = list(names(input_data), names(input_data), c("lower", "upper"))
-  )
-
-  idx_combinations <- t(combn(n_numeric, 2))
+                       dimnames = list(names(input_data), names(input_data)))
+  conf_int_df <- data.frame(Parameter1 = character(0),
+                            Parameter2 = character(0),
+                            CI_lower = numeric(0),
+                            CI_upper = numeric(0))
 
   result_table <- data.frame(Parameter1 = numeric(0),
                              Parameter2 = numeric(0),
@@ -30,6 +26,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                              CI_upper = numeric(0),
                              t = numeric(0),
                              p = numeric(0))
+
+
+  idx_combinations <- t(combn(n_numeric, 2))
 
   for (k in 1:nrow(idx_combinations)) {
     i <- idx_combinations[k, 1]
@@ -98,10 +97,14 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- r
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
-    conf_int_matrix[i, j, "lower"] <- conf_int_matrix[j, i, "lower"] <- lower_bound
-    conf_int_matrix[i, j, "upper"] <- conf_int_matrix[j, i, "upper"] <- upper_bound
+    # populate CI interval df
+    temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
+                             Parameter2 = names(input_data[j]),
+                             CI_lower = lower_bound,
+                             CI_upper = upper_bound)
+    conf_int_df <- rbind(conf_int_df, temp_ci_df)
 
-    # populate dataframe
+    # populate big dataframe
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
                           r = round(r, 2),
@@ -125,7 +128,6 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   # Converting the other matrices to DFs
   p_value_df <- as.data.frame(p_matrix)
   correlation_coefficient_df <- as.data.frame(cor_matrix)
-  conf_int_df <- array2table(conf_int_matrix)
 
   # rename columns and formatting main table
   if (method == 'pearson') {
@@ -143,18 +145,4 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
   return(list(p_value = p_value_df, correlation_coefficient = correlation_coefficient_df, confidence_intervals = conf_int_df, result_table = result_table))
 }
-
-
-# Helper function to convert an array into a data frame with multi-index columns
-array2table <- function(array) {
-  dims <- dim(array)
-  new_dims <- c(prod(dims[1:2]), dims[3])
-  array_reshaped <- array(data = array, dim = new_dims)
-  array_df <- as.data.frame(array_reshaped)
-  array_df$Var1 <- NULL
-  colnames(array_df) <- dimnames(array)[[3]]
-  rownames(array_df) <- do.call(paste, c(expand.grid(dimnames(array)[1:2]), sep = ":"))
-  return(array_df)
-}
-
 
