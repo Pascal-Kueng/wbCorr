@@ -5,7 +5,7 @@
 #' @param data A dataframe containing numeric variables for which correlations will be calculated.
 #' @param cluster A vector representing the clustering variable or a string with the name of the column in `data` that contains the clustering variable.
 #' @param alpha_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
-#' @param method A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').
+#' @param method A string indicating the correlation method to be used. Supported methods are 'pearson' and 'spearman' (default: 'pearson').
 #' @param weighted_between_statistics A logical value. If False, Variables are centered between-persons by
 #' simply taking the mean for each person and weighting them all the same, even if some
 #' contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
@@ -60,8 +60,8 @@ wbCorr <- function(data, cluster,
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
   }
-  if (!method %in% c("pearson", "spearman", "kendall")) {
-    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', or 'kendall'")
+  if (!method %in% c("pearson", "spearman")) {
+    stop("Invalid correlation method. Choose one of: 'pearson' or 'spearman'")
   }
 
   # Split variance into between- and within

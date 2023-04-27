@@ -8,7 +8,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   data_numeric <- input_data
 
   n_numeric <- ncol(input_data)
-  p_matrix <- matrix(1,
+  p_matrix <- matrix(0,
                      ncol = n_numeric, nrow = n_numeric,
                      dimnames = list(names(input_data), names(input_data))
   )
@@ -118,6 +118,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     # Check if the variable has zero variance
     if (var(col_i, na.rm = TRUE) == 0) {
       cor_matrix[i, i] <- NA
+      p_matrix[i,i] <- NA
     }
   }
 
