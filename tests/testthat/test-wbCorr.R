@@ -1,18 +1,64 @@
 
+
+# on my simulated data
 data("simdat_intensive_longitudinal")
 exp_tables <- readRDS("testdata/exp_tables.rds")
 exp_matrices <- readRDS("testdata/exp_matrices.rds")
 
-test_that("pearson stats are computed correctly", {
+test_that("pearson stats are computed correctly weighted and unweighted if all observations have the same amount of missings", {
   simdat_intensive_longitudinal$participantID <- as.numeric(simdat_intensive_longitudinal$participantID)
 
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
                           cluster = 'participantID',
                           weighted_between_statistics = TRUE)
+  cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
+                              cluster = 'participantID',
+                              weighted_between_statistics = FALSE)
 
-  tables <- get_table(cors_weighted)
-  matrices <- summary(cors_weighted)
-
-  expect_equal(tables, exp_tables)
-  expect_equal(matrices, exp_matrices)
+  expect_equal(get_tables(cors_weighted), exp_tables)
+  expect_equal(summary(cors_weighted), exp_matrices)
+  expect_equal(summary(cors_weighted), exp_matrices)
+  expect_equal(get_table(cors_weighted), exp_tables)
 })
+
+
+
+test_that("correlation coefficients are equal to statsBy implementation", {
+  # function to compare coefficients!
+  compare <- function(cors_weighted, statsby) {
+    # between correlation pearson
+    df_statsby <- round(as.data.frame(statsby$rbg), 8)
+    df_wbcorr <- round(cors_weighted@between$correlations, 8)
+
+    compare_within <- df_statsby == df_wbcorr
+
+    expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
+
+    # within correlation pearson
+    df_statsby <- round(as.data.frame(statsby$rwg), 8)
+    df_wbcorr <- round(cors_weighted@within$correlations, 8)
+
+    compare_within <- df_statsby == df_wbcorr
+
+    expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
+  }
+
+
+  # run with pearson.
+  cors_weighted <- wbCorr(simdat_intensive_longitudinal,
+                          cluster = 'participantID',
+                          weighted_between_statistics = TRUE)
+
+  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,
+                                             group = 'participantID'))
+
+  compare(cors_weighted, statsby)
+
+  # run with spearman.
+
+
+})
+
+# on other data
+
+

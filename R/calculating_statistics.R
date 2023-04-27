@@ -72,14 +72,28 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     if (method == 'pearson') {
       # Compute confidence intervals and p-values using t-distribution
       t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
-      t_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
-      p_value <- 2 * (1 - pt(abs(t_statistic), df = degrees_freedom, lower.tail = TRUE))
+      test_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
+      p_value <- 2 * (1 - pt(abs(test_statistic), df = degrees_freedom, lower.tail = TRUE))
 
       lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
       upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
     } else if (method == 'spearman') {
-      message('spearman CIs and p-Values approximated. Use boot for exact values')
+      message('spearman CIs and p-Values approximated. Use bootstraping for exact values')
+      # Fisher Z-transformation
       degrees_freedom_z <- degrees_freedom - 1
+      z_score <- atanh(r)
+      se <- sqrt(1/degrees_freedom_z)
+
+      # Confidence intervals
+      z_score_lower <- z_score - qnorm(1 - alpha_level / 2) * se
+      z_score_upper <- z_score + qnorm(1 - alpha_level / 2) * se
+
+      lower_bound <- tanh(z_score_lower)
+      upper_bound <- tanh(z_score_upper)
+
+      # p-values
+      z_statistic <- z_score / se
+      p_value <- 2 * (1 - pnorm(abs(z_statistic), lower.tail = TRUE))
       }
 
     # populate matrices
@@ -93,7 +107,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                           Parameter2 = names(input_data[j]),
                           r = round(r, 2),
                           CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
-                          t = round(t_statistic, 2),
+                          statistic = round(test_statistic, 2),
                           p = p_value)
     result_table <- rbind(result_table, temp_df)
   }
