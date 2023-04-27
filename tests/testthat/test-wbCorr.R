@@ -55,6 +55,12 @@ test_that("correlations are equal to statsBy implementation", {
     compare_within <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
 
     expect_equal(compare_within, 16)
+
+    # within CIs
+    df_statsby <- statsby$ci.wg[1]$r.ci
+    df_statsby
+    df_wbcorr <- cors_weighted@within$confidence_intervals
+    df_wbcorr
   }
 
 
