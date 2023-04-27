@@ -18,35 +18,14 @@ devtools::install_github('Pascal-Kueng/wbCorr')
 2. To access the full tables, use the `get_tables()` function on the object. 
 3. To retrieve correlation matrices, use `summary()` on the object.  
 
-### 1. wbCorr()
+### Check documentation
 ```R
 ?wbCorr # view documentation
-wbCorr(
-  data = NULL, 
-  cluster = NULL, 
-  alpha_level = 0.95, 
-  method = "pearson"
-)
 ```
-- `data` A dataframe containing numeric variables for which correlations will be calculated.  
-- `cluster`	A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable. 
 
-- `alpha_level`	A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).  
-
-- `method`	A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').  
-
-### 2. get_table()
-equivalent alias: `get_tables()`
-```R
-get_table(
-  object = NULL, 
-  which = c("within", "between")
-)
-```
-- `object` A `wbCorr` object, created by the `wbCorr()` function.  
-
-- `which` A character vector indicating which correlation table to return. Options are 'within' or 'w', and 'between' or 'b'.
-#### Sample Output
+#### Sample Output for get_table()
+using function `get_table()` on a 'wbCorr' object will provide you with two tables, one for within- and one for between- cluster correlations.
+see ?get_table() for more information and arguments. 
 ``` 
 # Sample output
 > get_table(wbCorrObject)
@@ -63,23 +42,8 @@ $between
 3       Var2       Var3 -0.03  [-0.25, 0.20] -0.24     0.814
 ```
 
-### 3. summary()
-equivalent alias: `get_matrix()` or `get_matrices()`
-```R
-## S4 method for signature 'wbCorr'
-summary(
-  object = NULL, 
-  which = c("within", "between", "merge"), 
-  ...
-)
-```
-- `object` A `wbCorr` object, created by the `wbCorr()` function.  
-
-- `which` A string or a character vector indicating which summaries to return. Options are 'within' or 'w', 'between' or 'b', and various merge options like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'. Default is c('within', 'between', 'merge'). The 'merge_wb' option returns a correlation matrix with within-correlations above the diagonal and between-correlations below the diagonal, while the 'merge_bw' option does the opposite, displaying between-correlations above the diagonal and within-correlations below the diagonal.
-
-- `...` Additional arguments passed to the base summary method.  
-
-#### Sample Output
+#### Sample Output for summary() or get_matrix()
+using `summary()` or `get_matrix` on a 'wbCorr' object will create matrices. The merged matrices provide within- and between- correlations with one above, and one below the diagonal. 
 ```
 > summary(wbCorrObject)
 $within
