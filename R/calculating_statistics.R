@@ -59,6 +59,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                               method = method,
                               use = 'pairwise.complete.obs'))
 
+    # degrees of freedom for t-test
     if (!is.null(n_clusters_between)) { # for between - person correlations
       degrees_freedom <- n_clusters_between - 2
     } else { # for within- person correlations
@@ -68,13 +69,18 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       degrees_freedom <- n_comparisons - 2
     }
 
-    # Compute confidence intervals and p-values using t-distribution
-    t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
-    t_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
-    p_value <- 2 * (1 - pt(abs(t_statistic), df = degrees_freedom, lower.tail = TRUE))
+    if (method == 'pearson') {
+      # Compute confidence intervals and p-values using t-distribution
+      t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
+      t_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
+      p_value <- 2 * (1 - pt(abs(t_statistic), df = degrees_freedom, lower.tail = TRUE))
 
-    lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
-    upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
+      lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
+      upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
+    } else if (method == 'spearman') {
+      message('spearman CIs and p-Values approximated. Use boot for exact values')
+      degrees_freedom_z <- degrees_freedom - 1
+      }
 
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- r

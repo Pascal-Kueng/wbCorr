@@ -1,4 +1,3 @@
-
 #' wbCorr
 #'
 #' Calculates within- and between-cluster correlations for a given dataset and clustering variable.
@@ -10,7 +9,7 @@
 #' @param weighted_between_statistics A logical value. If False, Variables are centered between-persons by
 #' simply taking the mean for each person and weighting them all the same, even if some
 #' contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
-#' without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE)
+#' without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE).
 #' @return A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
 #' Use the `get_table()` function on the wbCorr object to retrieve full tables.
 #' Use the `summary()` or `get_matrix()` function on the wbCorr object to retrieve correlation matrices.
@@ -27,15 +26,35 @@
 #' \code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_matrix]{get_matrix}}
 #'
 #' @examples
-#' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
-#' cors
-#' get_tables(cors, which = c('within', 'between'))
-#' summary(cors, which = c('within', 'between', 'merge'))
+#' # importing our simulated example dataset with pre-specified within- and between- correlations
+#' data("simdat_intensive_longitudinal")
+#' # use ?simdat_intensive_longitudinal # documentation of the dataset and the "true" correlations
+#' head(simdat_intensive_longitudinal)
+#'
+#' # returs an object:
+#' correlations <- wbCorr(data = simdat_intensive_longitudinal,
+#'                       cluster = 'participantID')
+#'
+#' # returns a list with full detailed tables of the correlations:
+#' tables <- get_table(correlations) # the get_tables() function is equivalent
+#' print(tables)
+#'
+#' # returns a correlation matrix with stars for p-values:
+#' matrices <- summary(correlations) # the get_matrix() and get_matrices() functions are equivalent
+#' print(matrices)
+#'
+#' # Access specific tables or matrices by:
+#' # Option 1:
+#' matrices$within
+#' tables$between
+#' # Option 2:
+#' get_tables(correlations, which = 'within')
+#' summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to full words
+#'
 #' @export
 wbCorr <- function(data, cluster,
                    alpha_level = 0.95, method = "pearson",
-                   weighted_between_statistics = FALSE) {
+                   weighted_between_statistics = TRUE) {
   # Input validation and error handling
   input_data <- data
   if (!is.data.frame(input_data)) {

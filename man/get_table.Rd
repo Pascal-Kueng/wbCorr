@@ -19,15 +19,28 @@ Options are 'within' or 'w', and 'between' or 'b'.}
 A list containing the selected tables of within- and/or between-cluster correlations.
 }
 \description{
-This function has an alias get_table() which can be used interchangeably.
-For correlations matrices, use the summary() function.
+This function has an alias get_tables() which can be used interchangeably.
+For correlations matrices, see the summary() function.
 }
 \examples{
-# Example using the iris dataset
-wbCorrObject <- wbCorr(iris, iris$Species)
-tables <- get_tables(wbCorrObject, which = c('within', 'between'))
-tables$within
+# importing our simulated example dataset with pre-specified within- and between- correlations
+data("simdat_intensive_longitudinal")
+
+# create object:
+correlations <- wbCorr(data = simdat_intensive_longitudinal,
+                      cluster = 'participantID')
+
+# returns a list with full detailed tables of the correlations:
+tables <- get_table(correlations) # the get_tables() function is equivalent
+print(tables)
+
+# Access specific tables by:
+# Option 1:
 tables$between
+# Option 2:
+within_table <- get_tables(correlations, which = 'w') # or use 'within' or 'between'
+print(within_table) # within_table could be saved to an excel or csv file (e.g., write.csv)
+
 }
 \seealso{
 \code{\link[=summary.wbCorr]{summary}}, \code{\link[=wbCorr]{wbCorr}}

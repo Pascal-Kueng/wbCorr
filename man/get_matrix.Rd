@@ -28,14 +28,27 @@ A list containing the selected matrices of within- and/or between-cluster correl
 }
 \description{
 You can use summary(), get_matrices(), or get_matrix() interchangeably.
+For more detailed statistics, use get_table().
 }
 \examples{
-# Example using the iris dataset
-cors <- wbCorr(iris, iris$Species)
-matrices <- get_matrices(cors, which = c('within', 'between', 'merge'))
+# importing our simulated example dataset with pre-specified within- and between- correlations
+data("simdat_intensive_longitudinal")
+
+# create object:
+correlations <- wbCorr(data = simdat_intensive_longitudinal,
+                      cluster = 'participantID')
+
+# returns a correlation matrix with stars for p-values:
+matrices <- summary(correlations) # the get_matrix() and get_matrices() functions are equivalent
+print(matrices)
+
+# Access specific matrices by:
+# Option 1:
 matrices$within
-matrices$between
-matrices$merged_wb
+# Option 2:
+within_matrix <- summary(correlations, which = 'w') # or use 'within'
+merged_within_between <- summary(correlations, which = 'wb')
+print(within_matrix) # could be saved to an excel or csv file (e.g., write.csv)
 
 }
 \seealso{

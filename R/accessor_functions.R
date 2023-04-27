@@ -3,8 +3,8 @@
 ################################
 
 #' @title Retrieve full tables for both within- and/or between-cluster correlations for a wbCorr object.
-#' @description This function has an alias get_table() which can be used interchangeably.
-#' For correlations matrices, use the summary() function.
+#' @description This function has an alias get_tables() which can be used interchangeably.
+#' For correlations matrices, see the summary() function.
 #'
 #' @param object A wbCorr object, created by the wbCorr() function.
 #' @param which A character vector indicating which correlation table to return.
@@ -14,11 +14,24 @@
 #'
 #' @seealso \code{\link[=summary.wbCorr]{summary}}, \code{\link[=wbCorr]{wbCorr}}
 #' @examples
-#' # Example using the iris dataset
-#' wbCorrObject <- wbCorr(iris, iris$Species)
-#' tables <- get_tables(wbCorrObject, which = c('within', 'between'))
-#' tables$within
+#' # importing our simulated example dataset with pre-specified within- and between- correlations
+#' data("simdat_intensive_longitudinal")
+#'
+#' # create object:
+#' correlations <- wbCorr(data = simdat_intensive_longitudinal,
+#'                       cluster = 'participantID')
+#'
+#' # returns a list with full detailed tables of the correlations:
+#' tables <- get_table(correlations) # the get_tables() function is equivalent
+#' print(tables)
+#'
+#' # Access specific tables by:
+#' # Option 1:
 #' tables$between
+#' # Option 2:
+#' within_table <- get_tables(correlations, which = 'w') # or use 'within' or 'between'
+#' print(within_table) # within_table could be saved to an excel or csv file (e.g., write.csv)
+#'
 #' @export
 get_table <- function(object, which = c('within', 'between')) {
   which <- match.arg(which, choices = c('within', 'w', 'between', 'b'), several.ok = TRUE) # Check for valid inputs
@@ -43,6 +56,7 @@ get_tables <- get_table
 
 #' @title Return matrices for within- and/or between-cluster correlations.
 #' @description You can use summary(), get_matrices(), or get_matrix() interchangeably.
+#' For more detailed statistics, use get_table().
 #'
 #' @param object A wbCorr object, created by the wbCorr() function.
 #' @param which A string or a character vector indicating which summaries to return.
@@ -54,12 +68,24 @@ get_tables <- get_table
 #' @return A list containing the selected matrices of within- and/or between-cluster correlations.
 #' @seealso \code{\link[=get_table]{get_tables}}, \code{\link[=wbCorr]{wbCorr}}
 #' @examples
-#' # Example using the iris dataset
-#' cors <- wbCorr(iris, iris$Species)
-#' matrices <- get_matrices(cors, which = c('within', 'between', 'merge'))
+#' # importing our simulated example dataset with pre-specified within- and between- correlations
+#' data("simdat_intensive_longitudinal")
+#'
+#' # create object:
+#' correlations <- wbCorr(data = simdat_intensive_longitudinal,
+#'                       cluster = 'participantID')
+#'
+#' # returns a correlation matrix with stars for p-values:
+#' matrices <- summary(correlations) # the get_matrix() and get_matrices() functions are equivalent
+#' print(matrices)
+#'
+#' # Access specific matrices by:
+#' # Option 1:
 #' matrices$within
-#' matrices$between
-#' matrices$merged_wb
+#' # Option 2:
+#' within_matrix <- summary(correlations, which = 'w') # or use 'within'
+#' merged_within_between <- summary(correlations, which = 'wb')
+#' print(within_matrix) # could be saved to an excel or csv file (e.g., write.csv)
 #'
 #' @export
 get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
