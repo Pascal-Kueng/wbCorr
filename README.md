@@ -9,8 +9,8 @@ for longitudinal analyses.
 You can install this package by running the following inside an R-terminal:
 
 ``` R
-install.packages('devtools')
-devtools::install_github('Pascal-Kueng/wbCorr')
+install.packages('remotes')
+remotes::install_github('Pascal-Kueng/wbCorr')
 ```
 
 ## Usage
