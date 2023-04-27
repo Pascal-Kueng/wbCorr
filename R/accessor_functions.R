@@ -92,11 +92,13 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
   if ('merge' %in% which | 'm' %in% which | 'merged' %in% which) {
     return_list[['merged_wb']] <- combined_df_wb
     return_list[['merged_bw']] <- combined_df_bw
+
   } else if ('merge_bw' %in% which | 'bw' %in% which) {
     return_list[['merged_bw']] <- combined_df_bw
   } else if ('merge_wb' %in% which | 'wb' %in% which) {
     return_list[['merged_wb']] <- combined_df_wb
   }
+  return_list[['note']] = '***p < 0.001, **p < 0.01, *p < 0.05'
   return(return_list)
 }
 

@@ -9,7 +9,7 @@
 #' @param method A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').
 #' @param weighted_between_statistics A logical value. If False, Variables are centered between-persons by
 #' simply taking the mean for each person and weighting them all the same, even if some
-#' contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalen in datasets
+#' contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
 #' without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE)
 #' @return A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
 #' Use the `get_table()` function on the wbCorr object to retrieve full tables.
@@ -44,7 +44,7 @@ wbCorr <- function(data, cluster,
   if (!method %in% c("pearson", "spearman", "kendall")) {
     stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', or 'kendall'")
   }
-  cluster <- as.factor(cluster)
+
   # Split variance into between- and within
   centered_df <- wbCenter(input_data, cluster, weighted_between_statistics)
 

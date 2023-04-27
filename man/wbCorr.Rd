@@ -23,7 +23,7 @@ wbCorr(
 
 \item{weighted_between_statistics}{A logical value. If False, Variables are centered between-persons by
 simply taking the mean for each person and weighting them all the same, even if some
-contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalen in datasets
+contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
 without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE)}
 }
 \value{

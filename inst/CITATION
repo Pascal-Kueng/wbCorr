@@ -9,4 +9,4 @@ bibentry(bibtype = "Manual",
          year = "2023",
          note = note)
 
-textVersion = paste0("Küng, P.(2023). wbCorr: Bivariate Within- and Between-Cluster Correlations. ", note)
+textVersion = sprintf("Küng, P.(2023). wbCorr: Bivariate Within- and Between-Cluster Correlations. %s", note)

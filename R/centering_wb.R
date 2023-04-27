@@ -18,10 +18,10 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
     if (!cluster %in% colnames(input_data)) {
       stop("cluster must be a character (name of column in passed DF) or a numeric vector")
     }
-    cluster_var <- input_data[[cluster]]
+    cluster_var <- as.factor(input_data[[cluster]])
     input_data[[cluster]] <- NULL
   } else {
-    cluster_var <- cluster
+    cluster_var <- as.factor(cluster)
     cluster <- "cluster"
   }
 
