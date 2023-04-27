@@ -122,16 +122,6 @@ print(matrices)
 
 ## Citation
 Please cite this package using:
-
-*Küng, P. (2023). wbCorr: Bivariate Within- and Between-Cluster Correlations. University of Zürich. R package version 0.0.1.000. https://github.com/Pascal-Kueng/wbCorr.*
-
-BibTeX-Entry:
-```BibTeX
-  @Manual{,
-    title = {wbCorr: Bivariate Within- and Between-Cluster Correlations},
-    author = {Pascal Küng},
-    organization = {University of Zürich},
-    year = {2023},
-    note = {R package version 0.0.1.000. https://github.com/Pascal-Kueng/wbCorr},
-  }
-  ```
+```
+citation('wbCorr')
+```
