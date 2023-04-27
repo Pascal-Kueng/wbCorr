@@ -31,7 +31,6 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
-  diag(df_summary) <- "1.00"
   return(as.data.frame(df_summary))
 }
 
@@ -47,6 +46,7 @@ combine_matrices <- function(within_matrix, between_matrix) {
       }
     }
   }
+  diag(combined_matrix) <- "-"
   return(as.data.frame(combined_matrix))
 }
 

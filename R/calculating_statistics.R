@@ -73,7 +73,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       # Compute confidence intervals and p-values using t-distribution
       t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
       test_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
-      p_value <- 2 * (1 - pt(abs(test_statistic), df = degrees_freedom, lower.tail = TRUE))
+      p_value <- 2 * pt(abs(test_statistic), df = degrees_freedom, lower.tail = FALSE)
 
       lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
       upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
@@ -92,13 +92,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
       # p-values
       test_statistic <- z_score / se
-      p_value <- 2 * (1 - pnorm(abs(test_statistic), lower.tail = TRUE))
+      p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
       }
 
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- r
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
-    diag(p_matrix) <- 0
     conf_int_matrix[i, j, "lower"] <- conf_int_matrix[j, i, "lower"] <- lower_bound
     conf_int_matrix[i, j, "upper"] <- conf_int_matrix[j, i, "upper"] <- upper_bound
 
@@ -111,6 +110,17 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                           p = p_value)
     result_table <- rbind(result_table, temp_df)
   }
+
+  # if there is no variance on a variable, set correlation with itself to NA.
+  for (i in 1:n_numeric) {
+    col_i <- data_numeric[[i]]
+
+    # Check if the variable has zero variance
+    if (var(col_i, na.rm = TRUE) == 0) {
+      cor_matrix[i, i] <- NA
+    }
+  }
+
   # Converting the other matrices to DFs
   p_value_df <- as.data.frame(p_matrix)
   correlation_coefficient_df <- as.data.frame(cor_matrix)
