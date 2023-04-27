@@ -30,35 +30,38 @@ test_that("correlations are equal to statsBy implementation", {
     df_statsby <- round(as.data.frame(statsby$rbg), 8)
     df_wbcorr <- round(cors_weighted@between$correlations, 8)
 
-    compare_within <- df_statsby == df_wbcorr
+    compare_between <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
+    print(compare_between)
 
-    expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
+    expect_equal(compare_between, 9)
 
     # between p-values
     df_statsby <- round(as.data.frame(statsby$pbg), 3)
-    df_statsby
     df_wbcorr <- round(cors_weighted@between$p_values, 3)
 
-    compare_within <- df_wbcorr == df_statsby
+    compare_between <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
+    print(compare_between)
 
-    expect_equal(!any(compare_within == FALSE), TRUE)
+    expect_equal(compare_between, 9)
 
     # within correlation
     df_statsby <- round(as.data.frame(statsby$rwg), 8)
     df_wbcorr <- round(cors_weighted@within$correlations, 8)
 
-    compare_within <- df_statsby == df_wbcorr
+    compare_within <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
+    print(compare_between)
 
-    expect_equal(!any(!is.na(compare_within) & compare_within == FALSE), TRUE)
+    expect_equal(compare_within, 16)
 
     # within p-values
     df_statsby <- round(as.data.frame(statsby$pwg), 3)
     df_statsby
     df_wbcorr <- round(cors_weighted@within$p_values, 3)
 
-    compare_within <- df_wbcorr == df_statsby
+    compare_within <- sum(df_statsby == df_wbcorr, na.rm = TRUE)
+    print(compare_between)
 
-    expect_equal(!any(compare_within == FALSE), TRUE)
+    expect_equal(compare_within, 16)
 
   }
 
