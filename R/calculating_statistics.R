@@ -213,9 +213,13 @@ jackknife <- function(col_i, col_j, alpha_level = 0.95) {
   test_statistic <- function(theta) {
     n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1)
   }
+  lower <- NA
+  upper <- NA
 
-  lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root
-  upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root
+  tryCatch(lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root,
+           error = function(e) return(c(NA, NA)))
+  tryCatch(upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root,
+           error = function(e) return(c(NA, NA)))
 
   return(c(lower,upper))
 }
