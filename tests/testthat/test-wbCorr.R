@@ -2,8 +2,10 @@
 
 # on my simulated data
 data("simdat_intensive_longitudinal")
-exp_tables <- readRDS("testdata/exp_tables.rds")
-exp_matrices <- readRDS("testdata/exp_matrices.rds")
+exp_tables_pearson <- readRDS("testdata/exp_tables_pearson.rds")
+exp_matrices_pearson <- readRDS("testdata/exp_matrices_pearson.rds")
+exp_tables_spearman <- readRDS("testdata/exp_tables_spearman.rds")
+exp_matrices_spearman <- readRDS("testdata/exp_matrices_spearman.rds")
 
 
 test_that("pearson stats are computed correctly weighted and unweighted if all observations have the same amount of missings", {
@@ -23,7 +25,18 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
   cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
                               cluster = "participantID",
                               weighted_between_statistics = FALSE)
-  compare_to_expected_output(cors_not_weighted, exp_matrices, exp_tables)
+  compare_to_expected_output(cors_not_weighted, exp_matrices_pearson, exp_tables_pearson)
+
+  # Test spearman
+  cors_weighted <- wbCorr(simdat_intensive_longitudinal,
+                          cluster = "participantID",
+                          method = 'spearman',
+                          weighted_between_statistics = TRUE)
+  cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
+                              cluster = "participantID",
+                              method = 'spearman',
+                              weighted_between_statistics = FALSE)
+  compare_to_expected_output(cors_not_weighted, exp_matrices_spearman, exp_tables_spearman)
 })
 
 
