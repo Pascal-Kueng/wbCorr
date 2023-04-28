@@ -53,6 +53,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       next
     }
 
+    # remove all cases when one variable is missing.
+    complete_cases <- complete.cases(col_i, col_j)
+    col_i <- col_i[complete_cases]
+    col_j <- col_j[complete_cases]
+    n_comparisons <- sum(complete_cases)
+
     # Retrieve the correlation coefficient
     if (method == 'spearman-jackknife') {
       method1 <- 'spearman'
@@ -61,16 +67,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     }
 
     correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
-                                                    method = method1,
-                                                    use = 'pairwise.complete.obs'))
+                                                    method = method1))
 
     # degrees of freedom for t-test
     if (!is.null(n_clusters_between)) { # for between - person correlations
       degrees_freedom <- n_clusters_between - 2
     } else { # for within- person correlations
-      # extract number of complete pairs that were compared to calculate DF
-      complete_cases <- complete.cases(col_i, col_j)
-      n_comparisons <- sum(complete_cases)
       degrees_freedom <- n_comparisons - 2
     }
 
@@ -98,28 +100,18 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       test_statistic <- z_score / se
       p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
     } else if (method == 'spearman-jackknife') {
-      n <- degrees_freedom + 2
+      jack <- jackknife(col_i, col_j)
+      lower_bound <- jack[1]
+      upper_bound <- jack[2]
 
-      # Compute jackknife pseudo-values
-      z <- numeric(n)
-      for (index in 1:n) {
-        z[index] <- n * correlation_coefficient - (n - 1) * cor(col_i[-index], col_j[-index], method = "spearman")
-      }
-
-      # Calculate test statistic
-      s_rho <- sum((z - correlation_coefficient)^2)
-      test_statistic <- (n - 1) * (mean(z) - correlation_coefficient)^2 / s_rho
-      p_value <- 2 * pt(abs(test_statistic), n - 2, lower.tail = FALSE)
-
-      # Construct the confidence intervals
-      critical_value <- qt(1 - alpha_level / 2, n - 2)
-      lower_bound <- correlation_coefficient - critical_value * sqrt((n - 1) / s_rho)
-      upper_bound <- correlation_coefficient + critical_value * sqrt((n - 1) / s_rho)
+      p_value <- NA
+      test_statistic <- NA
     }
 
     # populate matrices
     cat("Calculating...     ")
-    print(correlation_coefficient)
+    print(lower_bound)
+    print(upper_bound)
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
 
@@ -175,5 +167,43 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                                          sprintf("%.3f", result_table$p))))
 
   return(list(p_value = p_value_df, correlation_coefficient = correlation_coefficient_df, confidence_intervals = conf_int_df, result_table = result_table))
+}
+
+jackknife <- function(col_i, col_j, alpha_level = 0.95) {
+  length_i <- length(col_i)
+  length_j <- length(col_j)
+
+  ## Run a basic input validation
+  if (is.vector(col_i) == FALSE | is.vector(col_i) == FALSE | length_i != length_j) {
+    stop('col_i and col_j must be vectors of the same length')
+  }
+  if (sum(is.na(col_i)) != 0 | sum(is.na(col_j)) != 0) {
+    stop('missing values are not allowed')
+  }
+
+  correlation_coefficient <- cor(col_i, col_j, method = "spearman")
+  n_comparisons <- length_i
+
+
+
+
+  jackknife_pseudo_values <- as.double()
+  for(index in 1:n_comparisons) {
+    jackknife_pseudo_values[index] <- n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-index], col_j[-index],
+                                                                                                          method = "spearman")
+  }
+
+  variance_estimate <- function(theta) {
+    1 / n_comparisons * sum((jackknife_pseudo_values - theta)^2)
+  }
+
+  test_statistic <- function(theta) {
+    n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1) # or 1-alpha_level?
+  }
+
+  lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = .1*10^{-10})$root
+  upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = .1*10^{-10})$root
+
+  return(list(lower,upper))
 }
 
