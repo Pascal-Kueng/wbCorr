@@ -62,7 +62,8 @@
 #'
 #' @export
 wbCorr <- function(data, cluster,
-                   alpha_level = 0.95, method = "pearson",
+                   alpha_level = 0.95,
+                   method = "pearson",
                    weighted_between_statistics = TRUE) {
   # Input validation and error handling
   input_data <- data
