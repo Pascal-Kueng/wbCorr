@@ -15,30 +15,39 @@ wbCorr(
 \arguments{
 \item{data}{A dataframe containing numeric variables for which correlations will be calculated.}
 
-\item{cluster}{A vector representing the clustering variable or a string with the name of the column in \code{data} that contains the clustering variable.}
+\item{cluster}{A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.}
 
 \item{alpha_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
-\item{method}{A string indicating the correlation method to be used. Supported methods are 'pearson' and 'spearman' (default: 'pearson').}
+\item{method}{A string indicating the correlation method to be used.
+Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'
+(default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
+to determine confidence intervals and p-values.'spearman': Spearman correlation
+method uses the Fisher z-transformation for confidence intervals and p-values,
+assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
+correlation method employs the Euclidean jackknife technique to compute
+confidence intervals, providing more robust confidence intervals in the presence of
+non-normal data or outliers. Note that p-values are not currently available
+when this method is selected.}
 
-\item{weighted_between_statistics}{A logical value. If False, Variables are centered between-persons by
+\item{weighted_between_statistics}{A logical value. If FALSE, variables are centered between persons by
 simply taking the mean for each person and weighting them all the same, even if some
-contributed less measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
-without missing data and an equal amount of measurements per person. TRUE only supports continuous variables (default: FALSE).}
+contributed fewer measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
+without missing data and an equal number of measurements per person. TRUE only supports continuous variables (default: FALSE).}
 }
 \value{
 A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
-Use the \code{get_table()} function on the wbCorr object to retrieve full tables.
-Use the \code{summary()} or \code{get_matrix()} function on the wbCorr object to retrieve correlation matrices.
+Use the get_table() function on the wbCorr object to retrieve full tables.
+Use the summary() or get_matrix() function on the wbCorr object to retrieve correlation matrices.
 }
 \description{
-The \code{wbCorr} function creates a wbCorr object containing within- and between-cluster correlations,
+The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
 p-values, and confidence intervals for a given dataset and clustering variable.
 }
 \details{
 Calculates within- and between-cluster correlations for a given dataset and clustering variable.
 
-Inspired by the psych::statsBy function, \code{wbCorr} allows you to easily calculate and extract within-
+Inspired by the psych::statsBy function, wbCorr allows you to easily calculate and extract within-
 and between-cluster correlations for further analysis.
 }
 \examples{
@@ -47,9 +56,9 @@ data("simdat_intensive_longitudinal")
 # use ?simdat_intensive_longitudinal # documentation of the dataset and the "true" correlations
 head(simdat_intensive_longitudinal)
 
-# returs an object:
+# returns an object:
 correlations <- wbCorr(data = simdat_intensive_longitudinal,
-                      cluster = 'participantID')
+cluster = 'participantID')
 
 # returns a list with full detailed tables of the correlations:
 tables <- get_table(correlations) # the get_tables() function is equivalent
