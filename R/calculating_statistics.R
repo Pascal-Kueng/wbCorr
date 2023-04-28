@@ -17,6 +17,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   conf_int_df <- data.frame(Parameter1 = character(0),
                             Parameter2 = character(0),
                             CI_lower = numeric(0),
+                            correlation_coefficient = numeric(0),
                             CI_upper = numeric(0))
 
   result_table <- data.frame(Parameter1 = numeric(0),
@@ -68,50 +69,57 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
     correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
                                                     method = method1))
-
-    # degrees of freedom for t-test
-    if (!is.null(n_clusters_between)) { # for between - person correlations
-      degrees_freedom <- n_clusters_between - 2
-    } else { # for within- person correlations
-      degrees_freedom <- n_comparisons - 2
-    }
-
-    if (method == 'pearson') {
-      # Compute confidence intervals and p-values using t-distribution
-      t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
-      test_statistic <- correlation_coefficient * sqrt(degrees_freedom / (1 - correlation_coefficient^2))
-      p_value <- 2 * pt(abs(test_statistic), df = degrees_freedom, lower.tail = FALSE)
-
-      lower_bound <- correlation_coefficient - t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
-      upper_bound <- correlation_coefficient + t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
-    } else if (method == 'spearman') {
-      # Fisher Z-transformation
-      degrees_freedom_z <- degrees_freedom - 1
-      se <- 1 / sqrt(degrees_freedom_z)
-
-      critical_value = qnorm(1 - (1 - alpha_level) / 2)
-      delta <- critical_value * se
-
-      z_score <- atanh(correlation_coefficient)
-      lower_bound <- tanh(z_score - delta)
-      upper_bound <- tanh(z_score + delta)
-
-      # p-values
-      test_statistic <- z_score / se
-      p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
-    } else if (method == 'spearman-jackknife') {
-      jack <- jackknife(col_i, col_j)
-      lower_bound <- jack[1]
-      upper_bound <- jack[2]
-
-      p_value <- NA
+    if (is.na(correlation_coefficient)) {
       test_statistic <- NA
+      p_value <- NA
+      lower_bound <- NA
+      upper_bound <- NA
+    } else {
+      # degrees of freedom for t-test
+      if (!is.null(n_clusters_between)) { # for between - person correlations
+        degrees_freedom <- n_clusters_between - 2
+      } else { # for within- person correlations
+        degrees_freedom <- n_comparisons - 2
+      }
+
+      if (method == 'pearson') {
+        # Compute confidence intervals and p-values using t-distribution
+        t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
+        test_statistic <- correlation_coefficient * sqrt(degrees_freedom / (1 - correlation_coefficient^2))
+        p_value <- 2 * pt(abs(test_statistic), df = degrees_freedom, lower.tail = FALSE)
+
+        lower_bound <- correlation_coefficient - t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
+        upper_bound <- correlation_coefficient + t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
+      } else if (method == 'spearman') {
+        # Fisher Z-transformation
+        degrees_freedom_z <- degrees_freedom - 1
+        se <- 1 / sqrt(degrees_freedom_z)
+
+        critical_value = qnorm(1 - (1 - alpha_level) / 2)
+        delta <- critical_value * se
+
+        z_score <- atanh(correlation_coefficient)
+        lower_bound <- tanh(z_score - delta)
+        upper_bound <- tanh(z_score + delta)
+
+        # p-values
+        test_statistic <- z_score / se
+        p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
+      } else if (method == 'spearman-jackknife') {
+        print("resampling with jackknife method... ")
+
+        jack <- list(NA, NA)
+        try(jack <- jackknife(col_i, col_j))
+        lower_bound <- jack[1]
+        upper_bound <- jack[2]
+
+        p_value <- NA
+        test_statistic <- NA
+      }
     }
 
     # populate matrices
-    cat("Calculating...     ")
-    print(lower_bound)
-    print(upper_bound)
+    print("updating matrix...")
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
 
@@ -121,6 +129,8 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                              CI_lower = lower_bound,
                              correlation_coefficient = correlation_coefficient,
                              CI_upper = upper_bound)
+    # Make sure the column names of temp_ci_df match those of conf_int_df
+    colnames(temp_ci_df) <- colnames(conf_int_df)
     conf_int_df <- rbind(conf_int_df, temp_ci_df)
 
     # populate big dataframe
@@ -170,27 +180,22 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 }
 
 jackknife <- function(col_i, col_j, alpha_level = 0.95) {
+  if (length(col_i) != length(col_j)) {
+    stop("Input vectors must have the same length.")
+  }
+  if (var(col_i == 0) | var(col_j == 0)) {
+    return(list(NA, NA))
+  }
+
   length_i <- length(col_i)
   length_j <- length(col_j)
-
-  ## Run a basic input validation
-  if (is.vector(col_i) == FALSE | is.vector(col_i) == FALSE | length_i != length_j) {
-    stop('col_i and col_j must be vectors of the same length')
-  }
-  if (sum(is.na(col_i)) != 0 | sum(is.na(col_j)) != 0) {
-    stop('missing values are not allowed')
-  }
 
   correlation_coefficient <- cor(col_i, col_j, method = "spearman")
   n_comparisons <- length_i
 
-
-
-
   jackknife_pseudo_values <- as.double()
   for(index in 1:n_comparisons) {
-    jackknife_pseudo_values[index] <- n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-index], col_j[-index],
-                                                                                                          method = "spearman")
+    jackknife_pseudo_values[index] <- n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-index], col_j[-index], method = "spearman")
   }
 
   variance_estimate <- function(theta) {
@@ -198,12 +203,11 @@ jackknife <- function(col_i, col_j, alpha_level = 0.95) {
   }
 
   test_statistic <- function(theta) {
-    n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1) # or 1-alpha_level?
+    n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1)
   }
 
-  lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = .1*10^{-10})$root
-  upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = .1*10^{-10})$root
+  lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root
+  upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root
 
   return(list(lower,upper))
 }
-
