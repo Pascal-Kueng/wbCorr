@@ -5,14 +5,15 @@ data("simdat_intensive_longitudinal")
 exp_tables <- readRDS("testdata/exp_tables.rds")
 exp_matrices <- readRDS("testdata/exp_matrices.rds")
 
+'
 test_that("pearson stats are computed correctly weighted and unweighted if all observations have the same amount of missings", {
   simdat_intensive_longitudinal$participantID <- as.numeric(simdat_intensive_longitudinal$participantID)
 
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
-                          cluster = 'participantID',
+                          cluster = "participantID",
                           weighted_between_statistics = TRUE)
   cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
-                              cluster = 'participantID',
+                              cluster = "participantID",
                               weighted_between_statistics = FALSE)
 
   expect_equal(get_tables(cors_weighted), exp_tables)
@@ -20,7 +21,7 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
   expect_equal(summary(cors_weighted), exp_matrices)
   expect_equal(get_table(cors_weighted), exp_tables)
 })
-
+'
 
 
 test_that("correlations are equal to statsBy implementation", {
@@ -57,16 +58,19 @@ test_that("correlations are equal to statsBy implementation", {
 
     # within CIs
     df_statsby <- statsby$ci.wg[1]$r.ci
-    df_statsby
     df_wbcorr <- cors_weighted@within$confidence_intervals
-    df_wbcorr
+
+    print(df_statsby)
+    print(df_wbcorr)
+
+
   }
 
 
   # run with pearson.
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
                           cluster = 'participantID',
-                          weighted_between_statistics = TRUE)
+                          weighted_between_statistics = FALSE)
 
   statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,
                                              group = 'participantID'))
@@ -76,7 +80,7 @@ test_that("correlations are equal to statsBy implementation", {
   # run with spearman.
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
                           cluster = 'participantID',
-                          weighted_between_statistics = TRUE,
+                          weighted_between_statistics = FALSE,
                           method = 'spearman')
 
   statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,

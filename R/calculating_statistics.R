@@ -21,7 +21,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
   result_table <- data.frame(Parameter1 = numeric(0),
                              Parameter2 = numeric(0),
-                             r = numeric(0),
+                             correlation_coefficient = numeric(0),
                              CI_lower = numeric(0),
                              CI_upper = numeric(0),
                              t = numeric(0),
@@ -54,9 +54,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     }
 
     # Retrieve the correlation coefficient
-    r <- suppressWarnings(cor(col_i, col_j,
-                              method = method,
-                              use = 'pairwise.complete.obs'))
+    correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
+                                                    method = method,
+                                                    use = 'pairwise.complete.obs'))
 
     # degrees of freedom for t-test
     if (!is.null(n_clusters_between)) { # for between - person correlations
@@ -71,43 +71,64 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     if (method == 'pearson') {
       # Compute confidence intervals and p-values using t-distribution
       t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
-      test_statistic <- r * sqrt(degrees_freedom / (1 - r^2))
+      test_statistic <- correlation_coefficient * sqrt(degrees_freedom / (1 - correlation_coefficient^2))
       p_value <- 2 * pt(abs(test_statistic), df = degrees_freedom, lower.tail = FALSE)
 
-      lower_bound <- r - t_score * sqrt((1 - r^2) / (degrees_freedom))
-      upper_bound <- r + t_score * sqrt((1 - r^2) / (degrees_freedom))
+      lower_bound <- correlation_coefficient - t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
+      upper_bound <- correlation_coefficient + t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
     } else if (method == 'spearman') {
       # Fisher Z-transformation
       degrees_freedom_z <- degrees_freedom - 1
-      z_score <- atanh(r)
-      se <- sqrt(1/degrees_freedom_z)
+      se <- 1 / sqrt(degrees_freedom_z)
 
-      # Confidence intervals
-      z_score_lower <- z_score - qnorm(1 - alpha_level / 2) * se
-      z_score_upper <- z_score + qnorm(1 - alpha_level / 2) * se
+      critical_value = qnorm(1 - (1 - alpha_level) / 2)
+      delta <- critical_value * se
 
-      lower_bound <- tanh(z_score_lower)
-      upper_bound <- tanh(z_score_upper)
+      z_score <- atanh(correlation_coefficient)
+      lower_bound <- tanh(z_score - delta)
+      upper_bound <- tanh(z_score + delta)
 
       # p-values
       test_statistic <- z_score / se
       p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
+    } else if (method == 'spearman-jackknife') {
+      n <- length(complete_cases[complete_cases == TRUE])
+
+      # Compute jackknife pseudo-values
+      z <- numeric(n)
+      for (i in 1:n) {
+        z[i] <- n * correlation_coefficient - (n - 1) * cor(col_i[-i], col_j[-i], method = "spearman")
       }
 
+      # Calculate test statistic 2L(correlation_coefficient)
+      s_rho <- sum((z - correlation_coefficient)^2)
+      test_statistic <- n * (mean(z) - correlation_coefficient)^2 / s_rho
+
+      # Construct the confidence intervals
+      chi2_quantile <- qchisq(1 - alpha_level, df = 1)
+      lower_bound <- correlation_coefficient - sqrt(s_rho / (n * chi2_quantile))
+      upper_bound <- correlation_coefficient + sqrt(s_rho / (n * chi2_quantile))
+
+      # p-values: Use the Fisher Z-transformation method for p-value calculation
+      test_statistic_pval <- atanh(correlation_coefficient) / (1 / sqrt(n - 3))
+      p_value <- 2 * pnorm(abs(test_statistic_pval), lower.tail = FALSE)
+    }
+
     # populate matrices
-    cor_matrix[i, j] <- cor_matrix[j, i] <- r
+    cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
     # populate CI interval df
     temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
                              Parameter2 = names(input_data[j]),
                              CI_lower = lower_bound,
+                             correlation_coefficient = correlation_coefficient,
                              CI_upper = upper_bound)
     conf_int_df <- rbind(conf_int_df, temp_ci_df)
 
     # populate big dataframe
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
-                          r = round(r, 2),
+                          r = round(correlation_coefficient, 2),
                           CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
                           statistic = round(test_statistic, 2),
                           p = p_value)
@@ -132,8 +153,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   # rename columns and formatting main table
   if (method == 'pearson') {
     names(result_table)[5] <- c(sprintf('t(%d)', degrees_freedom))
+    names(result_table)[3] <- c("pearson's r")
   } else if (method == 'spearman') {
     names(result_table)[5] <- c(sprintf('z(%d)', degrees_freedom))
+    names(result_table)[3] <- c("spearman's rho")
+  } else if (method == 'spearman-jackknife') {
+    names(result_table)[5] <- c(sprintf('χ2(%d', degrees_freedom))
   }
 
   names(result_table)[4] <- c('95% CI')

@@ -19,7 +19,7 @@ wbCorr(
 
 \item{alpha_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
-\item{method}{A string indicating the correlation method to be used. Supported methods are 'pearson', 'kendall', and 'spearman' (default: 'pearson').}
+\item{method}{A string indicating the correlation method to be used. Supported methods are 'pearson' and 'spearman' (default: 'pearson').}
 
 \item{weighted_between_statistics}{A logical value. If False, Variables are centered between-persons by
 simply taking the mean for each person and weighting them all the same, even if some

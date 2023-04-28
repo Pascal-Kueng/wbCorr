@@ -60,7 +60,7 @@ wbCorr <- function(data, cluster,
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
   }
-  if (!method %in% c("pearson", "spearman")) {
+  if (!method %in% c("pearson", "spearman", "spearman-jackknife")) {
     stop("Invalid correlation method. Choose one of: 'pearson' or 'spearman'")
   }
 
