@@ -54,8 +54,14 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     }
 
     # Retrieve the correlation coefficient
+    if (method == 'spearman-jackknife') {
+      method1 <- 'spearman'
+    } else {
+      method1 <- method
+    }
+
     correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
-                                                    method = method,
+                                                    method = method1,
                                                     use = 'pairwise.complete.obs'))
 
     # degrees of freedom for t-test
@@ -92,31 +98,31 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       test_statistic <- z_score / se
       p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
     } else if (method == 'spearman-jackknife') {
-      n <- length(complete_cases[complete_cases == TRUE])
+      n <- degrees_freedom + 2
 
       # Compute jackknife pseudo-values
       z <- numeric(n)
-      for (i in 1:n) {
-        z[i] <- n * correlation_coefficient - (n - 1) * cor(col_i[-i], col_j[-i], method = "spearman")
+      for (index in 1:n) {
+        z[index] <- n * correlation_coefficient - (n - 1) * cor(col_i[-index], col_j[-index], method = "spearman")
       }
 
-      # Calculate test statistic 2L(correlation_coefficient)
+      # Calculate test statistic
       s_rho <- sum((z - correlation_coefficient)^2)
-      test_statistic <- n * (mean(z) - correlation_coefficient)^2 / s_rho
+      test_statistic <- (n - 1) * (mean(z) - correlation_coefficient)^2 / s_rho
+      p_value <- 2 * pt(abs(test_statistic), n - 2, lower.tail = FALSE)
 
       # Construct the confidence intervals
-      chi2_quantile <- qchisq(1 - alpha_level, df = 1)
-      lower_bound <- correlation_coefficient - sqrt(s_rho / (n * chi2_quantile))
-      upper_bound <- correlation_coefficient + sqrt(s_rho / (n * chi2_quantile))
-
-      # p-values: Use the Fisher Z-transformation method for p-value calculation
-      test_statistic_pval <- atanh(correlation_coefficient) / (1 / sqrt(n - 3))
-      p_value <- 2 * pnorm(abs(test_statistic_pval), lower.tail = FALSE)
+      critical_value <- qt(1 - alpha_level / 2, n - 2)
+      lower_bound <- correlation_coefficient - critical_value * sqrt((n - 1) / s_rho)
+      upper_bound <- correlation_coefficient + critical_value * sqrt((n - 1) / s_rho)
     }
 
     # populate matrices
+    cat("Calculating...     ")
+    print(correlation_coefficient)
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
+
     # populate CI interval df
     temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
                              Parameter2 = names(input_data[j]),
@@ -128,7 +134,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     # populate big dataframe
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
-                          r = round(correlation_coefficient, 2),
+                          coefficient = round(correlation_coefficient, 2),
                           CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
                           statistic = round(test_statistic, 2),
                           p = p_value)
@@ -158,7 +164,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     names(result_table)[5] <- c(sprintf('z(%d)', degrees_freedom))
     names(result_table)[3] <- c("spearman's rho")
   } else if (method == 'spearman-jackknife') {
-    names(result_table)[5] <- c(sprintf('χ2(%d', degrees_freedom))
+    names(result_table)[5] <- c(sprintf('χ2(%d)', degrees_freedom))
   }
 
   names(result_table)[4] <- c('95% CI')
