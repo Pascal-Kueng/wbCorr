@@ -5,8 +5,7 @@
 
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
 corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson") {
-  data_numeric <- input_data
-
+  # initializing values
   n_numeric <- ncol(input_data)
   p_matrix <- matrix(0,
                      ncol = n_numeric, nrow = n_numeric,
@@ -35,8 +34,8 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     i <- idx_combinations[k, 1]
     j <- idx_combinations[k, 2]
 
-    col_i <- data_numeric[[i]]
-    col_j <- data_numeric[[j]]
+    col_i <- input_data[[i]]
+    col_j <- input_data[[j]]
 
     if (is.null(col_i) || is.null(col_j)) { # Ignore correlations with null columns
       cor_matrix[i, j] <- cor_matrix[j, i] <- NA
@@ -106,14 +105,11 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
         test_statistic <- z_score / se
         p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
       } else if (method == 'spearman-jackknife') {
-        message("resampling with jackknife method... ")
-
-        jack <- list(NA, NA)
+        jack <- c(NA, NA)
         tryCatch(jack <- jackknife(col_i, col_j))
         lower_bound <- jack[1]
         upper_bound <- jack[2]
-
-        p_value <- NA
+        p_value <- NA # Extract the p_value from the jackknife function's output
         test_statistic <- NA
       }
     }
@@ -144,7 +140,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
   # if there is no variance on a variable, set correlation with itself to NA.
   for (i in 1:n_numeric) {
-    col_i <- data_numeric[[i]]
+    col_i <- input_data[[i]]
 
     # Check if the variable has zero variance
     if (var(col_i, na.rm = TRUE) == 0) {
@@ -165,7 +161,8 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     names(result_table)[5] <- c(sprintf('z(%d)', degrees_freedom))
     names(result_table)[3] <- c("spearman's rho")
   } else if (method == 'spearman-jackknife') {
-    names(result_table)[5] <- c(sprintf('χ2(%d)', degrees_freedom))
+    names(result_table)[3] <- c("spearman's rho")
+
   }
 
   names(result_table)[4] <- c('95% CI')
@@ -209,5 +206,5 @@ jackknife <- function(col_i, col_j, alpha_level = 0.95) {
   lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root
   upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root
 
-  return(list(lower,upper))
+  return(c(lower,upper))
 }

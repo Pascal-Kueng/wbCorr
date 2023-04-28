@@ -5,23 +5,27 @@ data("simdat_intensive_longitudinal")
 exp_tables <- readRDS("testdata/exp_tables.rds")
 exp_matrices <- readRDS("testdata/exp_matrices.rds")
 
-'
+
 test_that("pearson stats are computed correctly weighted and unweighted if all observations have the same amount of missings", {
+
+  compare_to_expected_output <- function(cors, exp_matrices, exp_tables) {
+    expect_equal(summary(cors), exp_matrices)
+    expect_equal(get_table(cors), exp_tables)
+  }
+
   simdat_intensive_longitudinal$participantID <- as.numeric(simdat_intensive_longitudinal$participantID)
 
+
+  # Test pearson
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
                           cluster = "participantID",
                           weighted_between_statistics = TRUE)
   cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
                               cluster = "participantID",
                               weighted_between_statistics = FALSE)
-
-  expect_equal(get_tables(cors_weighted), exp_tables)
-  expect_equal(summary(cors_weighted), exp_matrices)
-  expect_equal(summary(cors_weighted), exp_matrices)
-  expect_equal(get_table(cors_weighted), exp_tables)
+  compare_to_expected_output(cors_not_weighted, exp_matrices, exp_tables)
 })
-'
+
 
 
 test_that("correlations are equal to statsBy implementation", {
