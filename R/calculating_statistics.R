@@ -106,10 +106,10 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
         test_statistic <- z_score / se
         p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
       } else if (method == 'spearman-jackknife') {
-        print("resampling with jackknife method... ")
+        message("resampling with jackknife method... ")
 
         jack <- list(NA, NA)
-        try(jack <- jackknife(col_i, col_j))
+        tryCatch(jack <- jackknife(col_i, col_j))
         lower_bound <- jack[1]
         upper_bound <- jack[2]
 
@@ -119,7 +119,6 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     }
 
     # populate matrices
-    print("updating matrix...")
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
     p_matrix[i, j] <- p_matrix[j, i] <- p_value
 
@@ -178,6 +177,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
 
   return(list(p_value = p_value_df, correlation_coefficient = correlation_coefficient_df, confidence_intervals = conf_int_df, result_table = result_table))
 }
+
 
 jackknife <- function(col_i, col_j, alpha_level = 0.95) {
   if (length(col_i) != length(col_j)) {
