@@ -162,15 +162,11 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
   cat("Access correlation matrices with `summary(object, which = c('within', 'between', merge')`\n")
 
   # Function for printing a section of the object
-  max_columns <- max(1, floor((getOption("width")) / 1))
+  # Function for printing a section of the object
   print_section <- function(title, data) {
     cat("\n", title, "\n")
     cat(strrep("-", nchar(title)), "\n")
-    printed_data <- head(data[, 1:min(ncol(data), max_columns)])
-    print(printed_data)
-    if (ncol(data) > max_columns) {
-      cat("... ", ncol(data) - max_columns, " more columns\n")
-    }
+    print(head(data))
     if (nrow(data) > 6) {
       cat("... ", nrow(data) - 6, " more rows\n")
     }
@@ -182,6 +178,7 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
 
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
   cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')\n")
+
 
 })
 
