@@ -16,9 +16,15 @@
 Prints a summary of the \code{wbCorr} object.
 }
 \examples{
-# Example using the iris dataset
-cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
-print(cors)
+# Example
+data("simdat_intensive_longitudinal")
+correlations <- wbCorr(simdat_intensive_longitudinal,
+                       cluster = 'participantID',
+                       alpha_level = 0.95,
+                       method = 'spearman',
+                       weighted_between_statistics = FALSE)
+print(correlations)
+
 }
 \seealso{
 \code{\link[=wbCorr]{wbCorr}}

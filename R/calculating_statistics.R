@@ -2,7 +2,7 @@
 #######################################################
 # Calculating Statistics
 #######################################################
-
+#' @importFrom stats pnorm qchisq qnorm uniroot var
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
 corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson") {
   # initializing values
@@ -40,7 +40,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     if (is.null(col_i) || is.null(col_j)) { # Ignore correlations with null columns
       cor_matrix[i, j] <- cor_matrix[j, i] <- NA
       p_matrix[i, j] <- p_matrix[j, i] <- NA
-      conf_int_matrix[i, j, ] <- conf_int_matrix[j, i, ] <- NA
+      temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
+                               Parameter2 = names(input_data[j]),
+                               CI_lower = lower_bound,
+                               correlation_coefficient = correlation_coefficient,
+                               CI_upper = upper_bound)
+      conf_int_df <- rbind(conf_int_df, temp_ci_df)
       next
     }
 
@@ -49,7 +54,12 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     if (finite_count < 3) { # Ignore correlations with insufficient finite observations
       cor_matrix[i, j] <- cor_matrix[j, i] <- NA
       p_matrix[i, j] <- p_matrix[j, i] <- NA
-      conf_int_matrix[i, j, ] <- conf_int_matrix[j, i, ] <- NA
+      temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
+                               Parameter2 = names(input_data[j]),
+                               CI_lower = lower_bound,
+                               correlation_coefficient = correlation_coefficient,
+                               CI_upper = upper_bound)
+      conf_int_df <- rbind(conf_int_df, temp_ci_df)
       next
     }
 
@@ -106,6 +116,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
         p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
       } else if (method == 'spearman-jackknife') {
         jack <- c(NA, NA)
+        message("sampling... ")
         tryCatch(jack <- jackknife(col_i, col_j))
         lower_bound <- jack[1]
         upper_bound <- jack[2]
@@ -143,7 +154,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     col_i <- input_data[[i]]
 
     # Check if the variable has zero variance
-    if (var(col_i, na.rm = TRUE) == 0) {
+    if (is.na(var(col_i, na.rm = TRUE)) || var(col_i, na.rm = TRUE) == 0) {
       cor_matrix[i, i] <- NA
       p_matrix[i,i] <- NA
     }
