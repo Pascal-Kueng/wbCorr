@@ -4,31 +4,15 @@
 #######################################################
 #' @importFrom stats pnorm qchisq qnorm uniroot var
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
-corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson") {
+corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson", n_boot = NULL) {
   # initializing values
-  n_numeric <- ncol(input_data)
-  p_matrix <- matrix(0,
-                     ncol = n_numeric, nrow = n_numeric,
-                     dimnames = list(names(input_data), names(input_data)))
-  cor_matrix <- matrix(1,
-                       ncol = n_numeric, nrow = n_numeric,
-                       dimnames = list(names(input_data), names(input_data)))
-  conf_int_df <- data.frame(Parameter1 = character(0),
-                            Parameter2 = character(0),
-                            CI_lower = numeric(0),
-                            correlation_coefficient = numeric(0),
-                            CI_upper = numeric(0))
-
-  result_table <- data.frame(Parameter1 = numeric(0),
-                             Parameter2 = numeric(0),
-                             correlation_coefficient = numeric(0),
-                             CI_lower = numeric(0),
-                             CI_upper = numeric(0),
-                             t = numeric(0),
-                             p = numeric(0))
-
-
-  idx_combinations <- t(combn(n_numeric, 2))
+  value_list <- initializing_values(input_data)
+  n_numeric <- value_list$n_numeric
+  p_matrix <- value_list$p_matrix
+  cor_matrix <- value_list$cor_matrix
+  conf_int_df <- value_list$conf_int_df
+  result_table <- value_list$result_table
+  idx_combinations <- value_list$idx_combinations
 
   for (k in 1:nrow(idx_combinations)) {
     i <- idx_combinations[k, 1]
@@ -37,21 +21,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     col_i <- input_data[[i]]
     col_j <- input_data[[j]]
 
-    if (is.null(col_i) || is.null(col_j)) { # Ignore correlations with null columns
-      cor_matrix[i, j] <- cor_matrix[j, i] <- NA
-      p_matrix[i, j] <- p_matrix[j, i] <- NA
-      temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
-                               Parameter2 = names(input_data[j]),
-                               CI_lower = lower_bound,
-                               correlation_coefficient = correlation_coefficient,
-                               CI_upper = upper_bound)
-      conf_int_df <- rbind(conf_int_df, temp_ci_df)
-      next
-    }
 
     # Check if there are enough finite observations
-    finite_count <- sum(!is.na(col_i) & !is.na(col_j))
-    if (finite_count < 3) { # Ignore correlations with insufficient finite observations
+    if (is.null(col_i) || is.null(col_j) || (sum(!is.na(col_i) & !is.na(col_j))) < 3 ) { # Ignore correlations with insufficient finite observations
       cor_matrix[i, j] <- cor_matrix[j, i] <- NA
       p_matrix[i, j] <- p_matrix[j, i] <- NA
       temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
@@ -63,7 +35,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       next
     }
 
-    # remove all cases when one variable is missing.
+    # remove all pairwise cases when one variable is missing.
     complete_cases <- complete.cases(col_i, col_j)
     col_i <- col_i[complete_cases]
     col_j <- col_j[complete_cases]
@@ -76,54 +48,18 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       method1 <- method
     }
 
-    correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
-                                                    method = method1))
-    if (is.na(correlation_coefficient)) {
-      test_statistic <- NA
-      p_value <- NA
-      lower_bound <- NA
-      upper_bound <- NA
-    } else {
-      # degrees of freedom for t-test
-      if (!is.null(n_clusters_between)) { # for between - person correlations
-        degrees_freedom <- n_clusters_between - 2
-      } else { # for within- person correlations
-        degrees_freedom <- n_comparisons - 2
-      }
-
-      if (method == 'pearson') {
-        # Compute confidence intervals and p-values using t-distribution
-        t_score <- qt((1 + alpha_level) / 2, df = degrees_freedom)
-        test_statistic <- correlation_coefficient * sqrt(degrees_freedom / (1 - correlation_coefficient^2))
-        p_value <- 2 * pt(abs(test_statistic), df = degrees_freedom, lower.tail = FALSE)
-
-        lower_bound <- correlation_coefficient - t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
-        upper_bound <- correlation_coefficient + t_score * sqrt((1 - correlation_coefficient^2) / (degrees_freedom))
-      } else if (method == 'spearman') {
-        # Fisher Z-transformation
-        degrees_freedom_z <- degrees_freedom - 1
-        se <- 1 / sqrt(degrees_freedom_z)
-
-        critical_value = qnorm(1 - (1 - alpha_level) / 2)
-        delta <- critical_value * se
-
-        z_score <- atanh(correlation_coefficient)
-        lower_bound <- tanh(z_score - delta)
-        upper_bound <- tanh(z_score + delta)
-
-        # p-values
-        test_statistic <- z_score / se
-        p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
-      } else if (method == 'spearman-jackknife') {
-        jack <- c(NA, NA)
-        message("sampling... ")
-        tryCatch(jack <- jackknife(col_i, col_j))
-        lower_bound <- jack[1]
-        upper_bound <- jack[2]
-        p_value <- NA # Extract the p_value from the jackknife function's output
-        test_statistic <- NA
-      }
-    }
+    correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
+                                                                          method, method1,
+                                                                          n_clusters_between,
+                                                                          n_comparisons,
+                                                                          alpha_level)
+    class(correlations_statistics_list)
+    correlation_coefficient <- correlations_statistics_list$correlation_coefficient
+    test_statistic <- correlations_statistics_list$test_statistic
+    degrees_freedom <- correlations_statistics_list$degrees_freedom
+    p_value <- correlations_statistics_list$p_value
+    lower_bound <- correlations_statistics_list$lower_bound
+    upper_bound <- correlations_statistics_list$upper_bound
 
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
@@ -186,40 +122,34 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   return(list(p_value = p_value_df, correlation_coefficient = correlation_coefficient_df, confidence_intervals = conf_int_df, result_table = result_table))
 }
 
+initializing_values <- function(input_data) {
+  n_numeric <- ncol(input_data)
+  p_matrix <- matrix(0,
+                     ncol = n_numeric, nrow = n_numeric,
+                     dimnames = list(names(input_data), names(input_data)))
+  cor_matrix <- matrix(1,
+                       ncol = n_numeric, nrow = n_numeric,
+                       dimnames = list(names(input_data), names(input_data)))
+  conf_int_df <- data.frame(Parameter1 = character(0),
+                            Parameter2 = character(0),
+                            CI_lower = numeric(0),
+                            correlation_coefficient = numeric(0),
+                            CI_upper = numeric(0))
 
-jackknife <- function(col_i, col_j, alpha_level = 0.95) {
-  if (length(col_i) != length(col_j)) {
-    stop("Input vectors must have the same length.")
-  }
-  if (var(col_i == 0) | var(col_j == 0)) {
-    return(list(NA, NA))
-  }
+  result_table <- data.frame(Parameter1 = numeric(0),
+                             Parameter2 = numeric(0),
+                             correlation_coefficient = numeric(0),
+                             CI_lower = numeric(0),
+                             CI_upper = numeric(0),
+                             t = numeric(0),
+                             p = numeric(0))
 
-  length_i <- length(col_i)
-  length_j <- length(col_j)
-
-  correlation_coefficient <- cor(col_i, col_j, method = "spearman")
-  n_comparisons <- length_i
-
-  jackknife_pseudo_values <- as.double()
-  for(index in 1:n_comparisons) {
-    jackknife_pseudo_values[index] <- n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-index], col_j[-index], method = "spearman")
-  }
-
-  variance_estimate <- function(theta) {
-    1 / n_comparisons * sum((jackknife_pseudo_values - theta)^2)
-  }
-
-  test_statistic <- function(theta) {
-    n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1)
-  }
-  lower <- NA
-  upper <- NA
-
-  tryCatch(lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root,
-           error = function(e) return(c(NA, NA)))
-  tryCatch(upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root,
-           error = function(e) return(c(NA, NA)))
-
-  return(c(lower,upper))
+  idx_combinations <- t(combn(n_numeric, 2))
+  return(list(n_numeric = n_numeric,
+              p_matrix = p_matrix,
+              cor_matrix = cor_matrix,
+              conf_int_df = conf_int_df,
+              result_table = result_table,
+              idx_combinations = idx_combinations))
 }
+
