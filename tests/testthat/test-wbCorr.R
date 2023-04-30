@@ -6,6 +6,8 @@ exp_tables_pearson <- readRDS("testdata/exp_tables_pearson.rds")
 exp_matrices_pearson <- readRDS("testdata/exp_matrices_pearson.rds")
 exp_tables_spearman <- readRDS("testdata/exp_tables_spearman.rds")
 exp_matrices_spearman <- readRDS("testdata/exp_matrices_spearman.rds")
+exp_tables_jackknife <- readRDS("testdata/exp_tables_jackknife.rds")
+exp_matrices_jackknife <- readRDS("testdata/exp_matrices_jackknife.rds")
 
 
 test_that("pearson stats are computed correctly weighted and unweighted if all observations have the same amount of missings", {
@@ -26,7 +28,7 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
                               cluster = "participantID",
                               weighted_between_statistics = FALSE)
   compare_to_expected_output(cors_not_weighted, exp_matrices_pearson, exp_tables_pearson)
-
+  compare_to_expected_output(cors_weighted, exp_matrices_pearson, exp_tables_pearson)
   # Test spearman
   cors_weighted <- wbCorr(simdat_intensive_longitudinal,
                           cluster = "participantID",
@@ -37,7 +39,14 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
                               method = 'spearman',
                               weighted_between_statistics = FALSE)
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman, exp_tables_spearman)
-})
+  compare_to_expected_output(cors_weighted, exp_matrices_spearman, exp_tables_spearman)
+  # Test jackknife
+  cors_not_weighted <- wbCorr(simdat_intensive_longitudinal,
+                          cluster = "participantID",
+                          method = 'spearman-jackknife')
+  compare_to_expected_output(cors_not_weighted, exp_matrices_jackknife, exp_tables_jackknife)
+
+  })
 
 
 "
@@ -106,6 +115,7 @@ test_that('correlations are equal to statsBy implementation', {
 
   compare(cors_weighted, statsby)
 })
+
 "
 # on other data
 

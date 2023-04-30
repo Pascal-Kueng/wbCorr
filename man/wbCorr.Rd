@@ -9,7 +9,7 @@ wbCorr(
   cluster,
   alpha_level = 0.95,
   method = "pearson",
-  weighted_between_statistics = TRUE
+  weighted_between_statistics = FALSE
 )
 }
 \arguments{
