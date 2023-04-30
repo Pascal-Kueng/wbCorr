@@ -27,7 +27,7 @@ method uses the Fisher z-transformation for confidence intervals and p-values,
 assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
 correlation method employs the Euclidean jackknife technique to compute
 confidence intervals, providing more robust confidence intervals in the presence of
-non-normal data or outliers. Note that p-values are not currently available
+non-normal data or outliers. Note that p-values are not available
 when this method is selected.}
 
 \item{weighted_between_statistics}{A logical value. If FALSE, variables are centered between persons by
