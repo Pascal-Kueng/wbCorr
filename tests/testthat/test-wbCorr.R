@@ -48,8 +48,8 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
 
   })
 
-
 "
+
 test_that('correlations are equal to statsBy implementation', {
   # function to compare coefficients!
   compare <- function(cors_weighted, statsby) {
