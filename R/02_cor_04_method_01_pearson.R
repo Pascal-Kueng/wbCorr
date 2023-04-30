@@ -11,7 +11,6 @@ cor_pearson <- function(degrees_freedom, alpha_level, correlation_coefficient) {
 
   return(list(correlation_coefficient = correlation_coefficient,
               test_statistic = test_statistic,
-              degrees_freedom = degrees_freedom,
               p_value = p_value,
               lower_bound = lower_bound,
               upper_bound = upper_bound))

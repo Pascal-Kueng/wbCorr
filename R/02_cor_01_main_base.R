@@ -42,22 +42,27 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     col_j <- col_j[complete_cases]
     n_comparisons <- sum(complete_cases)
 
-    # Retrieve the correlation coefficient
-    if (method == 'spearman-jackknife') {
-      method1 <- 'spearman'
+    if (!is.null(n_clusters_between)) { # for between - person correlations
+      base_for_degrees_freedom <- n_clusters_between
+    } else { # for within- person correlations
+      base_for_degrees_freedom <- n_comparisons
+    }
+
+    if (method == 'pearson') {
+      degrees_freedom <- base_for_degrees_freedom -2
+    } else if (method == 'spearman') {
+      degrees_freedom <- base_for_degrees_freedom - 3
     } else {
-      method1 <- method
+      degrees_freedom <- NA
     }
 
     correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
-                                                                          method, method1,
-                                                                          n_clusters_between,
-                                                                          n_comparisons,
+                                                                          method,
+                                                                          degrees_freedom,
                                                                           alpha_level)
 
     correlation_coefficient <- correlations_statistics_list$correlation_coefficient
     test_statistic <- correlations_statistics_list$test_statistic
-    degrees_freedom <- correlations_statistics_list$degrees_freedom
     p_value <- correlations_statistics_list$p_value
     lower_bound <- correlations_statistics_list$lower_bound
     upper_bound <- correlations_statistics_list$upper_bound
@@ -80,8 +85,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
                           coefficient = round(correlation_coefficient, 2),
-                          CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
                           statistic = round(test_statistic, 2),
+                          df = degrees_freedom,
+                          CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
                           p = p_value)
     result_table <- rbind(result_table, temp_df)
   }
@@ -102,18 +108,18 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   correlation_coefficient_df <- as.data.frame(cor_matrix)
 
   # rename columns and formatting main table
+  names(result_table)[6] <- c('95% CI')
   if (method == 'pearson') {
-    names(result_table)[5] <- c(sprintf('t(%d)', degrees_freedom))
     names(result_table)[3] <- c("pearson's r")
+    names(result_table)[4] <- c("t-statistic")
   } else if (method == 'spearman') {
-    names(result_table)[5] <- c(sprintf('z(%d)', degrees_freedom))
     names(result_table)[3] <- c("spearman's rho")
+    names(result_table)[4] <- c("z-statistic")
   } else if (method == 'spearman-jackknife') {
     names(result_table)[3] <- c("spearman's rho")
-
   }
 
-  names(result_table)[4] <- c('95% CI')
+
 
   result_table$p <- ifelse(result_table$p < .001, "< .001***",
                            ifelse(result_table$p < .01, sprintf("%.3f**", result_table$p),

@@ -15,10 +15,10 @@ initializing_values <- function(input_data) {
 
   result_table <- data.frame(Parameter1 = numeric(0),
                              Parameter2 = numeric(0),
-                             correlation_coefficient = numeric(0),
-                             CI_lower = numeric(0),
-                             CI_upper = numeric(0),
-                             t = numeric(0),
+                             coefficient = numeric(0),
+                             statistic = numeric(0),
+                             df = numeric(0),
+                             CI = character(0),
                              p = numeric(0))
 
   idx_combinations <- t(combn(n_numeric, 2))
