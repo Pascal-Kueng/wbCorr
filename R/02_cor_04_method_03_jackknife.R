@@ -13,7 +13,6 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
     length_i <- length(col_i)
     length_j <- length(col_j)
 
-    correlation_coefficient <- cor(col_i, col_j, method = "spearman")
     n_comparisons <- length_i
 
     jackknife_pseudo_values <- as.double()
