@@ -7,6 +7,7 @@
 corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson", n_boot = NULL) {
   # initializing values
   value_list <- initializing_values(input_data)
+
   n_numeric <- value_list$n_numeric
   p_matrix <- value_list$p_matrix
   cor_matrix <- value_list$cor_matrix
@@ -53,7 +54,7 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                                                                           n_clusters_between,
                                                                           n_comparisons,
                                                                           alpha_level)
-    class(correlations_statistics_list)
+
     correlation_coefficient <- correlations_statistics_list$correlation_coefficient
     test_statistic <- correlations_statistics_list$test_statistic
     degrees_freedom <- correlations_statistics_list$degrees_freedom
@@ -119,37 +120,8 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
                                   ifelse(result_table$p < .05, sprintf("%.3f*", result_table$p),
                                          sprintf("%.3f", result_table$p))))
 
-  return(list(p_value = p_value_df, correlation_coefficient = correlation_coefficient_df, confidence_intervals = conf_int_df, result_table = result_table))
+  return(list(p_value = p_value_df,
+              correlation_coefficient = correlation_coefficient_df,
+              confidence_intervals = conf_int_df,
+              result_table = result_table))
 }
-
-initializing_values <- function(input_data) {
-  n_numeric <- ncol(input_data)
-  p_matrix <- matrix(0,
-                     ncol = n_numeric, nrow = n_numeric,
-                     dimnames = list(names(input_data), names(input_data)))
-  cor_matrix <- matrix(1,
-                       ncol = n_numeric, nrow = n_numeric,
-                       dimnames = list(names(input_data), names(input_data)))
-  conf_int_df <- data.frame(Parameter1 = character(0),
-                            Parameter2 = character(0),
-                            CI_lower = numeric(0),
-                            correlation_coefficient = numeric(0),
-                            CI_upper = numeric(0))
-
-  result_table <- data.frame(Parameter1 = numeric(0),
-                             Parameter2 = numeric(0),
-                             correlation_coefficient = numeric(0),
-                             CI_lower = numeric(0),
-                             CI_upper = numeric(0),
-                             t = numeric(0),
-                             p = numeric(0))
-
-  idx_combinations <- t(combn(n_numeric, 2))
-  return(list(n_numeric = n_numeric,
-              p_matrix = p_matrix,
-              cor_matrix = cor_matrix,
-              conf_int_df = conf_int_df,
-              result_table = result_table,
-              idx_combinations = idx_combinations))
-}
-
