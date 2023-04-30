@@ -36,14 +36,14 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
     tryCatch(upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root,
              error = function(e) return(c(NA, NA)))
 
-    return(list(correlation_coefficient = NA,
+    return(list(correlation_coefficient = correlation_coefficient,
                 test_statistic = NA,
                 degrees_freedom = NA,
                 p_value = NA,
                 lower_bound = lower,
                 upper_bound = upper))
   }, error = function(e) {
-    return(list(correlation_coefficient = NA,
+    return(list(correlation_coefficient = correlation_coefficient,
                 test_statistic = NA,
                 degrees_freedom = NA,
                 p_value = NA,
