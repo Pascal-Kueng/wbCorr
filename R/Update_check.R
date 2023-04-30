@@ -24,7 +24,6 @@ update_wbCorr <- function(ask = FALSE) {
   # Check if the request was successful
   if (!response$status_code == 200) {
     warning("Error: Could not check for updates.\n")
-    return(NULL)
   } else {
     # Get the remote DESCRIPTION file content as a character string
     remote_description <- httr::content(response, as = "text", encoding = "UTF-8")
@@ -57,7 +56,6 @@ update_wbCorr <- function(ask = FALSE) {
       return(1)
     } else {
       cat("Latest version already installed.\n")
-      return(0)
     }
   }
 }

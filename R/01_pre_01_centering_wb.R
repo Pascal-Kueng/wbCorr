@@ -14,9 +14,12 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
   }
 
   # Determine Cluster Variable
+  if (length(cluster) > 1) {
+    cluster <- as.factor(cluster)
+  }
   if (is.character(cluster)) {
     if (!cluster %in% colnames(input_data)) {
-      stop("cluster must be a character (name of column in passed DF) or a numeric vector")
+      stop("cluster must be a character (name of column in passed DF) or a numeric vector. Name correct?")
     }
     cluster_var <- as.factor(input_data[[cluster]])
     input_data[[cluster]] <- NULL
@@ -35,9 +38,13 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
 
     # Drop all non-numeric columns
     if(!is.numeric(col)) {
-      warning(paste("CAUTION: Non-Numeric Variable", name ,"was set to NA!
-      For correlations involving factors consider psych::statsBy"))
-      col <- NA
+      tryCatch({
+        col <- as.numeric(col)
+        warning("Converted non-numeric columns to numeric. Check assumptions!")
+      }, error = function(e) {
+        warning("CAUTION: Non-Numeric Variables are set to NA!")
+        col <- NA
+      })
     }
 
     grand_mean <- mean(col, na.rm = TRUE)

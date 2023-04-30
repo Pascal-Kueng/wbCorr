@@ -62,8 +62,9 @@
 #'
 #' @export
 wbCorr <- function(data, cluster,
-                   alpha_level = 0.95, method = "pearson",
-                   weighted_between_statistics = TRUE) {
+                   alpha_level = 0.95,
+                   method = "pearson",
+                   weighted_between_statistics = FALSE) {
   # Input validation and error handling
   input_data <- data
   if (!is.data.frame(input_data)) {
@@ -71,6 +72,10 @@ wbCorr <- function(data, cluster,
   }
   if (!method %in% c("pearson", "spearman", "spearman-jackknife")) {
     stop("Invalid correlation method. Choose one of: 'pearson' or 'spearman'")
+  }
+  if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
+    warning("weighted_between_statistics not supported for jackknife CIs. Ignoring argument.")
+    weighted_between_statistics = FALSE
   }
 
   # Split variance into between- and within
