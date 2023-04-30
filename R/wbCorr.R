@@ -79,7 +79,7 @@ wbCorr <- function(data, cluster,
   }
 
   # Split variance into between- and within
-  centered_df <- wbCenter(input_data, cluster, weighted_between_statistics)
+  centered_df <- wbCenter(input_data, cluster, method, weighted_between_statistics)
 
   # Calculate correlations, p-values, and confidence intervals.
   within_cors <- corAndPValues(centered_df$within[-1],

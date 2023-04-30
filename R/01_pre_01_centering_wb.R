@@ -5,7 +5,7 @@
 
 # This function centers the data within and between clusters.
 #' @importFrom stats aggregate
-wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
+wbCenter <- function(input_data, cluster, method, weighted_between_statistics = FALSE) {
   # Checks
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
@@ -36,16 +36,8 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
   for (name in colnames(input_data)) {
     col <- input_data[[name]]
 
-    # Drop all non-numeric columns
-    if(!is.numeric(col)) {
-      tryCatch({
-        col <- as.numeric(col)
-        warning("Converted non-numeric columns to numeric. Check assumptions!")
-      }, error = function(e) {
-        warning("CAUTION: Non-Numeric Variables are set to NA!")
-        col <- NA
-      })
-    }
+    # Check if we have variables that may violate assumptions.
+    col <- check_assumptions(col, method)
 
     grand_mean <- mean(col, na.rm = TRUE)
     col_grand_mean_c <- col - grand_mean
