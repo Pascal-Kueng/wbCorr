@@ -7,7 +7,12 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
       stop("Input vectors must have the same length.")
     }
     if (var(col_i == 0) | var(col_j == 0)) {
-      return(list(NA, NA))
+      return(list(correlation_coefficient = correlation_coefficient,
+                  test_statistic = NA,
+                  degrees_freedom = NA,
+                  p_value = NA,
+                  lower_bound = lower,
+                  upper_bound = upper))
     }
 
     length_i <- length(col_i)
