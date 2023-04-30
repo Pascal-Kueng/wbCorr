@@ -6,19 +6,8 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
     if (length(col_i) != length(col_j)) {
       stop("Input vectors must have the same length.")
     }
-    if (var(col_i == 0) | var(col_j == 0)) {
-      return(list(correlation_coefficient = correlation_coefficient,
-                  test_statistic = NA,
-                  degrees_freedom = NA,
-                  p_value = NA,
-                  lower_bound = lower,
-                  upper_bound = upper))
-    }
 
-    length_i <- length(col_i)
-    length_j <- length(col_j)
-
-    n_comparisons <- length_i
+    n_comparisons <- length(col_j)
 
     jackknife_pseudo_values <- as.double()
     for(index in 1:n_comparisons) {
@@ -35,10 +24,16 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
     lower <- NA
     upper <- NA
 
-    tryCatch(lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root,
-             error = function(e) return(c(NA, NA)))
-    tryCatch(upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root,
-             error = function(e) return(c(NA, NA)))
+    tryCatch({
+      lower <- uniroot(test_statistic, interval = c(-1, correlation_coefficient), tol = 1e-10)$root
+    }, error = function(e) {
+      lower <- NA
+    })
+    tryCatch({
+      upper <- uniroot(test_statistic, interval = c(correlation_coefficient, 1), tol = 1e-10)$root
+    }, error = function(e) {
+      upper <- NA
+    })
 
     return(list(correlation_coefficient = correlation_coefficient,
                 test_statistic = NA,
@@ -51,7 +46,7 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
                 test_statistic = NA,
                 degrees_freedom = NA,
                 p_value = NA,
-                lower_bound = NA,
-                upper_bound = NA))
+                lower_bound = 444,
+                upper_bound = 444))
     })
   }

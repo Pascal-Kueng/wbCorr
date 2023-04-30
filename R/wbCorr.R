@@ -13,7 +13,7 @@
 #' assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
 #' correlation method employs the Euclidean jackknife technique to compute
 #' confidence intervals, providing more robust confidence intervals in the presence of
-#' non-normal data or outliers. Note that p-values are not currently available
+#' non-normal data or outliers. Note that p-values are not available
 #' when this method is selected.
 #' @param weighted_between_statistics A logical value. If FALSE, variables are centered between persons by
 #' simply taking the mean for each person and weighting them all the same, even if some

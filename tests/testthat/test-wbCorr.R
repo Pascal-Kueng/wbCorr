@@ -119,4 +119,8 @@ test_that('correlations are equal to statsBy implementation', {
 "
 # on other data
 
+try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real.rds"))
+#try(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real.rds"))
+
+
 
