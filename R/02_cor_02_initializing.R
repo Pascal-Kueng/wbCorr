@@ -15,7 +15,10 @@ initializing_values <- function(input_data) {
 
   result_table <- data.frame(Parameter1 = numeric(0),
                              Parameter2 = numeric(0),
+                             warning = character(0),
+                             method = character(0),
                              coefficient = numeric(0),
+                             statistic_type = character(0),
                              statistic = numeric(0),
                              df = numeric(0),
                              CI = character(0),

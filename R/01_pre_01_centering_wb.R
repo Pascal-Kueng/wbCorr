@@ -5,7 +5,7 @@
 
 # This function centers the data within and between clusters.
 #' @importFrom stats aggregate
-wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
+wbCenter <- function(input_data, cluster, method, weighted_between_statistics = FALSE) {
   # Checks
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
@@ -22,30 +22,26 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
       stop("cluster must be a character (name of column in passed DF) or a numeric vector. Name correct?")
     }
     cluster_var <- as.factor(input_data[[cluster]])
-    input_data[[cluster]] <- NULL
+    cluster <- 'cluster'
   } else {
     cluster_var <- as.factor(cluster)
-    cluster <- "cluster"
+    cluster <- 'cluster'
   }
 
   # Center the data
   df_within <- data.frame(cluster = cluster_var)
   df_between <- data.frame(cluster = cluster_var)
 
-
+  auto_type <- list()
+  warnings <- list()
   for (name in colnames(input_data)) {
     col <- input_data[[name]]
 
-    # Drop all non-numeric columns
-    if(!is.numeric(col)) {
-      tryCatch({
-        col <- as.numeric(col)
-        warning("Converted non-numeric columns to numeric. Check assumptions!")
-      }, error = function(e) {
-        warning("CAUTION: Non-Numeric Variables are set to NA!")
-        col <- NA
-      })
-    }
+    # Check if we have variables that may violate assumptions.
+    assumptions <- check_assumptions(col, name, method)
+    col <- assumptions$col
+    auto_type[[name]] <- assumptions$type
+    warnings[[name]] <- assumptions$warning
 
     grand_mean <- mean(col, na.rm = TRUE)
     col_grand_mean_c <- col - grand_mean
@@ -70,5 +66,5 @@ wbCenter <- function(input_data, cluster, weighted_between_statistics = FALSE) {
     df_between$Group.1 <- NULL
   }
 
-  return(list(between = df_between, within = df_within))
+  return(list(between = df_between, within = df_within, auto_type = auto_type, warnings = warnings))
 }
