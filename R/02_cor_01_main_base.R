@@ -6,7 +6,7 @@
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
 corAndPValues <- function(input_data,
                           n_clusters_between = NULL,
-                          alpha_level = 0.95,
+                          confidence_level = 0.95,
                           method = "pearson",
                           auto_type,
                           warnings,
@@ -102,7 +102,7 @@ corAndPValues <- function(input_data,
     correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
                                                                           method,
                                                                           degrees_freedom,
-                                                                          alpha_level,
+                                                                          confidence_level,
                                                                           bootstrap,
                                                                           nboot)
 

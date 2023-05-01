@@ -4,7 +4,7 @@
 #'
 #' @param data A dataframe containing numeric variables for which correlations will be calculated.
 #' @param cluster A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.
-#' @param alpha_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
+#' @param confidence_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
 #' @param method A string indicating the correlation method to be used.
 #' Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.
 #' (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
@@ -64,7 +64,7 @@
 #'
 #' @export
 wbCorr <- function(data, cluster,
-                   alpha_level = 0.95,
+                   confidence_level = 0.95,
                    method = "pearson",
                    bootstrap = FALSE,
                    nboot = 1000,
@@ -102,7 +102,7 @@ wbCorr <- function(data, cluster,
 
   # Calculate correlations, p-values, and confidence intervals.
   within_cors <- corAndPValues(within_df,
-                               alpha_level = alpha_level,
+                               confidence_level = confidence_level,
                                method = method,
                                auto_type = auto_type,
                                warnings = warnings,
@@ -111,7 +111,7 @@ wbCorr <- function(data, cluster,
   between_cors <- corAndPValues(between_df,
                                 n_clusters_between = nlevels(as.factor(
                                     centered_df$between$cluster)),
-                                alpha_level = alpha_level,
+                                confidence_level = confidence_level,
                                 method = method,
                                 auto_type = auto_type,
                                 warnings = warnings,
@@ -180,7 +180,7 @@ methods::setClass("wbCorr", representation(within = "list", between = "list"))
 #' data("simdat_intensive_longitudinal")
 #' correlations <- wbCorr(simdat_intensive_longitudinal,
 #'                        cluster = 'participantID',
-#'                        alpha_level = 0.95,
+#'                        confidence_level = 0.95,
 #'                        method = 'spearman',
 #'                        weighted_between_statistics = FALSE)
 #' print(correlations)

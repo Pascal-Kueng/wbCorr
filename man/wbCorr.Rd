@@ -7,7 +7,7 @@
 wbCorr(
   data,
   cluster,
-  alpha_level = 0.95,
+  confidence_level = 0.95,
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
@@ -19,7 +19,7 @@ wbCorr(
 
 \item{cluster}{A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.}
 
-\item{alpha_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
+\item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
 \item{method}{A string indicating the correlation method to be used.
 Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.

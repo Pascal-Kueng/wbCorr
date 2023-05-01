@@ -1,5 +1,5 @@
 
-cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
+cor_jackknife <- function(col_i, col_j, confidence_level, correlation_coefficient) {
   message('sampling... ')
   set.seed('42')
   tryCatch({
@@ -19,7 +19,7 @@ cor_jackknife <- function(col_i, col_j, alpha_level, correlation_coefficient) {
     }
 
     test_statistic <- function(theta) {
-      n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(alpha_level, 1)
+      n_comparisons * (correlation_coefficient - theta)^2 / variance_estimate(theta) - qchisq(confidence_level, 1)
     }
     lower <- NA
     upper <- NA
