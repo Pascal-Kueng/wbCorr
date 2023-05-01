@@ -32,13 +32,14 @@ wbCenter <- function(input_data, cluster, method, weighted_between_statistics = 
   df_within <- data.frame(cluster = cluster_var)
   df_between <- data.frame(cluster = cluster_var)
 
-
+  auto_method <- list()
   for (name in colnames(input_data)) {
     col <- input_data[[name]]
 
     # Check if we have variables that may violate assumptions.
     assumptions <- check_assumptions(col, name, method)
     col <- assumptions$col
+    auto_method[[name]] <- assumptions$type
 
     grand_mean <- mean(col, na.rm = TRUE)
     col_grand_mean_c <- col - grand_mean
@@ -63,5 +64,5 @@ wbCenter <- function(input_data, cluster, method, weighted_between_statistics = 
     df_between$Group.1 <- NULL
   }
 
-  return(list(between = df_between, within = df_within))
+  return(list(between = df_between, within = df_within, auto_method = auto_method))
 }
