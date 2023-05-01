@@ -94,7 +94,7 @@ test_that('correlations are equal to statsBy implementation on simdat', {
                           cluster = simdat_intensive_longitudinal$participantID,
                           weighted_between_statistics = FALSE))
 
-  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal[2:5],
+  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,
                                              group = 'participantID'))
 
   compare(cors_weighted, statsby)
@@ -105,7 +105,7 @@ test_that('correlations are equal to statsBy implementation on simdat', {
                           weighted_between_statistics = FALSE,
                           method = 'spearman'))
 
-  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal[2:5],
+  statsby <- suppressWarnings(psych::statsBy(simdat_intensive_longitudinal,
                                              group = 'participantID',
                                              method = 'spearman'))
 
