@@ -37,7 +37,8 @@ wbCenter <- function(input_data, cluster, method, weighted_between_statistics = 
     col <- input_data[[name]]
 
     # Check if we have variables that may violate assumptions.
-    col <- check_assumptions(col, method)
+    assumptions <- check_assumptions(col, name, method)
+    col <- assumptions$col
 
     grand_mean <- mean(col, na.rm = TRUE)
     col_grand_mean_c <- col - grand_mean
