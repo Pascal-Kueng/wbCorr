@@ -19,11 +19,17 @@ update_wbCorr <- function(ask = FALSE) {
   url <- "https://raw.githubusercontent.com/Pascal-Kueng/wbCorr/main/DESCRIPTION"
 
   # Get the DESCRIPTION file content from GitHub
-  response <- httr::GET(url)
+  response <- list(status_code = 1)
+  tryCatch({
+    response <- httr::GET(url)
+  }, error = function(e) {
+    return(1)
+  })
+
 
   # Check if the request was successful
   if (!response$status_code == 200) {
-    warning("Error: Could not check for updates.\n")
+    warning("Could not check for updates.\n")
   } else {
     # Get the remote DESCRIPTION file content as a character string
     remote_description <- httr::content(response, as = "text", encoding = "UTF-8")
