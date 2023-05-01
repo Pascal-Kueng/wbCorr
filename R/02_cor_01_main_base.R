@@ -4,7 +4,7 @@
 #######################################################
 #' @importFrom stats pnorm qchisq qnorm uniroot var
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
-corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson", n_boot = NULL) {
+corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson", auto_type, warnings) {
   # initializing values
   value_list <- initializing_values(input_data)
 
@@ -48,12 +48,48 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
       base_for_degrees_freedom <- n_comparisons
     }
 
+
+    # set method
+    if (!is.null(auto_type)) {
+      type_i <- auto_type[[i]]
+      type_j <- auto_type[[j]]
+
+      if (type_i == 'factor' | type_j == 'factor') {
+        method = 'spearman'
+      } else {
+        method = 'pearson'
+      }
+    }
+
+    warning_i <- warnings[[i]]
+    warning_j <- warnings[[j]]
+
+    auto_warning <- 'None'
+    if (!warning_j == 'None') {
+      auto_warning <- warning_j
+    }
+    if (!warning_i == 'None') {
+      auto_warning <- warning_i
+    }
+
+    # Set degrees freedom
     if (method == 'pearson') {
       degrees_freedom <- base_for_degrees_freedom -2
+      statistic_type <- 't-statistic'
+      method_table <- "pearson's r"
     } else if (method == 'spearman') {
       degrees_freedom <- base_for_degrees_freedom - 3
-    } else {
+      statistic_type <- 'z-statistic'
+      method_table <- "spearman's rho"
+    } else if (method == 'spearman-jackknife') {
       degrees_freedom <- NA
+      statistic_type <- NA
+      method_table <- "spearman's rho"
+    }
+
+    else {
+      degrees_freedom <- NA
+      statistic_type <- NA
     }
 
     correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
@@ -84,7 +120,10 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     # populate big dataframe
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
+                          warning = auto_warning,
+                          method = method_table,
                           coefficient = round(correlation_coefficient, 2),
+                          statistic_type = statistic_type,
                           statistic = round(test_statistic, 2),
                           df = degrees_freedom,
                           CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
@@ -107,24 +146,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
   p_value_df <- as.data.frame(p_matrix)
   correlation_coefficient_df <- as.data.frame(cor_matrix)
 
-  # rename columns and formatting main table
-  names(result_table)[6] <- c('95% CI')
-  if (method == 'pearson') {
-    names(result_table)[3] <- c("pearson's r")
-    names(result_table)[4] <- c("t-statistic")
-  } else if (method == 'spearman') {
-    names(result_table)[3] <- c("spearman's rho")
-    names(result_table)[4] <- c("z-statistic")
-  } else if (method == 'spearman-jackknife') {
-    names(result_table)[3] <- c("spearman's rho")
-  }
 
 
-
-  result_table$p <- ifelse(result_table$p < .001, "< .001***",
-                           ifelse(result_table$p < .01, sprintf("%.3f**", result_table$p),
-                                  ifelse(result_table$p < .05, sprintf("%.3f*", result_table$p),
-                                         sprintf("%.3f", result_table$p))))
+  result_table <- format_result_table(result_table, method, auto_type)
 
   return(list(p_value = p_value_df,
               correlation_coefficient = correlation_coefficient_df,

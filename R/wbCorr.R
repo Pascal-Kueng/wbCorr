@@ -70,8 +70,8 @@ wbCorr <- function(data, cluster,
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
   }
-  if (!method %in% c("pearson", "spearman", "spearman-jackknife")) {
-    stop("Invalid correlation method. Choose one of: 'pearson' or 'spearman'")
+  if (!method %in% c("pearson", "spearman", "spearman-jackknife", "auto")) {
+    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', 'spearman-jackknife', 'auto'.")
   }
   if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
     warning("weighted_between_statistics not supported for jackknife CIs. Ignoring argument.")
@@ -81,15 +81,28 @@ wbCorr <- function(data, cluster,
   # Split variance into between- and within
   centered_df <- wbCenter(input_data, cluster, method, weighted_between_statistics)
 
+  within_df <- centered_df$within[-1]
+  between_df <- centered_df$between[-1]
+  auto_type <- centered_df$auto_type
+  warnings <- centered_df$warnings
+
+  if (!method == 'auto') {
+    auto_type = NULL
+  }
+
   # Calculate correlations, p-values, and confidence intervals.
-  within_cors <- corAndPValues(centered_df$within[-1],
+  within_cors <- corAndPValues(within_df,
                                alpha_level = alpha_level,
-                               method = method)
-  between_cors <- corAndPValues(centered_df$between[-1],
+                               method = method,
+                               auto_type = auto_type,
+                               warnings = warnings)
+  between_cors <- corAndPValues(between_df,
                                 n_clusters_between = nlevels(as.factor(
                                     centered_df$between$cluster)),
                                 alpha_level = alpha_level,
-                                method = method)
+                                method = method,
+                                auto_type = auto_type,
+                                warnings = warnings)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
