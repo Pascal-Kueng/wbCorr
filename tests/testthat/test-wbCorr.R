@@ -48,7 +48,7 @@ test_that("pearson stats are computed correctly weighted and unweighted if all o
 
   })
 
-"
+
 
 test_that('correlations are equal to statsBy implementation', {
   # function to compare coefficients!
@@ -116,7 +116,7 @@ test_that('correlations are equal to statsBy implementation', {
   compare(cors_weighted, statsby)
 })
 
-"
+
 # on other data
 
 try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real.rds"))
