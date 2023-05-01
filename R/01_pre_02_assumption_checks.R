@@ -41,3 +41,17 @@ check_assumptions <- function(col, name, method) {
     return(list(col = NULL, type = NULL, warning = 'Failed to convert to factor'))
   }
 }
+
+if (method = 'auto') {
+  if (is.numeric(col)) {
+    return(list(col = col, type = 'pearson', warning = NULL))
+  }
+  if (is.factor(col)) {
+    if (nlevels(col) == 2) {
+      return(list(col = as.numeric(col), type = 'point-biserial', warning = NULL))
+    }
+    if (is.ordered(col)) {
+      return(list(col = as.numeric(col), type = 'spearman', warning = NULL))
+    }
+  }
+}
