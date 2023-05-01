@@ -9,7 +9,7 @@
 #' Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.
 #' (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
 #' to determine confidence intervals and p-values.'spearman': Spearman correlation
-#' method uses the Fisher z-transformation for confidence intervals and p-values,
+#' method uses the Fisher z-transformation for confidence intervals and p-values (unless bootstrap is enabled),
 #' assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
 #' correlation method employs the Euclidean jackknife technique to compute
 #' confidence intervals, providing more robust confidence intervals in the presence of
@@ -17,6 +17,9 @@
 #' when this method is selected. 'auto' uses pearson for numeric variables and
 #' spearman for correlations involving at least one factors. Still check your
 #' assumptions.
+#' @param bootstrap Performs a bias-corrected and accelerated (BCa) bootstrap to compute both confidence
+#' intervals, as well as p-values (default: FALSE). Recommended, but slow.
+#' @param nboot Specifies the amount of bootstrap samples. We recommend a minimum of 1000 (default: 1000).
 #' @param weighted_between_statistics A logical value. If FALSE, variables are centered between persons by
 #' simply taking the mean for each person and weighting them all the same, even if some
 #' contributed fewer measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets

@@ -1,4 +1,5 @@
 
+#' @importFrom stats quantile
 cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot, correlation_coefficient) {
   set.seed(42)
   # Combine data
