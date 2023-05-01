@@ -82,8 +82,10 @@ wbCorr <- function(data, cluster,
     weighted_between_statistics = FALSE
   }
   if (method == 'spearman-jackknife' & bootstrap == TRUE) {
-    warning("Jackknife and bootstraping can't both be active at once. Using 'spearman' instead.")
-    method = 'spearman'
+    stop("Jackknife and bootstraping can't both be active at once.")
+  }
+  if (bootstrap == TRUE & weighted_between_statistics == TRUE) {
+    stop("weighted between-statistics not supported with bootstraping.")
   }
 
   # Split variance into between- and within

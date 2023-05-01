@@ -25,15 +25,17 @@ cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot, correla
   upper_bound <- quantile(boot_corr, pnorm(z_alpha_adj2))
 
   # Calculate the p-value
-  if (correlation_coefficient > 0) {
-    p_value <- mean(boot_corr >= correlation_coefficient)
-  } else {
-    p_value <- mean(boot_corr <= correlation_coefficient)
-  }
+  p_value <- min(mean((correlation_coefficient > 0 & boot_corr < 0) |
+                        (correlation_coefficient < 0 & boot_corr > 0)) * 2, 1)
+
+
+
+
 
   # Return the result
   return(list(correlation_coefficient = correlation_coefficient,
+              test_statistic = NA,
+              p_value = p_value,
               lower_bound = lower_bound,
-              upper_bound = upper_bound,
-              p_value = p_value))
+              upper_bound = upper_bound))
 }
