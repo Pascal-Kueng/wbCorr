@@ -45,7 +45,7 @@ test_that("all methods are corredct for simdat", {
   })
 
 
-
+"
 test_that('correlations are equal to statsBy implementation on simdat', {
   # function to compare coefficients!
   compare <- function(cors_weighted, statsby) {
@@ -112,7 +112,7 @@ test_that('correlations are equal to statsBy implementation on simdat', {
   compare(cors_weighted, statsby)
 })
 
-
+"
 # on other data
 
 
