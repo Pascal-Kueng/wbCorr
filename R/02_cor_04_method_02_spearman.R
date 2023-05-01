@@ -20,3 +20,4 @@ cor_spearman <- function(degrees_freedom, alpha_level, correlation_coefficient) 
               lower_bound = lower_bound,
               upper_bound = upper_bound))
 }
+

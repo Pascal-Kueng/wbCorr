@@ -4,8 +4,15 @@
 #######################################################
 #' @importFrom stats pnorm qchisq qnorm uniroot var
 # This function calculates the correlation coefficients, p-values, and confidence intervals for the input data.
-corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0.95, method = "pearson", auto_type, warnings) {
-  # initializing values
+corAndPValues <- function(input_data,
+                          n_clusters_between = NULL,
+                          alpha_level = 0.95,
+                          method = "pearson",
+                          auto_type,
+                          warnings,
+                          bootstrap,
+                          nboot) {
+  # initializing matrices and lists
   value_list <- initializing_values(input_data)
 
   n_numeric <- value_list$n_numeric
@@ -95,7 +102,9 @@ corAndPValues <- function(input_data, n_clusters_between = NULL, alpha_level = 0
     correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
                                                                           method,
                                                                           degrees_freedom,
-                                                                          alpha_level)
+                                                                          alpha_level,
+                                                                          bootstrap,
+                                                                          nboot)
 
     correlation_coefficient <- correlations_statistics_list$correlation_coefficient
     test_statistic <- correlations_statistics_list$test_statistic

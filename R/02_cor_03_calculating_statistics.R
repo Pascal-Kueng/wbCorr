@@ -1,7 +1,11 @@
+
+
 calculate_correlations_and_statistics <- function(col_i, col_j,
                                                   method,
                                                   degrees_freedom,
-                                                  alpha_level) {
+                                                  alpha_level,
+                                                  bootstrap,
+                                                  nboot) {
 
   # Retrieve the correlation coefficient
   if (method == 'spearman-jackknife') {
@@ -18,6 +22,11 @@ calculate_correlations_and_statistics <- function(col_i, col_j,
                 p_value = NA,
                 lower_bound = NA,
                 upper_bound = NA))
+  }
+
+  # boot
+  if (bootstrap) {
+    return(cor_bootstrap(col_i, col_j, method, alpha_level, nboot, correlation_coefficient))
   }
 
   # calculating correlations and statistics

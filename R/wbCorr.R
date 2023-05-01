@@ -6,7 +6,7 @@
 #' @param cluster A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.
 #' @param alpha_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
 #' @param method A string indicating the correlation method to be used.
-#' Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'
+#' Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.
 #' (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
 #' to determine confidence intervals and p-values.'spearman': Spearman correlation
 #' method uses the Fisher z-transformation for confidence intervals and p-values,
@@ -14,7 +14,9 @@
 #' correlation method employs the Euclidean jackknife technique to compute
 #' confidence intervals, providing more robust confidence intervals in the presence of
 #' non-normal data or outliers. Note that p-values are not available
-#' when this method is selected.
+#' when this method is selected. 'auto' uses pearson for numeric variables and
+#' spearman for correlations involving at least one factors. Still check your
+#' assumptions.
 #' @param weighted_between_statistics A logical value. If FALSE, variables are centered between persons by
 #' simply taking the mean for each person and weighting them all the same, even if some
 #' contributed fewer measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
@@ -64,6 +66,8 @@
 wbCorr <- function(data, cluster,
                    alpha_level = 0.95,
                    method = "pearson",
+                   bootstrap = FALSE,
+                   nboot = 1000,
                    weighted_between_statistics = FALSE) {
   # Input validation and error handling
   input_data <- data
@@ -76,6 +80,10 @@ wbCorr <- function(data, cluster,
   if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
     warning("weighted_between_statistics not supported for jackknife CIs. Ignoring argument.")
     weighted_between_statistics = FALSE
+  }
+  if (method == 'spearman-jackknife' & bootstrap == TRUE) {
+    warning("Jackknife and bootstraping can't both be active at once. Using 'spearman' instead.")
+    method = 'spearman'
   }
 
   # Split variance into between- and within
@@ -95,14 +103,18 @@ wbCorr <- function(data, cluster,
                                alpha_level = alpha_level,
                                method = method,
                                auto_type = auto_type,
-                               warnings = warnings)
+                               warnings = warnings,
+                               bootstrap = bootstrap,
+                               nboot = nboot)
   between_cors <- corAndPValues(between_df,
                                 n_clusters_between = nlevels(as.factor(
                                     centered_df$between$cluster)),
                                 alpha_level = alpha_level,
                                 method = method,
                                 auto_type = auto_type,
-                                warnings = warnings)
+                                warnings = warnings,
+                                bootstrap = bootstrap,
+                                nboot = nboot)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
