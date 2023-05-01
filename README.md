@@ -2,7 +2,9 @@
 
 The wbCorr package efficiently decomposes the variance of input variables into their within- and between-cluster components, and subsequently computes the corresponding bivariate correlations for each level independently. This functionality is particularly beneficial for longitudinal data analysis.
 
-The package accomplishes this by centering the variables at both within- and between-cluster levels, followed by computing the correlations on the transformed dataframes. To determine significance tests and confidence intervals, the degrees of freedom for within-cluster correlations rely on the total number of complete pairs across all observations, while the degrees of freedom for between-cluster correlations depend on the total number of clusters.
+The package accomplishes this by centering the variables at both within- and between-cluster levels, followed by computing the correlations on the transformed dataframes. To determine significance tests and confidence intervals, the degrees of freedom for within-cluster correlations rely on the total number of complete pairs across all observations, while the degrees of freedom for between-cluster correlations depend on the total number of clusters.  
+
+Bootstrapping now supported!
 
 ## Installation
 You can install this package by running the following inside an R-terminal:
