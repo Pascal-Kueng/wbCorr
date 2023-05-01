@@ -157,7 +157,7 @@ corAndPValues <- function(input_data,
 
 
 
-  result_table <- format_result_table(result_table, method, auto_type)
+  result_table <- format_result_table(result_table, method, auto_type, confidence_level, bootstrap)
 
   return(list(p_value = p_value_df,
               correlation_coefficient = correlation_coefficient_df,

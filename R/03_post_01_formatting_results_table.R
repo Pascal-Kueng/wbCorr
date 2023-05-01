@@ -1,12 +1,12 @@
 
 
 
-format_result_table <- function(result_table, method, auto_type) {
+format_result_table <- function(result_table, method, auto_type, confidence_level, bootstrap) {
 
 
   # rename columns and formatting main table
-
-  colnames(result_table)[colnames(result_table) == "CI"] <- "95% CI"
+  level <- confidence_level * 100
+  colnames(result_table)[colnames(result_table) == "CI"] <- paste0(level, "% CI")
   colnames(result_table)[colnames(result_table) == "statistic_type"] <- "statistic type"
 
   if (is.null(auto_type)) {
@@ -29,6 +29,16 @@ format_result_table <- function(result_table, method, auto_type) {
       result_table$p <- NULL
     }
   }
+
+  if (bootstrap) {
+    result_table$df <- NULL
+    for (name in colnames(result_table)) {
+      if (all(is.na(result_table[[name]]))) {
+        result_table[[name]] <- NULL
+      }
+    }
+  }
+
 
   # drop Warning if there is none.
 

@@ -31,8 +31,6 @@ cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot, correla
 
 
 
-
-
   # Return the result
   return(list(correlation_coefficient = correlation_coefficient,
               test_statistic = NA,
