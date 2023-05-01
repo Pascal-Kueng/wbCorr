@@ -1,9 +1,9 @@
 
-cor_spearman <- function(degrees_freedom, alpha_level, correlation_coefficient) {
+cor_spearman <- function(degrees_freedom, confidence_level, correlation_coefficient) {
   # Fisher Z-transformation
   se <- 1 / sqrt(degrees_freedom)
 
-  critical_value = qnorm(1 - (1 - alpha_level) / 2)
+  critical_value = qnorm(1 - (1 - confidence_level) / 2)
   delta <- critical_value * se
 
   z_score <- atanh(correlation_coefficient)
@@ -20,3 +20,4 @@ cor_spearman <- function(degrees_freedom, alpha_level, correlation_coefficient) 
               lower_bound = lower_bound,
               upper_bound = upper_bound))
 }
+

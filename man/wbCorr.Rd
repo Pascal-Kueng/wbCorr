@@ -7,8 +7,10 @@
 wbCorr(
   data,
   cluster,
-  alpha_level = 0.95,
+  confidence_level = 0.95,
   method = "pearson",
+  bootstrap = FALSE,
+  nboot = 1000,
   weighted_between_statistics = FALSE
 )
 }
@@ -17,18 +19,25 @@ wbCorr(
 
 \item{cluster}{A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.}
 
-\item{alpha_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
+\item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
 \item{method}{A string indicating the correlation method to be used.
-Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'
+Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.
 (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
 to determine confidence intervals and p-values.'spearman': Spearman correlation
-method uses the Fisher z-transformation for confidence intervals and p-values,
+method uses the Fisher z-transformation for confidence intervals and p-values (unless bootstrap is enabled),
 assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
 correlation method employs the Euclidean jackknife technique to compute
 confidence intervals, providing more robust confidence intervals in the presence of
 non-normal data or outliers. Note that p-values are not available
-when this method is selected.}
+when this method is selected. 'auto' uses pearson for numeric variables and
+spearman for correlations involving at least one factors. Still check your
+assumptions.}
+
+\item{bootstrap}{Performs a bias-corrected and accelerated (BCa) bootstrap to compute both confidence
+intervals, as well as p-values (default: FALSE). Recommended, but slow.}
+
+\item{nboot}{Specifies the amount of bootstrap samples. We recommend a minimum of 1000 (default: 1000).}
 
 \item{weighted_between_statistics}{A logical value. If FALSE, variables are centered between persons by
 simply taking the mean for each person and weighting them all the same, even if some

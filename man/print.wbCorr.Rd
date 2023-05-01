@@ -20,7 +20,7 @@ Prints a summary of the \code{wbCorr} object.
 data("simdat_intensive_longitudinal")
 correlations <- wbCorr(simdat_intensive_longitudinal,
                        cluster = 'participantID',
-                       alpha_level = 0.95,
+                       confidence_level = 0.95,
                        method = 'spearman',
                        weighted_between_statistics = FALSE)
 print(correlations)

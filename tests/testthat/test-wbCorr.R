@@ -9,6 +9,10 @@ exp_matrices_spearman_simdat <- readRDS("testdata/exp_matrices_spearman_simdat.r
 exp_tables_jackknife_simdat <- readRDS("testdata/exp_tables_jackknife_simdat.rds")
 exp_matrices_jackknife_simdat <- readRDS("testdata/exp_matrices_jackknife_simdat.rds")
 
+# boot
+exp_tables_spearman_boot_simdat <- readRDS("testdata/exp_tables_spearman_boot_simdat.rds")
+exp_tables_auto99_boot_simdat <- readRDS("testdata/exp_tables_auto99_boot_simdat.rds")
+
 compare_to_expected_output <- function(cors, exp_matrices, exp_tables) {
   expect_equal(summary(cors), exp_matrices)
   expect_equal(get_table(cors), exp_tables)
@@ -35,8 +39,23 @@ test_that("all methods are corredct for simdat", {
                               method = 'spearman',
                               weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman_simdat, exp_tables_spearman_simdat)
-  # Test jackknife
 
+  # Test boot spearman
+  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                  cluster = 'participantID',
+                                  method = 'spearman',
+                                  boot = TRUE))
+  expect_equal(exp_tables_spearman_boot_simdat, get_tables(cors))
+
+  # Test boot auto
+  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                  cluster = 'participantID',
+                                  method = 'auto',
+                                  boot = TRUE,
+                                  confidence_level = 0.99))
+  expect_equal(exp_tables_auto99_boot_simdat, get_tables(cors))
+
+  # Test jackknife
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
                           cluster = 'participantID',
                           method = 'spearman-jackknife'))
@@ -126,6 +145,9 @@ exp_matrices_spearman_real <- readRDS("testdata/exp_matrices_spearman_real.rds")
 exp_tables_jackknife_real <- readRDS("testdata/exp_tables_jackknife_real.rds")
 exp_matrices_jackknife_real <- readRDS("testdata/exp_matrices_jackknife_real.rds")
 
+exp_tables_spearman_boot_real <- readRDS("testdata/exp_tables_spearman_boot_real.rds")
+exp_tables_auto_boot_real <- readRDS("testdata/exp_tables_auto_boot_real.rds")
+
 test_that('all functions are correct on real output', {
   # Test pearson
   cors_not_weighted <- suppressWarnings(wbCorr(dat,
@@ -142,13 +164,29 @@ test_that('all functions are correct on real output', {
                               method = 'spearman',
                               weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman_real, exp_tables_spearman_real)
-  # Test jackknife
 
+  # Test boot spearman
+  cors <- suppressWarnings(wbCorr(dat,
+                                  cluster = 'CoupleID',
+                                  method = 'spearman',
+                                  boot = TRUE))
+  expect_equal(exp_tables_spearman_boot_real, get_tables(cors))
+
+  # Test boot auto
+  cors <- suppressWarnings(wbCorr(dat,
+                                  cluster = 'CoupleID',
+                                  method = 'auto',
+                                  boot = TRUE,
+                                  confidence_level = 0.95))
+  expect_equal(exp_tables_auto_boot_real, get_tables(cors))
+
+
+
+  # Test jackknife
   cors_not_weighted <- suppressWarnings(wbCorr(dat,
                               cluster = 'CoupleID',
                               method = 'spearman-jackknife'))
   compare_to_expected_output(cors_not_weighted, exp_matrices_jackknife_real, exp_tables_jackknife_real)
-
 
 })
 
