@@ -9,12 +9,7 @@ create_files <- function(data, cluster, type) {
                  method = 'spearman',
   )
 
-  get_table(cors)
   saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_spearman_',type,'.rds'))
-
-
-  summary(cors)
-
   saveRDS(summary(cors), file = paste0('tests/testthat/testdata/exp_matrices_spearman_',type,'.rds'))
 
   # pearson
@@ -23,12 +18,7 @@ create_files <- function(data, cluster, type) {
                  cluster = cluster
   )
 
-  get_table(cors)
   saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_pearson_',type,'.rds'))
-
-
-  summary(cors)
-
   saveRDS(summary(cors), file = paste0('tests/testthat/testdata/exp_matrices_pearson_',type,'.rds'))
 
   # Jackknife
@@ -37,12 +27,37 @@ create_files <- function(data, cluster, type) {
                  method = 'spearman-jackknife',
   )
 
-  get_table(cors)
+
   saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_jackknife_',type,'.rds'))
-
-
-  summary(cors)
   saveRDS(summary(cors), file = paste0('tests/testthat/testdata/exp_matrices_jackknife_',type,'.rds'))
+
+  # boot spearman
+  cors <- wbCorr(data,
+                 cluster = cluster,
+                 method = 'spearman',
+                 boot = TRUE
+  )
+
+  saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_spearman_boot_',type,'.rds'))
+
+  # boot auto
+  cors <- wbCorr(data,
+                 cluster = cluster,
+                 method = 'auto',
+                 boot = TRUE
+  )
+
+  saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_auto_boot_',type,'.rds'))
+
+  # boot auto with 99% CI
+  cors <- wbCorr(data,
+                 cluster = cluster,
+                 method = 'auto',
+                 boot = TRUE,
+                 confidence_level = 0.99
+  )
+
+  saveRDS(get_table(cors), file = paste0('tests/testthat/testdata/exp_tables_auto99_boot_',type,'.rds'))
 
 }
 
