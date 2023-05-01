@@ -22,10 +22,10 @@ wbCenter <- function(input_data, cluster, method, weighted_between_statistics = 
       stop("cluster must be a character (name of column in passed DF) or a numeric vector. Name correct?")
     }
     cluster_var <- as.factor(input_data[[cluster]])
-    input_data[[cluster]] <- NULL
+    cluster <- 'cluster'
   } else {
     cluster_var <- as.factor(cluster)
-    cluster <- "cluster"
+    cluster <- 'cluster'
   }
 
   # Center the data
