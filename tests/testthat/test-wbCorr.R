@@ -1,22 +1,22 @@
 
 
 # on my simulated data
-data("simdat_intensive_longitudinal")
-exp_tables_pearson_simdat <- readRDS("testdata/exp_tables_pearson_simdat.rds")
-exp_matrices_pearson_simdat <- readRDS("testdata/exp_matrices_pearson_simdat.rds")
-exp_tables_spearman_simdat <- readRDS("testdata/exp_tables_spearman_simdat.rds")
-exp_matrices_spearman_simdat <- readRDS("testdata/exp_matrices_spearman_simdat.rds")
-exp_tables_jackknife_simdat <- readRDS("testdata/exp_tables_jackknife_simdat.rds")
-exp_matrices_jackknife_simdat <- readRDS("testdata/exp_matrices_jackknife_simdat.rds")
+data('simdat_intensive_longitudinal')
+exp_tables_pearson_simdat <- readRDS('testdata/exp_tables_pearson_simdat.rds')
+exp_matrices_pearson_simdat <- readRDS('testdata/exp_matrices_pearson_simdat.rds')
+exp_tables_spearman_simdat <- readRDS('testdata/exp_tables_spearman_simdat.rds')
+exp_matrices_spearman_simdat <- readRDS('testdata/exp_matrices_spearman_simdat.rds')
+exp_tables_jackknife_simdat <- readRDS('testdata/exp_tables_jackknife_simdat.rds')
+exp_matrices_jackknife_simdat <- readRDS('testdata/exp_matrices_jackknife_simdat.rds')
 
 # on real data
-#tryCatch(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
-tryCatch(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+#tryCatch(dat <- readRDS('C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
+tryCatch(dat <- readRDS('C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
 
 
 # boot
-exp_tables_spearman_boot_simdat <- readRDS("testdata/exp_tables_spearman_boot_simdat.rds")
-exp_tables_auto99_boot_simdat <- readRDS("testdata/exp_tables_auto99_boot_simdat.rds")
+exp_tables_spearman_boot_simdat <- readRDS('testdata/exp_tables_spearman_boot_simdat.rds')
+exp_tables_auto99_boot_simdat <- readRDS('testdata/exp_tables_auto99_boot_simdat.rds')
 
 compare_to_expected_output <- function(cors, exp_matrices, exp_tables) {
   expect_equal(summary(cors), exp_matrices)
@@ -35,23 +35,23 @@ test_that('cluster specification is equivalent', {
 
 
 
-test_that("all methods are corredct for simdat", {
+test_that('all methods are corredct for simdat', {
 
   # Test pearson
   cors_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                           cluster = "participantID",
+                                           cluster = 'participantID',
                                            weighted_between_statistics = TRUE))
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                               cluster = "participantID",
+                                               cluster = 'participantID',
                                                weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_pearson_simdat, exp_tables_pearson_simdat)
   # Test spearman
   cors_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                           cluster = "participantID",
+                                           cluster = 'participantID',
                                            method = 'spearman',
                                            weighted_between_statistics = TRUE))
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                               cluster = "participantID",
+                                               cluster = 'participantID',
                                                method = 'spearman',
                                                weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman_simdat, exp_tables_spearman_simdat)
@@ -152,15 +152,15 @@ test_that('correlations are equal to statsBy implementation on simdat', {
 
 
 
-exp_tables_pearson_real <- readRDS("testdata/exp_tables_pearson_real.rds")
-exp_matrices_pearson_real <- readRDS("testdata/exp_matrices_pearson_real.rds")
-exp_tables_spearman_real <- readRDS("testdata/exp_tables_spearman_real.rds")
-exp_matrices_spearman_real <- readRDS("testdata/exp_matrices_spearman_real.rds")
-exp_tables_jackknife_real <- readRDS("testdata/exp_tables_jackknife_real.rds")
-exp_matrices_jackknife_real <- readRDS("testdata/exp_matrices_jackknife_real.rds")
+exp_tables_pearson_real <- readRDS('testdata/exp_tables_pearson_real.rds')
+exp_matrices_pearson_real <- readRDS('testdata/exp_matrices_pearson_real.rds')
+exp_tables_spearman_real <- readRDS('testdata/exp_tables_spearman_real.rds')
+exp_matrices_spearman_real <- readRDS('testdata/exp_matrices_spearman_real.rds')
+exp_tables_jackknife_real <- readRDS('testdata/exp_tables_jackknife_real.rds')
+exp_matrices_jackknife_real <- readRDS('testdata/exp_matrices_jackknife_real.rds')
 
-exp_tables_spearman_boot_real <- readRDS("testdata/exp_tables_spearman_boot_real.rds")
-exp_tables_auto_boot_real <- readRDS("testdata/exp_tables_auto_boot_real.rds")
+exp_tables_spearman_boot_real <- readRDS('testdata/exp_tables_spearman_boot_real.rds')
+exp_tables_auto_boot_real <- readRDS('testdata/exp_tables_auto_boot_real.rds')
 
 test_that('all functions are correct on real output', {
   # Test pearson

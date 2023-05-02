@@ -7,9 +7,9 @@ cor_jackknife <- function(col_i, col_j, confidence_level, correlation_coefficien
 
   n_comparisons <- length(col_j)
 
-  jackknife_pseudo_values <- sapply(1:n_comparisons, function(index) {
-    n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-index], col_j[-index], method = "spearman")
-  })
+  jackknife_pseudo_values <- mapply(function(i, j) {
+    n_comparisons * correlation_coefficient - (n_comparisons - 1) * cor(col_i[-i], col_j[-j], method = "spearman")
+  }, i = seq_along(col_i), j = seq_along(col_j))
 
   variance_estimate <- function(theta) {
     1 / n_comparisons * sum((jackknife_pseudo_values - theta)^2)
