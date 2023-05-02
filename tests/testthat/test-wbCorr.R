@@ -9,6 +9,11 @@ exp_matrices_spearman_simdat <- readRDS("testdata/exp_matrices_spearman_simdat.r
 exp_tables_jackknife_simdat <- readRDS("testdata/exp_tables_jackknife_simdat.rds")
 exp_matrices_jackknife_simdat <- readRDS("testdata/exp_matrices_jackknife_simdat.rds")
 
+# on real data
+#tryCatch(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+tryCatch(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+
+
 # boot
 exp_tables_spearman_boot_simdat <- readRDS("testdata/exp_tables_spearman_boot_simdat.rds")
 exp_tables_auto99_boot_simdat <- readRDS("testdata/exp_tables_auto99_boot_simdat.rds")
@@ -19,25 +24,36 @@ compare_to_expected_output <- function(cors, exp_matrices, exp_tables) {
 }
 
 
+
+test_that('cluster specification is equivalent', {
+  vers1 <- suppressWarnings(wbCorr(dat, dat$CoupleID, method = 'auto'))
+  vers2 <- suppressWarnings(wbCorr(dat, 'CoupleID', method = 'auto'))
+
+  expect_equal(get_table(vers1), get_tables(vers2))
+  expect_equal(summary(vers1), get_matrix(vers2))
+})
+
+
+
 test_that("all methods are corredct for simdat", {
 
   # Test pearson
   cors_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                          cluster = "participantID",
-                          weighted_between_statistics = TRUE))
+                                           cluster = "participantID",
+                                           weighted_between_statistics = TRUE))
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                              cluster = "participantID",
-                              weighted_between_statistics = FALSE))
+                                               cluster = "participantID",
+                                               weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_pearson_simdat, exp_tables_pearson_simdat)
   # Test spearman
   cors_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                          cluster = "participantID",
-                          method = 'spearman',
-                          weighted_between_statistics = TRUE))
+                                           cluster = "participantID",
+                                           method = 'spearman',
+                                           weighted_between_statistics = TRUE))
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                              cluster = "participantID",
-                              method = 'spearman',
-                              weighted_between_statistics = FALSE))
+                                               cluster = "participantID",
+                                               method = 'spearman',
+                                               weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman_simdat, exp_tables_spearman_simdat)
 
   # Test boot spearman
@@ -57,11 +73,11 @@ test_that("all methods are corredct for simdat", {
 
   # Test jackknife
   cors_not_weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                          cluster = 'participantID',
-                          method = 'spearman-jackknife'))
+                                               cluster = 'participantID',
+                                               method = 'spearman-jackknife'))
   compare_to_expected_output(cors_not_weighted, exp_matrices_jackknife_simdat, exp_tables_jackknife_simdat)
 
-  })
+})
 
 
 "
@@ -135,8 +151,6 @@ test_that('correlations are equal to statsBy implementation on simdat', {
 # on other data
 
 
-try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
-#try(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real.rds"))
 
 exp_tables_pearson_real <- readRDS("testdata/exp_tables_pearson_real.rds")
 exp_matrices_pearson_real <- readRDS("testdata/exp_matrices_pearson_real.rds")
@@ -151,8 +165,8 @@ exp_tables_auto_boot_real <- readRDS("testdata/exp_tables_auto_boot_real.rds")
 test_that('all functions are correct on real output', {
   # Test pearson
   cors_not_weighted <- suppressWarnings(wbCorr(dat,
-                          cluster = 'CoupleID',
-                          weighted_between_statistics = FALSE))
+                                               cluster = 'CoupleID',
+                                               weighted_between_statistics = FALSE))
 
   compare_to_expected_output(cors_not_weighted, exp_matrices_pearson_real, exp_tables_pearson_real)
 
@@ -160,9 +174,9 @@ test_that('all functions are correct on real output', {
   # Test spearman
 
   cors_not_weighted <- suppressWarnings(wbCorr(dat,
-                              cluster = 'CoupleID',
-                              method = 'spearman',
-                              weighted_between_statistics = FALSE))
+                                               cluster = 'CoupleID',
+                                               method = 'spearman',
+                                               weighted_between_statistics = FALSE))
   compare_to_expected_output(cors_not_weighted, exp_matrices_spearman_real, exp_tables_spearman_real)
 
   # Test boot spearman
@@ -184,17 +198,9 @@ test_that('all functions are correct on real output', {
 
   # Test jackknife
   cors_not_weighted <- suppressWarnings(wbCorr(dat,
-                              cluster = 'CoupleID',
-                              method = 'spearman-jackknife'))
+                                               cluster = 'CoupleID',
+                                               method = 'spearman-jackknife'))
   compare_to_expected_output(cors_not_weighted, exp_matrices_jackknife_real, exp_tables_jackknife_real)
 
-})
-
-test_that('cluster specification is equivalent', {
-  vers1 <- suppressWarnings(wbCorr(dat, dat$CoupleID, method = 'auto'))
-  vers2 <- suppressWarnings(wbCorr(dat, 'CoupleID', method = 'auto'))
-
-  expect_equal(get_table(vers1), get_tables(vers2))
-  expect_equal(summary(vers1), get_matrix(vers2))
 })
 

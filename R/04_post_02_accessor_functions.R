@@ -132,3 +132,38 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
 #' @rdname  get_matrix
 #' @export
 get_matrices <- get_matrix
+
+
+##############################################
+# get_ICC(), get_ICCs()
+##############################################
+
+#' @title Return all ICCs for the original variables.
+#' @description You can use get_ICC() or get_ICCs() interchangeably.
+#'
+#' @param object A wbCorr object, created by the wbCorr() function.
+#' @return A dataframe with ICCs for all variables. ICC is obtained by fitting
+#' mixed effects models and extracting the variance components. Then, the formula
+#' between- variance / total- variance is applied.
+#' @seealso \code{\link[=wbCorr]{wbCorr}}
+#' @examples
+#' # importing our simulated example dataset with pre-specified within- and between- correlations
+#' data("simdat_intensive_longitudinal")
+#'
+#' # create object:
+#' correlations <- wbCorr(data = simdat_intensive_longitudinal,
+#'                       cluster = 'participantID')
+#'
+#' # returns the ICCs:
+#' ICCs <- get_ICC(correlations)
+#' print(ICCs)
+#'
+#' @export
+get_ICC <- function(object) {
+  return(object@ICC)
+}
+
+#' @rdname  get_ICC
+#' @export
+get_ICCs <- get_ICC
+

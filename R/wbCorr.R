@@ -72,27 +72,19 @@ wbCorr <- function(data, cluster,
                    bootstrap = FALSE,
                    nboot = 1000,
                    weighted_between_statistics = FALSE) {
-  # Input validation and error handling
+
+  # input validation and preparation
   input_data <- data
-  if (!is.data.frame(input_data)) {
-    stop("input_data must be a data frame")
-  }
-  if (!method %in% c("pearson", "spearman", "spearman-jackknife", "auto")) {
-    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', 'spearman-jackknife', 'auto'.")
-  }
-  if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
-    warning("weighted_between_statistics not supported for jackknife CIs. Ignoring argument.")
-    weighted_between_statistics = FALSE
-  }
-  if (method == 'spearman-jackknife' & bootstrap == TRUE) {
-    stop("Jackknife and bootstraping can't both be active at once.")
-  }
-  if (bootstrap == TRUE & weighted_between_statistics == TRUE) {
-    stop("weighted between-statistics not supported with bootstraping.")
-  }
+  validated_cluster <- input_validation_and_prep(input_data, cluster, method,
+                                           weighted_between_statistics,
+                                           bootstrap)
+  cluster_var <- validated_cluster$cluster_var
+  cluster_name <- validated_cluster$cluster_name
+  cluster <- 'cluster'
 
   # Split variance into between- and within
-  centered_df <- wbCenter(input_data, cluster, method, weighted_between_statistics)
+  centered_df <- wbCenter(input_data, cluster_var, method,
+                          weighted_between_statistics)
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
@@ -133,7 +125,11 @@ wbCorr <- function(data, cluster,
   within_table <- within_cors$result_table
   between_table <- between_cors$result_table
 
-  # Store them in two sections of the object
+
+  # Calculate ICCs
+  ICC <- compute_ICC1(input_data, cluster_var, cluster_name)
+
+  # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
                  p_values = within_p_values,
                  confidence_intervals = within_confidence_intervals,
@@ -143,7 +139,7 @@ wbCorr <- function(data, cluster,
                   confidence_intervals = between_confidence_intervals,
                   table = between_table)
 
-  output <- new("wbCorr", within = within, between = between)
+  output <- new("wbCorr", within = within, between = between, ICC = ICC)
   attr(output, "call") <- match.call()
   return(output)
 }
@@ -167,7 +163,7 @@ wbCorr <- function(data, cluster,
 #' @importFrom methods setMethod
 #' @importFrom methods setClass
 #' @export
-methods::setClass("wbCorr", representation(within = "list", between = "list"))
+methods::setClass("wbCorr", representation(within = "list", between = "list", ICC = "data.frame"))
 
 
 # Set method for printing
@@ -193,10 +189,10 @@ methods::setClass("wbCorr", representation(within = "list", between = "list"))
 methods::setMethod("print", "wbCorr", function(x, ...) {
   cat("\n---- wbCorr Object ----\n")
   cat("Call: ", deparse(x@call), "\n")
-  cat("\nAccess full tables with `get_tables(object, which = c('within', 'between'))`\n")
-  cat("Access correlation matrices with `summary(object, which = c('within', 'between', merge')`\n")
+  cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
+  cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
+  cat("\nAccess full ICC list with get_ICC(object)\n")
 
-  # Function for printing a section of the object
   # Function for printing a section of the object
   print_section <- function(title, data) {
     cat("\n", title, "\n")
@@ -210,10 +206,11 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
   # printing...
   print_section("Within-Cluster Correlations:", x@within$table)
   print_section("Between-Cluster Correlations:", x@between$table)
+  print_section("Intraclass Correlation Coefficients:", x@ICC)
 
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
-  cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')\n")
-
+  cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
+  cat("\nAccess full ICC list with get_ICC(object)\n")
 
 })
 

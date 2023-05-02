@@ -5,27 +5,12 @@
 
 # This function centers the data within and between clusters.
 #' @importFrom stats aggregate
-wbCenter <- function(input_data, cluster, method, weighted_between_statistics = FALSE) {
+wbCenter <- function(input_data, cluster_var, method, weighted_between_statistics = FALSE) {
   # Checks
   if (!is.data.frame(input_data)) {
     stop("input_data must be a data frame")
   } else if (ncol(input_data) < 2) {
     stop("input_data must have at least two columns")
-  }
-
-  # Determine Cluster Variable
-  if (length(cluster) > 1) {
-    cluster <- as.factor(cluster)
-  }
-  if (is.character(cluster)) {
-    if (!cluster %in% colnames(input_data)) {
-      stop("cluster must be a character (name of column in passed DF) or a numeric vector. Name correct?")
-    }
-    cluster_var <- as.factor(input_data[[cluster]])
-    cluster <- 'cluster'
-  } else {
-    cluster_var <- as.factor(cluster)
-    cluster <- 'cluster'
   }
 
   # Center the data
