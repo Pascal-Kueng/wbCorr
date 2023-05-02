@@ -45,7 +45,7 @@ update_wbCorr <- function(ask = FALSE) {
       cat("There is a newer version available on GitHub.\n")
 
       if (ask == TRUE) {
-        response <- readline("\n\nDo you want to update the package? (y/n): ")
+        response <- readline("Do you want to update the package? (y/n): ")
       } else if (ask == FALSE) {
         response <- 'y'
       }
