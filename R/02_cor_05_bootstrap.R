@@ -1,7 +1,18 @@
 
 #' @importFrom stats quantile
-cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot, correlation_coefficient) {
+cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot) {
   set.seed(42)
+
+  correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
+                                                  method = method))
+  if (is.na(correlation_coefficient)) {
+    return(list(correlation_coefficient = NA,
+                test_statistic = NA,
+                p_value = NA,
+                lower_bound = NA,
+                upper_bound = NA))
+  }
+
   # Combine data
   df <- data.frame(x = col_i, y = col_j)
 

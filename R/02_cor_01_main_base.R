@@ -61,10 +61,22 @@ corAndPValues <- function(input_data,
       type_i <- auto_type[[i]]
       type_j <- auto_type[[j]]
 
-      if (type_i == 'factor' | type_j == 'factor') {
-        method = 'spearman'
+      method <- 'pearson'
+      method_table <- "pearson's r"
+
+
+      if (type_i == 'ordinal' | type_j == 'ordinal') {
+        method <- 'spearman'
+        method_table <- "spearman's rho"
       } else {
-        method = 'pearson'
+        if(type_i == 'binary' | type_j == 'binary') {
+          method <- 'pearson'
+          method_table <- "point-biserial"
+          if (type_i == 'binary' & type_j  == 'binary') {
+            method <- 'pearson'
+            method_table <- "phi coefficient"
+          }
+        }
       }
     }
 
@@ -83,15 +95,21 @@ corAndPValues <- function(input_data,
     if (method == 'pearson') {
       degrees_freedom <- base_for_degrees_freedom -2
       statistic_type <- 't-statistic'
-      method_table <- "pearson's r"
+      if (is.null(auto_type)) {
+        method_table <- "spearman's rho"
+      }
     } else if (method == 'spearman') {
       degrees_freedom <- base_for_degrees_freedom - 3
       statistic_type <- 'z-statistic'
-      method_table <- "spearman's rho"
+      if (is.null(auto_type)) {
+        method_table <- "spearman's rho"
+      }
     } else if (method == 'spearman-jackknife') {
       degrees_freedom <- NA
       statistic_type <- NA
-      method_table <- "spearman's rho"
+      if (is.null(auto_type)) {
+        method_table <- "spearman's rho"
+      }
     }
 
     else {

@@ -28,6 +28,14 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     auto_type[[name]] <- assumptions$type
     warnings[[name]] <- assumptions$warning
 
+    if(assumptions$type == 'nominal'& method == 'auto') {
+      warning("removed nominal Variable. Change coding or don't use method = 'auto' if you want to include variable.")
+      auto_type[[name]] <- NULL
+      warnings[[name]] <- NULL
+      input_data[[name]] <- NULL
+      next
+      }
+
     grand_mean <- mean(col, na.rm = TRUE)
     col_grand_mean_c <- col - grand_mean
 

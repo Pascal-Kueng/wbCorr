@@ -1,5 +1,16 @@
 
-cor_spearman <- function(degrees_freedom, confidence_level, correlation_coefficient) {
+cor_spearman <- function(col_i, col_j, degrees_freedom, confidence_level) {
+
+  correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
+                                                  method = 'spearman'))
+  if (is.na(correlation_coefficient)) {
+    return(list(correlation_coefficient = NA,
+                test_statistic = NA,
+                p_value = NA,
+                lower_bound = NA,
+                upper_bound = NA))
+  }
+
   # Fisher Z-transformation
   se <- 1 / sqrt(degrees_freedom)
 

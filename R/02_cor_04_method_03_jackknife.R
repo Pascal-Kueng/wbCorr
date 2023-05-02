@@ -1,5 +1,16 @@
-cor_jackknife <- function(col_i, col_j, confidence_level, correlation_coefficient) {
+cor_jackknife <- function(col_i, col_j, confidence_level) {
   set.seed(42)
+
+  correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
+                                                  method = 'spearman'))
+
+  if (is.na(correlation_coefficient)) {
+    return(list(correlation_coefficient = NA,
+                test_statistic = NA,
+                p_value = NA,
+                lower_bound = NA,
+                upper_bound = NA))
+  }
 
   if (!all(lengths(list(col_i, col_j)) == length(col_i))) {
     stop("Input vectors must have the same length.")

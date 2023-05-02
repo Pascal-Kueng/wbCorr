@@ -10,13 +10,15 @@ check_assumptions <- function(col, name, method) {
     return(list(col = col, type = 'numeric', warning = "None"))
   }
   if (is.factor(col)) {
-    if (nlevels(col) == 2 | is.ordered(col)) {
-      return(list(col = as.numeric(col), type = 'factor', warning = "None"))
+    if (nlevels(col) == 2) {
+      return(list(col = as.numeric(col), type = 'binary', warning = "None"))
+    }
+    if (is.ordered(col)) {
+      return(list(col = as.numeric(col), type = 'ordinal', warning = "None"))
     } else {
-      warning(paste("The factor", name, "has more than two levels and is unordered. Check coding of the variable and assumptions!"))
-      return(list(col = as.numeric(col), type = 'factor', warning = "Unordered factor. Check coding and assumptions!"))
+      warning(paste("The factor", name, "coded as non-binary nominal variable. Can not meaningfully be centered. Consider dummy-coding for each level."))
+      return(list(col = as.numeric(col), type = 'nominal', warning = paste(name, "nominal variable?")))
     }
   }
-  warning(paste("Failed to convert", name, "to factor. Check coding of the variable and assumptions!"))
-  return(list(col = col, type = NULL, warning = "Failed to convert. Check coding and assumptions!"))
+  warning(paste("Failed to convert", name, "to numeric. Check coding of the variable and assumptions!"))
 }
