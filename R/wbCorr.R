@@ -75,9 +75,11 @@ wbCorr <- function(data, cluster,
 
   # input validation and preparation
   input_data <- data
-  cluster_var <- input_validation_and_prep(input_data, cluster, method,
+  validated_cluster <- input_validation_and_prep(input_data, cluster, method,
                                            weighted_between_statistics,
                                            bootstrap)
+  cluster_var <- validated_cluster$cluster_var
+  cluster_name <- validated_cluster$cluster_name
   cluster <- 'cluster'
 
   # Split variance into between- and within
