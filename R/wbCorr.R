@@ -130,7 +130,7 @@ wbCorr <- function(data, cluster,
   between_variance_compenents <- diag(var(between_df, na.rm = TRUE))
   within_variance_components <- diag(var(within_df, na.rm = TRUE))
 
-  ICC_df <- (between_variance_compenents) / (between_variance_compenents + within_variance_components)
+  ICC_df <- compute_ICC1(input_data, cluster_var)
 
   # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
