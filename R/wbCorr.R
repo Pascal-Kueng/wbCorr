@@ -72,27 +72,17 @@ wbCorr <- function(data, cluster,
                    bootstrap = FALSE,
                    nboot = 1000,
                    weighted_between_statistics = FALSE) {
-  # Input validation and error handling
+
+  # input validation and preparation
   input_data <- data
-  if (!is.data.frame(input_data)) {
-    stop("input_data must be a data frame")
-  }
-  if (!method %in% c("pearson", "spearman", "spearman-jackknife", "auto")) {
-    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', 'spearman-jackknife', 'auto'.")
-  }
-  if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
-    warning("weighted_between_statistics not supported for jackknife CIs. Ignoring argument.")
-    weighted_between_statistics = FALSE
-  }
-  if (method == 'spearman-jackknife' & bootstrap == TRUE) {
-    stop("Jackknife and bootstraping can't both be active at once.")
-  }
-  if (bootstrap == TRUE & weighted_between_statistics == TRUE) {
-    stop("weighted between-statistics not supported with bootstraping.")
-  }
+  cluster_var <- input_validation_and_prep(input_data, cluster, method,
+                                           weighted_between_statistics,
+                                           bootstrap)
+  cluster <- 'cluster'
 
   # Split variance into between- and within
-  centered_df <- wbCenter(input_data, cluster, method, weighted_between_statistics)
+  centered_df <- wbCenter(input_data, cluster_var, method,
+                          weighted_between_statistics)
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
@@ -133,7 +123,14 @@ wbCorr <- function(data, cluster,
   within_table <- within_cors$result_table
   between_table <- between_cors$result_table
 
-  # Store them in two sections of the object
+
+  # Calculate ICCs
+  between_variance_compenents <- diag(var(between_df, na.rm = TRUE))
+  within_variance_components <- diag(var(within_df, na.rm = TRUE))
+
+  ICC_df <- (between_variance_compenents) / (between_variance_compenents + within_variance_components)
+
+  # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
                  p_values = within_p_values,
                  confidence_intervals = within_confidence_intervals,
@@ -142,8 +139,9 @@ wbCorr <- function(data, cluster,
                   p_values = between_p_values,
                   confidence_intervals = between_confidence_intervals,
                   table = between_table)
+  ICC <- "Not yet supported"
 
-  output <- new("wbCorr", within = within, between = between)
+  output <- new("wbCorr", within = within, between = between, ICC = ICC)
   attr(output, "call") <- match.call()
   return(output)
 }
@@ -167,7 +165,7 @@ wbCorr <- function(data, cluster,
 #' @importFrom methods setMethod
 #' @importFrom methods setClass
 #' @export
-methods::setClass("wbCorr", representation(within = "list", between = "list"))
+methods::setClass("wbCorr", representation(within = "list", between = "list", ICC = "character"))
 
 
 # Set method for printing

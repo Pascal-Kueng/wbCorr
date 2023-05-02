@@ -135,8 +135,8 @@ test_that('correlations are equal to statsBy implementation on simdat', {
 # on other data
 
 
-try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
-#try(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real.rds"))
+#tryCatch(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+tryCatch(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
 
 exp_tables_pearson_real <- readRDS("testdata/exp_tables_pearson_real.rds")
 exp_matrices_pearson_real <- readRDS("testdata/exp_matrices_pearson_real.rds")
