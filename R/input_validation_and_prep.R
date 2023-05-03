@@ -20,17 +20,22 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
   }
 
   # Determine Cluster Variable
-  # if we have a vector:
+  if (is.null(cluster)) {
+    stop("Cluster Variable empty!")
+  }
+
+
+  # Do we have a vector?
   if (length(cluster) > 1) {
     cluster_var <- as.factor(cluster)
 
+    # is vector in data?
     for (name in colnames(input_data)) {
-      if (all(input_data[[name]] == cluster, na.rm = TRUE)) {
-        cluster_name <- name
+      if (all(as.numeric(as.factor(input_data[[name]])) == as.numeric(cluster_var), na.rm = TRUE)) {
+        input_data[[name]] <- NULL
       }
     }
-
-    return(list(cluster_var = cluster_var, cluster_name = cluster_name))
+    return(cluster_var)
   }
 
   # if we have a character string:
@@ -38,7 +43,7 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
     stop("cluster must be a character (name of column in passed DF) or a numeric vector. Name correct?")
   }
 
-  cluster_name <- cluster
-  cluster_var <- as.factor(input_data[[cluster_name]])
-  return(list(cluster_var = cluster_var, cluster_name = cluster_name))
+  cluster_var <- as.factor(input_data[[cluster]])
+  input_data[[cluster]] <- NULL
+  return(cluster_var)
 }

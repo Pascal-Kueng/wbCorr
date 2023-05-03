@@ -117,7 +117,9 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
   }
   if ('merge' %in% which | 'm' %in% which | 'merged' %in% which) {
     return_list[['merged_wb']] <- combined_df_wb
+    return_list[['note_wb']] <- "Top-right triangle: Within-correlations. Bottom-left triangle: Between-correlations."
     return_list[['merged_bw']] <- combined_df_bw
+    return_list[['note_bw']] <- "Top-right triangle: Between-correlations. Bottom-left triangle: Within-correlations."
 
   } else if ('merge_bw' %in% which | 'bw' %in% which) {
     return_list[['merged_bw']] <- combined_df_bw
@@ -166,4 +168,10 @@ get_ICC <- function(object) {
 #' @rdname  get_ICC
 #' @export
 get_ICCs <- get_ICC
+
+#' @rdname get_ICC
+#' @export
+get_icc <- get_ICC
+
+
 

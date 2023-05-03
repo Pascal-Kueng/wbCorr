@@ -1,6 +1,7 @@
 
 data("simdat_intensive_longitudinal")
-try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+#try(dat <- readRDS("C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
+try(dat <- readRDS("C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds"))
 
 create_files <- function(data, cluster, type) {
   # spearman
