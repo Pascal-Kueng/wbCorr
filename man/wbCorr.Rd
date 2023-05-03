@@ -2,9 +2,20 @@
 % Please edit documentation in R/wbCorr.R
 \name{wbCorr}
 \alias{wbCorr}
+\alias{wbcorr}
 \title{wbCorr}
 \usage{
 wbCorr(
+  data,
+  cluster,
+  confidence_level = 0.95,
+  method = "pearson",
+  bootstrap = FALSE,
+  nboot = 1000,
+  weighted_between_statistics = FALSE
+)
+
+wbcorr(
   data,
   cluster,
   confidence_level = 0.95,
@@ -87,5 +98,5 @@ summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to 
 
 }
 \seealso{
-\code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_matrix]{get_matrix}}
+\code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_ICC]{get_ICC}}
 }

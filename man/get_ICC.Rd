@@ -3,11 +3,14 @@
 \name{get_ICC}
 \alias{get_ICC}
 \alias{get_ICCs}
+\alias{get_icc}
 \title{Return all ICCs for the original variables.}
 \usage{
 get_ICC(object)
 
 get_ICCs(object)
+
+get_icc(object)
 }
 \arguments{
 \item{object}{A wbCorr object, created by the wbCorr() function.}

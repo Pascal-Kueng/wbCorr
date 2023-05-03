@@ -37,7 +37,7 @@
 #' and between-cluster correlations for further analysis.
 #'
 #' @seealso
-#' \code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_matrix]{get_matrix}}
+#' \code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_ICC]{get_ICC}}
 #'
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -239,4 +239,6 @@ setMethod("show", signature("wbCorr"), function(object) {
 methods::setMethod("summary", "wbCorr", get_matrices)
 
 
-
+#' @rdname wbCorr
+#' @export
+wbcorr <- wbCorr
