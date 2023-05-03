@@ -56,9 +56,10 @@ contributed fewer measurement points. If TRUE, correlations are weighted. These 
 without missing data and an equal number of measurements per person. TRUE only supports continuous variables (default: FALSE).}
 }
 \value{
-A wbCorr object that contains within- and between-cluster correlations, p-values, and confidence intervals.
-Use the get_table() function on the wbCorr object to retrieve full tables.
-Use the summary() or get_matrix() function on the wbCorr object to retrieve correlation matrices.
+A wbCorr object that contains within- and between-cluster statistics.
+Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
+Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices.
+Use  get_ICC() in order to get all intra class correlations.
 }
 \description{
 The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
