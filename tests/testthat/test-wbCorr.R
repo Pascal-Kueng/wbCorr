@@ -31,6 +31,8 @@ test_that('cluster specification is equivalent', {
 
   expect_equal(get_table(vers1), get_tables(vers2))
   expect_equal(summary(vers1), get_matrix(vers2))
+
+  vers1 <- suppressWarnings
 })
 
 
@@ -204,3 +206,10 @@ test_that('all functions are correct on real output', {
 
 })
 
+
+
+# Test inputs
+wbCorr(dat, dat$CoupleID)
+wbCorr(dat, 'CoupleID')
+
+wbCorr(dat[4:10], dat$CoupleID)

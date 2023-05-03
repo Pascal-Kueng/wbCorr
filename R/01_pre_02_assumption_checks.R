@@ -20,5 +20,6 @@ check_assumptions <- function(col, name, method) {
       return(list(col = as.numeric(col), type = 'nominal', warning = paste(name, "nominal variable?")))
     }
   }
+  return(list(col = NULL, type = NULL, warning = paste(name, "ERROR")))
   warning(paste("Failed to convert", name, "to numeric. Check coding of the variable and assumptions!"))
 }

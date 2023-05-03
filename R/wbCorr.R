@@ -76,11 +76,10 @@ wbCorr <- function(data, cluster,
 
   # input validation and preparation
   input_data <- data
-  validated_cluster <- input_validation_and_prep(input_data, cluster, method,
+  cluster_var <- input_validation_and_prep(input_data, cluster, method,
                                            weighted_between_statistics,
                                            bootstrap)
-  cluster_var <- validated_cluster$cluster_var
-  cluster_name <- validated_cluster$cluster_name
+
   cluster <- 'cluster'
 
   # Split variance into between- and within
@@ -128,7 +127,7 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  ICC <- compute_ICC1(input_data, cluster_var, cluster_name)
+  ICC <- compute_ICC1(input_data, cluster_var)
 
   # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
