@@ -1,5 +1,6 @@
 
 wb_plot <- function(x, y, which = NULL,
+                    standardize = TRUE,
                     outlier_detection = 'zscore',
                     outlier_threshold = 'recommended',
                     type = "p",
@@ -10,9 +11,17 @@ wb_plot <- function(x, y, which = NULL,
     which <- y
   }
 
+  within_df <- x@within_df
+  between_df <- x@between_df
+
+  if (standardize) {
+    within_df <- scale(within_df)
+    between_df <- scale(between_df)
+  }
+
   message("This may take a while...")
   if ('w' %in% which | 'within' %in% which) {
-    pairs(x@within_df,
+    pairs(within_df,
           main = "Bivariate associations of within-cluster centered variables.",
           panel = function(x, y, ...) custom_panel(x, y, type,
                                                    outlier_detection,
@@ -23,7 +32,7 @@ wb_plot <- function(x, y, which = NULL,
           ...)
   }
   if ('b' %in% which | 'between' %in% which) {
-    pairs(x@between_df,
+    pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",
           panel = function(x, y, ...) custom_panel(x, y, type,
                                                    outlier_detection,

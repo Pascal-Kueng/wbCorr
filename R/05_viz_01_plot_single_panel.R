@@ -5,6 +5,12 @@ custom_panel <- function(x, y, type,
                          reg_lwd,
                          ...) {
 
+  # detect nan and infinate values.
+  valid_pairs <- is.finite(x) & is.finite(y)
+
+  x <- x[valid_pairs]
+  y <- y[valid_pairs]
+
   # Plot all points
   points(x, y, type = type,
          pch = pch, lwd = dot_lwd,
