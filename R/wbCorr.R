@@ -94,6 +94,18 @@ wbCorr <- function(data, cluster,
   auto_type <- centered_df$auto_type
   warnings <- centered_df$warnings
 
+  "
+  # Check for outliars
+  within_outliers_check <- wb_check_outliers(within_df)
+  within_outliers <- within_outliers_check$outliers
+  within_df_no_outliers <- within_outliers_check$data_no_outliers
+
+  # between centered
+  between_outliers_check <- wb_check_outliers(between)
+  between_outliers <- between_outliers_check$outliers
+  between_df_no_outliers <- between_outliers_check$data_no_outliers
+  "
+
   if (!method == 'auto') {
     auto_type = NULL
   }

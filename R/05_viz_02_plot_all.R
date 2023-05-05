@@ -1,23 +1,9 @@
-wb_plot <- function(x, y, which = NULL, type = "p", ...) {
+
+wb_plot <- function(x, y, which = NULL, type = "p", show_outliers = TRUE, ...) {
   if (is.null(which)) {
     which <- y
   }
 
-  custom_panel <- function(x, y, type, ...) {
-    points(x, y, type = type, ...)
-
-    linear_regression <- NULL
-
-    tryCatch({
-      linear_regression <- lm(y ~ x, na.action = 'na.omit')
-    }, error = function(e) {})
-    if (!is.null(linear_regression) && all(is.finite(coef(linear_regression)))) {
-      a <-
-      abline(linear_regression,
-             col = "blue",
-             lwd = 2)
-    }
-  }
 
   if ('w' %in% which | 'within' %in% which) {
     pairs(x@within_df,
