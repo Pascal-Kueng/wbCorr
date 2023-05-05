@@ -139,7 +139,13 @@ wbCorr <- function(data, cluster,
                   confidence_intervals = between_confidence_intervals,
                   table = between_table)
 
-  output <- new("wbCorr", within = within, between = between, ICC = ICC)
+  output <- new("wbCorr",
+                within = within,
+                between = between,
+                ICC = ICC,
+                within_df = within_df,
+                between_df = between_df)
+
   attr(output, "call") <- match.call()
   return(output)
 }
@@ -163,7 +169,11 @@ wbCorr <- function(data, cluster,
 #' @importFrom methods setMethod
 #' @importFrom methods setClass
 #' @export
-methods::setClass("wbCorr", representation(within = "list", between = "list", ICC = "data.frame"))
+methods::setClass("wbCorr", representation(within = "list",
+                                           between = "list",
+                                           ICC = "data.frame",
+                                           within_df = "data.frame",
+                                           between_df = "data.frame"))
 
 #' @rdname wbCorr
 #' @export
