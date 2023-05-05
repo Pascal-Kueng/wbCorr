@@ -279,7 +279,9 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @param x A wbCorr object.
 #' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
 #' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.
-#' @param ... further options to be passed to the base plot function.
+#' @param type Choose the method of plotting (see ?base::plot for available types).
+#' @param ... further options (see ?base::plot) to be passed to the base plot function.
+#' @seealso \code{\link[=base::plot]{plot}}
 #' @export
 #' @aliases plot.wbCorr
 methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)

@@ -7,7 +7,7 @@
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).}
 \usage{
-\S4method{plot}{wbCorr}(x, y, which = NULL, ...)
+\S4method{plot}{wbCorr}(x, y, which = NULL, type = "p", ...)
 }
 \arguments{
 \item{x}{A wbCorr object.}
@@ -16,10 +16,15 @@ or the within-centered variables (representing the within-cluster correlations b
 
 \item{which}{Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.}
 
-\item{...}{further options to be passed to the base plot function.}
+\item{type}{Choose the method of plotting (see ?base::plot for available types).}
+
+\item{...}{further options (see ?base::plot) to be passed to the base plot function.}
 }
 \description{
 Plots the centered variables of the provided dataframe against each other.
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
+}
+\seealso{
+\code{\link[=base::plot]{plot}}
 }
