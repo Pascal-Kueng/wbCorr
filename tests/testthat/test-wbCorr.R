@@ -10,8 +10,8 @@ exp_tables_jackknife_simdat <- readRDS('testdata/exp_tables_jackknife_simdat.rds
 exp_matrices_jackknife_simdat <- readRDS('testdata/exp_matrices_jackknife_simdat.rds')
 
 # on real data
-#tryCatch(dat <- readRDS('C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
-tryCatch(dat <- readRDS('C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
+tryCatch(dat <- readRDS('C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
+#tryCatch(dat <- readRDS('C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
 
 
 # boot

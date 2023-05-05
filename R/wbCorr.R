@@ -166,6 +166,10 @@ wbCorr <- function(data, cluster,
 methods::setClass("wbCorr", representation(within = "list", between = "list", ICC = "data.frame"))
 
 
+#######################################################
+# Print()
+#######################################################
+
 # Set method for printing
 #' @title Print Method for the wbCorr Class
 #' @description Prints a summary of the \code{wbCorr} object.
@@ -214,6 +218,11 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
 
 })
 
+
+#######################################################
+# Show()
+#######################################################
+
 #' @title Show Method for the wbCorr Class
 #'
 #' @description Shows a summary of the \code{wbCorr} object, equivalent to the print method.
@@ -230,6 +239,11 @@ methods::setMethod("print", "wbCorr", function(x, ...) {
 setMethod("show", signature("wbCorr"), function(object) {
   print(object)
 })
+
+
+#######################################################
+# summary()
+#######################################################
 
 #' @rdname  get_matrix
 #' @aliases get_matrices
