@@ -43,12 +43,10 @@
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
 #' data("simdat_intensive_longitudinal")
-#' # use ?simdat_intensive_longitudinal # documentation of the dataset and the "true" correlations
-#' head(simdat_intensive_longitudinal)
 #'
-#' # returns an object:
-#' correlations <- wbCorr(data = simdat_intensive_longitudinal,
-#' cluster = 'participantID')
+#' # create a wbCorr object:
+#' correlations <- wbCorr(simdat_intensive_longitudinal,
+#'                      'participantID')
 #'
 #' # returns a list with full detailed tables of the correlations:
 #' tables <- get_table(correlations) # the get_tables() function is equivalent
@@ -65,6 +63,11 @@
 #' # Option 2:
 #' get_tables(correlations, which = 'within')
 #' summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to full words
+#'
+#' # Plot the centered variables against each other
+#' plot(correlations, 'within')
+#' plot(correlations, which = 'b')
+#'
 #'
 #' @export
 wbCorr <- function(data, cluster,
@@ -203,7 +206,7 @@ wbcorr <- wbCorr
 #'
 #' @importFrom methods setMethod
 #' @export
-methods::setMethod("print", "wbCorr", function(x, ...) {
+methods::setMethod("print", signature("wbCorr"), function(x, ...) {
   cat("\n---- wbCorr Object ----\n")
   cat("Call: ", deparse(x@call), "\n")
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
@@ -263,7 +266,20 @@ setMethod("show", signature("wbCorr"), function(object) {
 #' @aliases summary.wbCorr
 #' @importFrom methods setMethod
 #' @export
-methods::setMethod("summary", "wbCorr", get_matrices)
+methods::setMethod("summary", signature("wbCorr"), get_matrices)
 
 
+#######################################################
+# plot()
+#######################################################
 
+#' Plots the centered variables of the provided dataframe against each other.
+#' Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
+#' or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
+#' @param x A wbCorr object.
+#' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
+#' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.
+#' @param ... further options to be passed to the base plot function.
+#' @export
+#' @aliases plot.wbCorr
+methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)

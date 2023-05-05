@@ -74,12 +74,10 @@ and between-cluster correlations for further analysis.
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations
 data("simdat_intensive_longitudinal")
-# use ?simdat_intensive_longitudinal # documentation of the dataset and the "true" correlations
-head(simdat_intensive_longitudinal)
 
-# returns an object:
-correlations <- wbCorr(data = simdat_intensive_longitudinal,
-cluster = 'participantID')
+# create a wbCorr object:
+correlations <- wbCorr(simdat_intensive_longitudinal,
+                     'participantID')
 
 # returns a list with full detailed tables of the correlations:
 tables <- get_table(correlations) # the get_tables() function is equivalent
@@ -96,6 +94,11 @@ tables$between
 # Option 2:
 get_tables(correlations, which = 'within')
 summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to full words
+
+# Plot the centered variables against each other
+plot(correlations, 'within')
+plot(correlations, which = 'b')
+
 
 }
 \seealso{

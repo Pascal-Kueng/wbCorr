@@ -209,7 +209,13 @@ test_that('all functions are correct on real output', {
 
 
 # Test inputs
-wbCorr(dat, dat$CoupleID)
-wbCorr(dat, 'CoupleID')
+suppressWarnings(wbCorr(dat, dat$CoupleID))
+suppressWarnings(wbCorr(dat, 'CoupleID'))
 
-wbCorr(dat[4:10], dat$CoupleID)
+a <- suppressWarnings(wbCorr(dat[4:10], dat$CoupleID))
+
+# Test Plots
+suppressWarnings(plot(a, 'w'))
+suppressWarnings(plot(a, 'between'))
+suppressWarnings(plot(a, which = 'within'))
+suppressWarnings(plot(a, 'w', which = 'between'))
