@@ -7,7 +7,15 @@
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).}
 \usage{
-\S4method{plot}{wbCorr}(x, y, which = NULL, type = "p", show_outliers = TRUE, ...)
+\S4method{plot}{wbCorr}(
+  x,
+  y,
+  which = NULL,
+  type = "p",
+  outlier_detection = "zscore",
+  outlier_threshold = "recommended",
+  ...
+)
 }
 \arguments{
 \item{x}{A wbCorr object.}

@@ -1,14 +1,7 @@
-custom_panel <- function(x, y, type, ...) {
-
-  # Identify Outliers
-  x_outliers <- wb_check_outliers(x)
-  y_outliers <- wb_check_outliers(y)
+custom_panel <- function(x, y, type, outlier_detection, outlier_threshold, ...) {
 
   # Plot all points
   points(x, y, type = type, pch = 19, col = "black", ...)
-
-
-
 
   # Create Abline (regression)
   linear_regression <- NULL
@@ -21,5 +14,40 @@ custom_panel <- function(x, y, type, ...) {
       abline(linear_regression,
              col = "blue",
              lwd = 2)
+  }
+
+
+  # Identify Outliers
+  if (outlier_detection == FALSE) {
+    return(NULL)
+  }
+  x_outliers <- wb_check_outliers(x, outlier_detection, outlier_threshold)
+  y_outliers <- wb_check_outliers(y, outlier_detection, outlier_threshold)
+
+  # Plot x outliers in red
+
+  if (length(x_outliers) > 0) {
+    x_outlier_indices <- which(x %in% x_outliers)
+    y_corresponding <- y[x_outlier_indices]
+    if (length(x_outliers) == length(y_corresponding)) {
+      points(x_outliers,
+             y[x_outlier_indices],
+             type = 'p',
+             pch = 19,
+             col = "red")
+    }
+  }
+
+  # Plot y outliers in red
+  if (length(y_outliers) > 0) {
+    y_outlier_indices <- which(y %in% y_outliers)
+    x_corresponding <- x[y_outlier_indices]
+    if (length(y_outliers) == length(x_corresponding)) {
+      points(x[y_outlier_indices],
+             y_outliers,
+             type = 'p',
+             pch = 19,
+             col = "red")
+    }
   }
 }
