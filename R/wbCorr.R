@@ -165,6 +165,9 @@ wbCorr <- function(data, cluster,
 #' @export
 methods::setClass("wbCorr", representation(within = "list", between = "list", ICC = "data.frame"))
 
+#' @rdname wbCorr
+#' @export
+wbcorr <- wbCorr
 
 #######################################################
 # Print()
@@ -253,6 +256,4 @@ setMethod("show", signature("wbCorr"), function(object) {
 methods::setMethod("summary", "wbCorr", get_matrices)
 
 
-#' @rdname wbCorr
-#' @export
-wbcorr <- wbCorr
+
