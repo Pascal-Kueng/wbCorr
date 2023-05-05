@@ -11,9 +11,12 @@ or the within-centered variables (representing the within-cluster correlations b
   x,
   y,
   which = NULL,
-  type = "p",
   outlier_detection = "zscore",
   outlier_threshold = "recommended",
+  type = "p",
+  pch = 20,
+  dot_lwd = 2,
+  reg_lwd = 2,
   ...
 )
 }

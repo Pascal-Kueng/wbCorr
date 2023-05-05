@@ -1,7 +1,14 @@
-custom_panel <- function(x, y, type, outlier_detection, outlier_threshold, ...) {
+custom_panel <- function(x, y, type,
+                         outlier_detection,
+                         outlier_threshold,
+                         pch, dot_lwd,
+                         reg_lwd,
+                         ...) {
 
   # Plot all points
-  points(x, y, type = type, pch = 19, col = "black", ...)
+  points(x, y, type = type,
+         pch = pch, lwd = dot_lwd,
+         col = "black", ...)
 
   # Create Abline (regression)
   linear_regression <- NULL
@@ -12,8 +19,8 @@ custom_panel <- function(x, y, type, outlier_detection, outlier_threshold, ...) 
   if (!is.null(linear_regression) && all(is.finite(coef(linear_regression)))) {
     a <-
       abline(linear_regression,
-             col = "blue",
-             lwd = 2)
+             col = "darkblue",
+             lwd = reg_lwd)
   }
 
 
@@ -33,7 +40,8 @@ custom_panel <- function(x, y, type, outlier_detection, outlier_threshold, ...) 
       points(x_outliers,
              y[x_outlier_indices],
              type = 'p',
-             pch = 19,
+             pch = pch,
+             lwd = dot_lwd,
              col = "red")
     }
   }
@@ -46,7 +54,8 @@ custom_panel <- function(x, y, type, outlier_detection, outlier_threshold, ...) 
       points(x[y_outlier_indices],
              y_outliers,
              type = 'p',
-             pch = 19,
+             pch = pch,
+             lwd = dot_lwd,
              col = "red")
     }
   }
