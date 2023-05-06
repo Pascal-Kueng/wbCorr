@@ -19,10 +19,8 @@ wb_plot <- function(x, y, which = NULL,
     between_df <- scale(between_df)
 
     # make sure we only have valid numers or NA
-    within_df[!is.finite(within_df)] <- NA
-    between_df[!is.finite(between_df)] <- NA
-    print(within_df)
-    print(between_df)
+    within_df[!is.finite(within_df)] <- 0
+    between_df[!is.finite(between_df)] <- 0
 
     # Remove columns with only NA values
     within_df <- within_df[, colSums(is.na(within_df)) != nrow(within_df)]
