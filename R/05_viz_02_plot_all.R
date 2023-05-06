@@ -1,5 +1,6 @@
 
 wb_plot <- function(x, y, which = NULL,
+                    plot_NA = TRUE,
                     standardize = TRUE,
                     outlier_detection = 'zscore',
                     outlier_threshold = 'recommended',
@@ -18,13 +19,15 @@ wb_plot <- function(x, y, which = NULL,
     within_df <- scale(within_df)
     between_df <- scale(between_df)
 
-    # make sure we only have valid numers or NA
+    # make sure we only have valid numbers or NA
     within_df[!is.finite(within_df)] <- 0
     between_df[!is.finite(between_df)] <- 0
+  }
 
-    # Remove columns with only NA values
-    within_df <- within_df[, colSums(is.na(within_df)) != nrow(within_df)]
-    between_df <- between_df[, colSums(is.na(between_df)) != nrow(between_df)]
+  # Remove columns with zero variance
+  if (!plot_NA) {
+    within_df <- within_df[, apply(within_df, 2, var) != 0]
+    between_df <- between_df[, apply(between_df, 2, var) != 0]
   }
 
   message("This may take a while...")
