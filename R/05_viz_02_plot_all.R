@@ -20,8 +20,10 @@ wb_plot <- function(x, y, which = NULL,
     between_df <- scale(between_df)
 
     # make sure we only have valid numbers or NA
-    within_df[!is.finite(within_df)] <- 0
-    between_df[!is.finite(between_df)] <- 0
+    within_df[is.infinite(within_df)] <- 0
+    between_df[is.infinite(between_df)] <- 0
+    within_df[is.nan(within_df)] <- 0
+    between_df[is.nan(between_df)] <- 0
   }
 
   # Remove columns with zero variance
