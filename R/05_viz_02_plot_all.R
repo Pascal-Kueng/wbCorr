@@ -17,6 +17,16 @@ wb_plot <- function(x, y, which = NULL,
   if (standardize) {
     within_df <- scale(within_df)
     between_df <- scale(between_df)
+
+    # make sure we only have valid numers or NA
+    within_df[!is.finite(within_df)] <- NA
+    between_df[!is.finite(between_df)] <- NA
+    print(within_df)
+    print(between_df)
+
+    # Remove columns with only NA values
+    within_df <- within_df[, colSums(is.na(within_df)) != nrow(within_df)]
+    between_df <- between_df[, colSums(is.na(between_df)) != nrow(between_df)]
   }
 
   message("This may take a while...")
@@ -30,8 +40,7 @@ wb_plot <- function(x, y, which = NULL,
                                                    reg_lwd,
                                                    ...),
           ...)
-  }
-  if ('b' %in% which | 'between' %in% which) {
+  } else if ('b' %in% which | 'between' %in% which) {
     pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",
           panel = function(x, y, ...) custom_panel(x, y, type,
