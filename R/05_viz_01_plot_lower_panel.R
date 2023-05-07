@@ -1,4 +1,4 @@
-custom_panel <- function(x, y, type,
+custom_lower_panel <- function(x, y, type,
                          outlier_detection,
                          outlier_threshold,
                          pch, dot_lwd,
