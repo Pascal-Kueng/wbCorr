@@ -36,22 +36,24 @@ wb_plot <- function(x, y, which = NULL,
   if ('w' %in% which | 'within' %in% which) {
     pairs(within_df,
           main = "Bivariate associations of within-cluster centered variables.",
-          panel = function(x, y, ...) custom_lower_panel(x, y, type,
+          lower.panel = function(x, y, ...) custom_lower_panel(x, y, type,
                                                    outlier_detection,
                                                    outlier_threshold,
                                                    pch, dot_lwd,
                                                    reg_lwd,
                                                    ...),
+          upper.panel = function(x, y, ...) custom_upper_panel(x, y, ...),
           ...)
   } else if ('b' %in% which | 'between' %in% which) {
     pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",
-          panel = function(x, y, ...) custom_lower_panel(x, y, type,
+          lower.panel = function(x, y, ...) custom_lower_panel(x, y, type,
                                                          outlier_detection,
                                                          outlier_threshold,
                                                          pch, dot_lwd,
                                                          reg_lwd,
                                                          ...),
+          upper.panel = function(x, y, ...) custom_upper_panel(x, y, ...),
           ...)
   }
 }
