@@ -12,8 +12,10 @@ wb_plot <- function(x, y, which = NULL,
     which <- y
   }
 
-  within_df <- x@within_df
-  between_df <- x@between_df
+  wbCorrObject <- x
+
+  within_df <- wbCorrObject@within_df
+  between_df <- wbCorrObject@between_df
 
   if (standardize) {
     within_df <- scale(within_df)
@@ -42,7 +44,9 @@ wb_plot <- function(x, y, which = NULL,
                                                    pch, dot_lwd,
                                                    reg_lwd,
                                                    ...),
-          upper.panel = function(x, y, ...) custom_upper_panel(x, y, ...),
+          upper.panel = function(x, y, ...) custom_upper_panel(x, y,
+                                                               wbCorrObject = wbCorrObject@within,
+                                                               ...),
           ...)
   } else if ('b' %in% which | 'between' %in% which) {
     pairs(between_df,
@@ -53,7 +57,9 @@ wb_plot <- function(x, y, which = NULL,
                                                          pch, dot_lwd,
                                                          reg_lwd,
                                                          ...),
-          upper.panel = function(x, y, ...) custom_upper_panel(x, y, ...),
+          upper.panel = function(x, y, ...) custom_upper_panel(x, y,
+                                                               wbCorrObject = wbCorrObject@between,
+                                                               ...),
           ...)
   }
 }

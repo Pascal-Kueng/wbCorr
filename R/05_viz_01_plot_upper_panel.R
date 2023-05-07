@@ -1,4 +1,7 @@
-custom_upper_panel <- function(x, y, ...) {
+custom_upper_panel <- function(x, y, wbCorrObject, ...) {
+
+  # print(wbCorrObject$correlations)
+
   valid_pairs <- is.finite(x) & is.finite(y)
   x <- x[valid_pairs]
   y <- y[valid_pairs]
