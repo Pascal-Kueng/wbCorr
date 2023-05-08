@@ -10,10 +10,21 @@ custom_upper_panel <- function(x, y, wbCorrObject, standardize, ...) {
     linear_regression <- lm(y ~ x, na.action = 'na.omit')
     coef_value <- coef(linear_regression)[2]
     coef_value <- sprintf("%.2f", coef_value)
+
+    p_value <- summary(linear_regression)$coefficients[2, 4]
+    stars <- ""
+    if (p_value < 0.001) {
+      stars <- "***"
+    } else if (p_value < 0.01) {
+      stars <- "**"
+    } else if (p_value < 0.05) {
+      stars <- "*"
+    }
+
     if (standardize) {
-      msg <- paste("β =", coef_value)
+      msg <- paste0("β = ", coef_value, stars)
     } else {
-      msg <- paste("b =", coef_value)
+      msg <- paste("b = ", coef_value, stars)
     }
   }
 
