@@ -20,8 +20,8 @@ custom_upper_panel <- function(x, y,
   y_type <- decode_type(y[3])
 
   # remove coding from variables
-  x <- x[-c(1,2,3)]
-  y <- y[-c(1,2,3)]
+  x <- x[-c(1,2,3,4)]
+  y <- y[-c(1,2,3,4)]
 
 
   # Valid pairs.

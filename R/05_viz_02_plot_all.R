@@ -42,10 +42,6 @@ wb_plot <- function(x, y, which = NULL,
   between_df <- encode_type(between_df, var_type)
 
   # store variable index at top of df
-  print(ncol(within_df))
-  print(dim(within_df))
-  print(1:ncol(within_df))
-
   w_val <- 1:ncol(within_df) /100
   w_val_comp <- -w_val # to compensate and make scaling equal on both sides.
 

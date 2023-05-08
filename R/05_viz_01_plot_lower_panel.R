@@ -20,9 +20,6 @@ custom_lower_panel <- function(x, y, type = 'p',
   x_type <- decode_type(x[3])
   y_type <- decode_type(y[3])
 
-  print(x_type)
-  print(y_type)
-
   # remove coding from variables
   x <- x[-c(1,2,3,4)]
   y <- y[-c(1,2,3,4)]
