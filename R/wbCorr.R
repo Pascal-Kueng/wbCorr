@@ -72,15 +72,7 @@ wbCorr <- function(data, cluster,
                    nboot = 1000,
                    weighted_between_statistics = FALSE) {
 
-  # Store settings
-  settings <- list(data = data, cluster = cluster,
-                   confidence_level = confidence_level,
-                   method = method,
-                   bootstrap = bootstrap,
-                   nboot = nboot,
-                   weighted_between_statistics = weighted_between_statistics)
-
-  # input validation and preparation
+    # input validation and preparation
   input_data <- data
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
                                            weighted_between_statistics,
@@ -146,6 +138,15 @@ wbCorr <- function(data, cluster,
                   p_values = between_p_values,
                   confidence_intervals = between_confidence_intervals,
                   table = between_table)
+
+  # Store settings
+  settings <- list(data = data, cluster = cluster,
+                   confidence_level = confidence_level,
+                   method = method,
+                   bootstrap = bootstrap,
+                   nboot = nboot,
+                   weighted_between_statistics = weighted_between_statistics,
+                   auto_type = auto_type)
 
   output <- new("wbCorr",
                 within = within,
