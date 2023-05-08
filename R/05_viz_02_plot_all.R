@@ -1,4 +1,6 @@
 
+#' @importFrom graphics abline pairs par points text
+#' @importFrom stats coef lm median sd
 wb_plot <- function(x, y, which = NULL,
                     plot_NA = TRUE,
                     standardize = TRUE,

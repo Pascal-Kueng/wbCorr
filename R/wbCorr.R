@@ -38,7 +38,10 @@
 #' and between-cluster correlations for further analysis.
 #'
 #' @seealso
-#' \code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_ICC]{get_ICC}}
+#' \code{\link[=get_table]{get_table}},
+#' \code{\link[=summary.wbCorr]{summary}},
+#' \code{\link[=get_ICC]{get_ICC}},
+#' \code{\link[=plot.wbCorr]{plot.wbCorr}}
 #'
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -283,7 +286,8 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 # plot()
 #######################################################
 
-#' Plots the centered variables of the provided dataframe against each other.
+#' @title Plot within- and between associations
+#' @description Plots the centered variables of the provided dataframe against each other.
 #' Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 #' or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
 #' A regression line is provided and the corresponding coefficient with significance displayed.
@@ -300,7 +304,7 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @param dot_lwd Graphical parameter. Set size of the points.
 #' @param reg_lwd Graphical parameter. Set thickness of the regression line.
 #' @param ... further options to be passed to the base plot (pairs) function.
-#' @seealso \code{\link[=base::plot]{plot}}
+#' @seealso \code{\link[=wbCorr]{wbCorr}}
 #' @export
 #' @aliases plot.wbCorr
 methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)

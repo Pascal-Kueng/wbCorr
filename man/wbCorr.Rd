@@ -102,5 +102,8 @@ plot(correlations, which = 'b')
 
 }
 \seealso{
-\code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_ICC]{get_ICC}}
+\code{\link[=get_table]{get_table}},
+\code{\link[=summary.wbCorr]{summary}},
+\code{\link[=get_ICC]{get_ICC}},
+\code{\link[=plot.wbCorr]{plot.wbCorr}}
 }

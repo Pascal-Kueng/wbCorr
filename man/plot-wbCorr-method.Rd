@@ -3,10 +3,7 @@
 \name{plot,wbCorr-method}
 \alias{plot,wbCorr-method}
 \alias{plot.wbCorr}
-\title{Plots the centered variables of the provided dataframe against each other.
-Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
-or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
-A regression line is provided and the corresponding coefficient with significance displayed.}
+\title{Plot within- and between associations}
 \usage{
 \S4method{plot}{wbCorr}(
   x,
@@ -56,5 +53,5 @@ or the within-centered variables (representing the within-cluster correlations b
 A regression line is provided and the corresponding coefficient with significance displayed.
 }
 \seealso{
-\code{\link[=base::plot]{plot}}
+\code{\link[=wbCorr]{wbCorr}}
 }
