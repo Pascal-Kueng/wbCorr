@@ -32,8 +32,9 @@ wb_plot <- function(x, y, which = NULL,
 
   # Remove columns with zero variance
   if (!plot_NA) {
-    within_df <- within_df[, apply(within_df, 2, var) != 0]
-    between_df <- between_df[, apply(between_df, 2, var) != 0]
+    within_df <- within_df[, apply(within_df, 2, function(x) var(x, na.rm = TRUE)) != 0]
+    between_df <- between_df[, apply(between_df, 2, function(x) var(x, na.rm = TRUE)) != 0]
+
   }
 
   # extract settings
