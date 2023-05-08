@@ -5,7 +5,8 @@
 \alias{plot.wbCorr}
 \title{Plots the centered variables of the provided dataframe against each other.
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
-or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).}
+or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
+A regression line is provided and the corresponding coefficient with significance displayed.}
 \usage{
 \S4method{plot}{wbCorr}(
   x,
@@ -23,20 +24,36 @@ or the within-centered variables (representing the within-cluster correlations b
 )
 }
 \arguments{
-\item{x}{A wbCorr object.}
+\item{x}{A wbCorr object to be plotted.}
 
 \item{y}{Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.}
 
 \item{which}{Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.}
 
-\item{type}{Choose the method of plotting (see ?base::plot for available types).}
+\item{plot_NA}{Boolean. Whether variables that have no variation on the selected level should be plotted or not.}
 
-\item{...}{further options (see ?base::plot) to be passed to the base plot function.}
+\item{standardize}{Booleam. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
+correlation.}
+
+\item{outlier_detection}{If FALSE, outliers will not be marked in red. Otherwise you may provide the method. Choose from: 'zscore', 'mad', or 'tukey'.}
+
+\item{outlier_threshold}{If 'recommended', the threshold for 'zscore' and 'mad' will be set to 3, and for 'tukey' to 1.5. You can provide and other numeric here.}
+
+\item{type}{points, lines, etc. see ?base::plot for available types).}
+
+\item{pch}{Graphical parameter. Select which type of points should be plotted.}
+
+\item{dot_lwd}{Graphical parameter. Set size of the points.}
+
+\item{reg_lwd}{Graphical parameter. Set thickness of the regression line.}
+
+\item{...}{further options to be passed to the base plot (pairs) function.}
 }
 \description{
 Plots the centered variables of the provided dataframe against each other.
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
+A regression line is provided and the corresponding coefficient with significance displayed.
 }
 \seealso{
 \code{\link[=base::plot]{plot}}
