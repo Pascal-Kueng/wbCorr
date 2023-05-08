@@ -59,14 +59,6 @@
 #' matrices <- summary(correlations) # the get_matrix() and get_matrices() functions are equivalent
 #' print(matrices)
 #'
-#' # Access specific tables or matrices by:
-#' # Option 1:
-#' matrices$within
-#' tables$between
-#' # Option 2:
-#' get_tables(correlations, which = 'within')
-#' summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to full words
-#'
 #' # Plot the centered variables against each other
 #' plot(correlations, 'within')
 #' plot(correlations, which = 'b')

@@ -58,7 +58,7 @@ wb_plot <- function(x, y, which = NULL,
 
   } else if ('b' %in% which | 'between' %in% which) {
     if (is_weighted) {
-      warning("No significance codes for between- regression coefficients can be calculated if weighted_between_statistics == TRUE.")
+      message("No significance codes for between- regression coefficients can be calculated if weighted_between_statistics == TRUE.")
     }
       pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",

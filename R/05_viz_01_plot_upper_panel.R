@@ -27,7 +27,7 @@ custom_upper_panel <- function(x, y, wbCorrObject, standardize, is_weighted, ...
 
 
     if (standardize) {
-      msg <- paste0("β = ", coef_value, stars)
+      msg <- paste0("\u03B2 = ", coef_value, stars)
     } else {
       msg <- paste("b = ", coef_value, stars)
     }
