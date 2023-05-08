@@ -9,13 +9,13 @@ encode_type <- function(df, types) {
   for (i in 1:length(types)) {
     type <- types[i]
     if (type == 'numeric') {
-      num_type <- 1
+      num_type <- 0.01
     } else if (type == 'binary') {
       num_type <- 0
     } else if (type == 'ordinal') {
-      num_type <- 2
+      num_type <- 0.02
     } else if (type == 'nominal') {
-      num_type <- 3
+      num_type <- 0.03
     }
     num_types[i] <- num_type
   }

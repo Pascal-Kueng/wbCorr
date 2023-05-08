@@ -41,8 +41,14 @@ wb_plot <- function(x, y, which = NULL,
   between_df <- encode_type(between_df, types)
 
   # store variable index at top of df
-  within_df <- rbind(1:ncol(within_df), within_df)
-  between_df <- rbind(1:ncol(between_df), between_df)
+  w_val <- 1:ncol(within_df) /1000
+  w_val_comp <- -w_val # to compensate and make scaling equal on both sides.
+
+  b_val <- 1:ncol(between_df) /1000
+  b_val_comp <- - b_val
+
+  within_df <- rbind(w_val, w_val_comp, within_df)
+  between_df <- rbind(b_val, b_val_comp, between_df)
 
   # Remove columns with zero variance
   if (!plot_NA) {

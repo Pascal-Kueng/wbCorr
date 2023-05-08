@@ -9,8 +9,8 @@ custom_lower_panel <- function(x, y, type,
                          ...) {
 
   # Find out variable names
-  x_idx <- x[1]
-  y_idx <- y[1]
+  x_idx <- x[1] * 1000
+  y_idx <- y[1] * 1000
 
   x_name <- colnames(df)[x_idx]
   y_name <- colnames(df)[y_idx]
