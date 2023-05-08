@@ -34,6 +34,9 @@ wb_plot <- function(x, y, which = NULL,
     between_df <- between_df[, apply(between_df, 2, var) != 0]
   }
 
+  # extract settings
+  is_weighted <- wbCorrObject@settings$weighted_between_statistics
+
   message("This may take a while...")
   if ('w' %in% which | 'within' %in% which) {
     pairs(within_df,
@@ -47,10 +50,15 @@ wb_plot <- function(x, y, which = NULL,
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
                                                                wbCorrObject = wbCorrObject@within,
                                                                standardize = standardize,
+                                                               is_weighted = is_weighted,
                                                                ...),
           ...)
+
   } else if ('b' %in% which | 'between' %in% which) {
-    pairs(between_df,
+    if (is_weighted) {
+      warning("No significance codes for between- regression coefficients can be calculated if weighted_between_statistics == TRUE.")
+    }
+      pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",
           lower.panel = function(x, y, ...) custom_lower_panel(x, y, type,
                                                          outlier_detection,
@@ -61,6 +69,7 @@ wb_plot <- function(x, y, which = NULL,
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
                                                                wbCorrObject = wbCorrObject@between,
                                                                standardize = standardize,
+                                                               is_weighted = is_weighted,
                                                                ...),
           ...)
   }
