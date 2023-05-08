@@ -1,7 +1,7 @@
 
 
 
-format_result_table <- function(result_table, method, auto_type, confidence_level, bootstrap) {
+format_result_table <- function(result_table, method, auto_type, var_type, confidence_level, bootstrap) {
 
   # For all
   ci_name <- paste0(confidence_level * 100, "% CI")
@@ -10,7 +10,7 @@ format_result_table <- function(result_table, method, auto_type, confidence_leve
 
 
   # rename columns and formatting main table: specific changes
-  if (is.null(auto_type)) {
+  if (!auto_type) {
     if (method == 'pearson') {
       colnames(result_table)[colnames(result_table) == "coefficient"] <- "pearson's r"
       if (bootstrap) {

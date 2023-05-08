@@ -1,33 +1,40 @@
-custom_lower_panel <- function(x, y, type,
-                         outlier_detection,
-                         outlier_threshold,
-                         pch, dot_lwd,
-                         reg_lwd,
-                         df,
-                         standardize,
-                         plot_NA,
-                         ...) {
+custom_lower_panel <- function(x, y, type = 'p',
+                               auto_type, var_type,
+                               outlier_detection,
+                               outlier_threshold,
+                               pch, dot_lwd,
+                               reg_lwd,
+                               df,
+                               standardize,
+                               plot_NA,
+                               ...) {
 
   # Find out variable names
-  x_idx <- x[1] * 1000
-  y_idx <- y[1] * 1000
+  x_idx <- x[1] * 100
+  y_idx <- y[1] * 100
 
   x_name <- colnames(df)[x_idx]
   y_name <- colnames(df)[y_idx]
 
   # Find out type code
-  x_type <- x[2]
-  y_type <- x[2]
+  x_type <- decode_type(x[3])
+  y_type <- decode_type(y[3])
+
+  print(x_type)
+  print(y_type)
 
   # remove coding from variables
-  x <- x[-c(1,2)]
-  y <- y[-c(1,2)]
+  x <- x[-c(1,2,3,4)]
+  y <- y[-c(1,2,3,4)]
 
 
   # Valid pairs.
   valid_pairs <- is.finite(x) & is.finite(y)
   x <- x[valid_pairs]
   y <- y[valid_pairs]
+
+
+  # Prepare Tile
 
   # Plot all points
   points(x, y, type = type,

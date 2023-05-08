@@ -9,6 +9,7 @@ corAndPValues <- function(input_data,
                           confidence_level = 0.95,
                           method = "pearson",
                           auto_type,
+                          var_type,
                           warnings,
                           bootstrap,
                           nboot) {
@@ -57,9 +58,9 @@ corAndPValues <- function(input_data,
 
 
     # set method
-    if (!is.null(auto_type)) {
-      type_i <- auto_type[[i]]
-      type_j <- auto_type[[j]]
+    if (auto_type) {
+      type_i <- var_type[[i]]
+      type_j <- var_type[[j]]
 
       method <- 'pearson'
       method_table <- "pearson's r"
@@ -95,19 +96,19 @@ corAndPValues <- function(input_data,
     if (method == 'pearson') {
       degrees_freedom <- base_for_degrees_freedom -2
       statistic_type <- 't-statistic'
-      if (is.null(auto_type)) {
+      if (!auto_type) {
         method_table <- "spearman's rho"
       }
     } else if (method == 'spearman') {
       degrees_freedom <- base_for_degrees_freedom - 3
       statistic_type <- 'z-statistic'
-      if (is.null(auto_type)) {
+      if (!auto_type) {
         method_table <- "spearman's rho"
       }
     } else if (method == 'spearman-jackknife') {
       degrees_freedom <- NA
       statistic_type <- NA
-      if (is.null(auto_type)) {
+      if (!auto_type) {
         method_table <- "spearman's rho"
       }
     }
@@ -175,7 +176,7 @@ corAndPValues <- function(input_data,
 
 
 
-  result_table <- format_result_table(result_table, method, auto_type, confidence_level, bootstrap)
+  result_table <- format_result_table(result_table, method, auto_type, var_type, confidence_level, bootstrap)
 
   return(list(p_value = p_value_df,
               correlation_coefficient = correlation_coefficient_df,

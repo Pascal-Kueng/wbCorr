@@ -86,13 +86,15 @@ wbCorr <- function(data, cluster,
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
-  auto_type <- centered_df$auto_type
+  var_type <- centered_df$var_type
   warnings <- centered_df$warnings
 
   centered_data <- list(within_df = within_df, between_df = between_df)
 
-  if (!method == 'auto') {
-    auto_type = NULL
+  if (method == 'auto') {
+    auto_type <- TRUE
+  } else {
+    auto_type <- FALSE
   }
 
   # Calculate correlations, p-values, and confidence intervals.
@@ -100,6 +102,7 @@ wbCorr <- function(data, cluster,
                                confidence_level = confidence_level,
                                method = method,
                                auto_type = auto_type,
+                               var_type = var_type,
                                warnings = warnings,
                                bootstrap = bootstrap,
                                nboot = nboot)
@@ -109,6 +112,7 @@ wbCorr <- function(data, cluster,
                                 confidence_level = confidence_level,
                                 method = method,
                                 auto_type = auto_type,
+                                var_type = var_type,
                                 warnings = warnings,
                                 bootstrap = bootstrap,
                                 nboot = nboot)
@@ -146,7 +150,8 @@ wbCorr <- function(data, cluster,
                    bootstrap = bootstrap,
                    nboot = nboot,
                    weighted_between_statistics = weighted_between_statistics,
-                   auto_type = auto_type)
+                   auto_type = auto_type,
+                   var_type = var_type)
 
   output <- new("wbCorr",
                 within = within,

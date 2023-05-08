@@ -17,7 +17,7 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
   df_within <- data.frame(cluster = cluster_var)
   df_between <- data.frame(cluster = cluster_var)
 
-  auto_type <- list()
+  var_type <- list()
   warnings <- list()
   for (name in colnames(input_data)) {
     col <- input_data[[name]]
@@ -25,12 +25,12 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     # Check if we have variables that may violate assumptions.
     assumptions <- check_assumptions(col, name, method)
     col <- assumptions$col
-    auto_type[[name]] <- assumptions$type
+    var_type[[name]] <- assumptions$type
     warnings[[name]] <- assumptions$warning
 
     if(assumptions$type == 'nominal'& method == 'auto') {
       warning("removed nominal Variable. Change coding or don't use method = 'auto' if you want to include variable.")
-      auto_type[[name]] <- NULL
+      var_type[[name]] <- NULL
       warnings[[name]] <- NULL
       input_data[[name]] <- NULL
       next
@@ -59,5 +59,5 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     df_between$Group.1 <- NULL
   }
 
-  return(list(between = df_between, within = df_within, auto_type = auto_type, warnings = warnings))
+  return(list(between = df_between, within = df_within, var_type = var_type, warnings = warnings))
 }

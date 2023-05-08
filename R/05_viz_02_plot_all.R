@@ -34,17 +34,22 @@ wb_plot <- function(x, y, which = NULL,
   # extract settings
   is_weighted <- wbCorrObject@settings$weighted_between_statistics
   method <- wbCorrObject@settings$method
-  types <- wbCorrObject@settings$auto_type
+  var_type <- wbCorrObject@settings$var_type
+  auto_type <- wbCorrObject@settings$auto_type
 
   # encode type into df
-  within_df <- encode_type(within_df, types)
-  between_df <- encode_type(between_df, types)
+  within_df <- encode_type(within_df, var_type)
+  between_df <- encode_type(between_df, var_type)
 
   # store variable index at top of df
-  w_val <- 1:ncol(within_df) /1000
+  print(ncol(within_df))
+  print(dim(within_df))
+  print(1:ncol(within_df))
+
+  w_val <- 1:ncol(within_df) /100
   w_val_comp <- -w_val # to compensate and make scaling equal on both sides.
 
-  b_val <- 1:ncol(between_df) /1000
+  b_val <- 1:ncol(between_df) /100
   b_val_comp <- - b_val
 
   within_df <- rbind(w_val, w_val_comp, within_df)
@@ -52,9 +57,8 @@ wb_plot <- function(x, y, which = NULL,
 
   # Remove columns with zero variance
   if (!plot_NA) {
-    within_df <- within_df[, apply(within_df[-c(1,2), ], 2, function(x) var(x, na.rm = TRUE)) != 0]
-    between_df <- between_df[, apply(between_df[-c(1,2), ], 2, function(x) var(x, na.rm = TRUE)) != 0]
-
+    within_df <- within_df[, apply(within_df[-c(1,2,3,4), ], 2, function(x) var(x, na.rm = TRUE)) != 0]
+    between_df <- between_df[, apply(between_df[-c(1,2,3,4), ], 2, function(x) var(x, na.rm = TRUE)) != 0]
   }
 
   message("This may take a while...")
@@ -63,6 +67,8 @@ wb_plot <- function(x, y, which = NULL,
           main = "Bivariate associations of within-cluster centered variables.",
           lower.panel = function(x, y, ...) custom_lower_panel(x, y,
                                                                type = type,
+                                                               auto_type = auto_type,
+                                                               var_type = var_type,
                                                                outlier_detection = outlier_detection,
                                                                outlier_threshold = outlier_threshold,
                                                                pch = pch, dot_lwd = dot_lwd,
@@ -72,6 +78,8 @@ wb_plot <- function(x, y, which = NULL,
                                                                plot_NA = plot_NA,
                                                                ...),
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
+                                                               auto_type = auto_type,
+                                                               var_type = var_type,
                                                                wbCorrObject = wbCorrObject@within,
                                                                is_weighted = is_weighted,
                                                                df = within_df,
@@ -87,7 +95,8 @@ wb_plot <- function(x, y, which = NULL,
       pairs(between_df,
           main = "Bivariate associations of between-cluster centered variables.",
           lower.panel = function(x, y, ...) custom_lower_panel(x, y,
-                                                               type = type,
+                                                               auto_type = auto_type,
+                                                               var_type = var_type,
                                                                outlier_detection = outlier_detection,
                                                                outlier_threshold = outlier_threshold,
                                                                pch = pch, dot_lwd = dot_lwd,
@@ -97,6 +106,8 @@ wb_plot <- function(x, y, which = NULL,
                                                                plot_NA = plot_NA,
                                                                ...),
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
+                                                               auto_type = auto_type,
+                                                               var_type = var_type,
                                                                wbCorrObject = wbCorrObject@within,
                                                                is_weighted = is_weighted,
                                                                df = within_df,
