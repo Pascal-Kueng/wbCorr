@@ -1,5 +1,28 @@
-custom_upper_panel <- function(x, y, wbCorrObject, standardize, is_weighted, ...) {
+custom_upper_panel <- function(x, y,
+                               wbCorrObject,
+                               is_weighted,
+                               df,
+                               standardize,
+                               plot_NA,
+                               ...) {
 
+  # Find out variable names
+  x_idx <- x[1]
+  y_idx <- y[1]
+
+  x_name <- colnames(df)[x_idx]
+  y_name <- colnames(df)[y_idx]
+
+  # Find out type code
+  x_type <- x[2]
+  y_type <- x[2]
+
+  # remove coding from variables
+  x <- x[-c(1,2)]
+  y <- y[-c(1,2)]
+
+
+  # Valid pairs.
   valid_pairs <- is.finite(x) & is.finite(y)
   x <- x[valid_pairs]
   y <- y[valid_pairs]
