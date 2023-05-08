@@ -77,6 +77,14 @@ wbCorr <- function(data, cluster,
                    nboot = 1000,
                    weighted_between_statistics = FALSE) {
 
+  # Store settings
+  settings <- list(data = data, cluster = cluster,
+                   confidence_level = confidence_level,
+                   method = method,
+                   bootstrap = bootstrap,
+                   nboot = nboot,
+                   weighted_between_statistics = weighted_between_statistics)
+
   # input validation and preparation
   input_data <- data
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
@@ -148,8 +156,8 @@ wbCorr <- function(data, cluster,
                 within = within,
                 between = between,
                 ICC = ICC,
-                centered_data = centered_data
-                )
+                centered_data = centered_data,
+                settings = settings)
 
   attr(output, "call") <- match.call()
   return(output)
@@ -177,7 +185,8 @@ wbCorr <- function(data, cluster,
 methods::setClass("wbCorr", representation(within = "list",
                                            between = "list",
                                            ICC = "data.frame",
-                                           centered_data = "list"))
+                                           centered_data = "list",
+                                           settings = 'list'))
 
 #' @rdname wbCorr
 #' @export
