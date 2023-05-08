@@ -46,6 +46,7 @@ wb_plot <- function(x, y, which = NULL,
                                                    ...),
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
                                                                wbCorrObject = wbCorrObject@within,
+                                                               standardize = standardize,
                                                                ...),
           ...)
   } else if ('b' %in% which | 'between' %in% which) {
@@ -59,6 +60,7 @@ wb_plot <- function(x, y, which = NULL,
                                                          ...),
           upper.panel = function(x, y, ...) custom_upper_panel(x, y,
                                                                wbCorrObject = wbCorrObject@between,
+                                                               standardize = standardize,
                                                                ...),
           ...)
   }
