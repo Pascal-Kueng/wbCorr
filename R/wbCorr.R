@@ -94,17 +94,7 @@ wbCorr <- function(data, cluster,
   auto_type <- centered_df$auto_type
   warnings <- centered_df$warnings
 
-  "
-  # Check for outliars
-  within_outliers_check <- wb_check_outliers(within_df)
-  within_outliers <- within_outliers_check$outliers
-  within_df_no_outliers <- within_outliers_check$data_no_outliers
-
-  # between centered
-  between_outliers_check <- wb_check_outliers(between)
-  between_outliers <- between_outliers_check$outliers
-  between_df_no_outliers <- between_outliers_check$data_no_outliers
-  "
+  centered_data <- list(within_df = within_df, between_df = between_df)
 
   if (!method == 'auto') {
     auto_type = NULL
@@ -158,8 +148,8 @@ wbCorr <- function(data, cluster,
                 within = within,
                 between = between,
                 ICC = ICC,
-                within_df = within_df,
-                between_df = between_df)
+                centered_data = centered_data
+                )
 
   attr(output, "call") <- match.call()
   return(output)
@@ -187,8 +177,7 @@ wbCorr <- function(data, cluster,
 methods::setClass("wbCorr", representation(within = "list",
                                            between = "list",
                                            ICC = "data.frame",
-                                           within_df = "data.frame",
-                                           between_df = "data.frame"))
+                                           centered_data = "list"))
 
 #' @rdname wbCorr
 #' @export

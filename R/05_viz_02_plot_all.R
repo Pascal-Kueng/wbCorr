@@ -14,8 +14,8 @@ wb_plot <- function(x, y, which = NULL,
 
   wbCorrObject <- x
 
-  within_df <- wbCorrObject@within_df
-  between_df <- wbCorrObject@between_df
+  within_df <- wbCorrObject@centered_data$within_df
+  between_df <- wbCorrObject@centered_data$between_df
 
   if (standardize) {
     within_df <- scale(within_df)
