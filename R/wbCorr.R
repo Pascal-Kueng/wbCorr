@@ -41,7 +41,7 @@
 #' \code{\link[=get_table]{get_table}},
 #' \code{\link[=summary.wbCorr]{summary}},
 #' \code{\link[=get_ICC]{get_ICC}},
-#' \code{\link[=plot.wbCorr]{plot.wbCorr}}
+#' \code{\link[=plot.wbCorr]{plot}}
 #'
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
