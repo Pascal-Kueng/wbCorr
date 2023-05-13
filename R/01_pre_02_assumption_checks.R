@@ -14,9 +14,10 @@ check_assumptions <- function(col, name, method) {
       return(list(col = as.numeric(col), type = 'binary', warning = "None"))
     }
     if (is.ordered(col)) {
-      return(list(col = as.numeric(col), type = 'ordinal', warning = "None"))
+      warning(paste("The factor", name, "coded as non-binary ordinal variable. Centering may not be meaningful and correlations may not be interpretable. Consider dummy-coding for each level."))
+      return(list(col = as.numeric(col), type = 'ordinal', warning = "ordinal variable?"))
     } else {
-      warning(paste("The factor", name, "coded as non-binary nominal variable. Can not meaningfully be centered. Consider dummy-coding for each level."))
+      warning(paste("The factor", name, "coded as non-binary nominal variable. Centering is likely not meaningful and correlations may not be interpretable. Consider dummy-coding for each level."))
       return(list(col = as.numeric(col), type = 'nominal', warning = paste(name, "nominal variable?")))
     }
   }

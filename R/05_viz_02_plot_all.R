@@ -16,6 +16,12 @@ wb_plot <- function(x, y, which = NULL,
 
   wbCorrObject <- x
 
+  # input validation
+  if (!any(which %in% c("w", "within", "b", "between"))) {
+    stop("Invalid value for the 'which' argument. Allowed values are 'w', 'within', 'b', and 'between'.")
+  }
+
+
   # Get the data
   within_df <- wbCorrObject@centered_data$within_df
   between_df <- wbCorrObject@centered_data$between_df

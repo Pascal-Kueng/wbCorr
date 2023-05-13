@@ -7,7 +7,7 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
     stop("input_data must be a data frame")
   }
   if (!method %in% c("pearson", "spearman", "spearman-jackknife", "auto")) {
-    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', 'spearman-jackknife', 'auto'.")
+    stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', and 'spearman-jackknife'.")
   }
   if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
     stop("weighted_between_statistics not supported for jackknife CIs.")
