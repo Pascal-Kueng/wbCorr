@@ -33,7 +33,7 @@ wbcorr(
 \item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
 \item{method}{A string indicating the correlation method to be used.
-Supported methods are 'pearson', 'spearman', 'spearman-jackknife', and 'auto'.
+Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
 (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
 to determine confidence intervals and p-values.'spearman': Spearman correlation
 method uses the Fisher z-transformation for confidence intervals and p-values (unless bootstrap is enabled),
@@ -48,7 +48,7 @@ assumptions.}
 \item{bootstrap}{Performs a bias-corrected and accelerated (BCa) bootstrap to compute both confidence
 intervals, as well as p-values (default: FALSE). Recommended, but slow.}
 
-\item{nboot}{Specifies the amount of bootstrap samples. We recommend a minimum of 1000 (default: 1000).}
+\item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
 
 \item{weighted_between_statistics}{A logical value. If FALSE, variables are centered between persons by
 simply taking the mean for each person and weighting them all the same, even if some
@@ -66,7 +66,8 @@ The wbCorr function creates a wbCorr object containing within- and between-clust
 p-values, and confidence intervals for a given dataset and clustering variable.
 }
 \details{
-Calculates within- and between-cluster correlations for a given dataset and clustering variable.
+Calculates within- and between-cluster correlations for a given dataframe and clustering variable.
+Only recommended for continuous or binary variables.
 
 Inspired by the psych::statsBy function, wbCorr allows you to easily calculate and extract within-
 and between-cluster correlations for further analysis.
@@ -74,12 +75,10 @@ and between-cluster correlations for further analysis.
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations
 data("simdat_intensive_longitudinal")
-# use ?simdat_intensive_longitudinal # documentation of the dataset and the "true" correlations
-head(simdat_intensive_longitudinal)
 
-# returns an object:
-correlations <- wbCorr(data = simdat_intensive_longitudinal,
-cluster = 'participantID')
+# create a wbCorr object:
+correlations <- wbCorr(simdat_intensive_longitudinal,
+                     'participantID')
 
 # returns a list with full detailed tables of the correlations:
 tables <- get_table(correlations) # the get_tables() function is equivalent
@@ -89,15 +88,15 @@ print(tables)
 matrices <- summary(correlations) # the get_matrix() and get_matrices() functions are equivalent
 print(matrices)
 
-# Access specific tables or matrices by:
-# Option 1:
-matrices$within
-tables$between
-# Option 2:
-get_tables(correlations, which = 'within')
-summary(correlations, which = c('w', 'wb', 'bw')) # abbreviations equivalent to full words
+# Plot the centered variables against each other
+plot(correlations, 'within')
+plot(correlations, which = 'b')
+
 
 }
 \seealso{
-\code{\link[=get_table]{get_table}}, \code{\link[=summary.wbCorr]{summary}}, \code{\link[=get_ICC]{get_ICC}}
+\code{\link[=get_table]{get_table}},
+\code{\link[=summary.wbCorr]{summary}},
+\code{\link[=get_ICC]{get_ICC}},
+\code{\link[=plot.wbCorr]{plot}}
 }

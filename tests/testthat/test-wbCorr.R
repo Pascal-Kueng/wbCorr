@@ -10,8 +10,8 @@ exp_tables_jackknife_simdat <- readRDS('testdata/exp_tables_jackknife_simdat.rds
 exp_matrices_jackknife_simdat <- readRDS('testdata/exp_matrices_jackknife_simdat.rds')
 
 # on real data
-#tryCatch(dat <- readRDS('C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
-tryCatch(dat <- readRDS('C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
+tryCatch(dat <- readRDS('C:\\Users\\pascku\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
+#tryCatch(dat <- readRDS('C:\\Users\\kueng\\OneDrive\\scripts\\01 R-Packages\\within-between-correlations\\test_data_real_factors.rds'))
 
 
 # boot
@@ -209,7 +209,13 @@ test_that('all functions are correct on real output', {
 
 
 # Test inputs
-wbCorr(dat, dat$CoupleID)
-wbCorr(dat, 'CoupleID')
+suppressWarnings(wbCorr(dat, dat$CoupleID))
+suppressWarnings(wbCorr(dat, 'CoupleID'))
 
-wbCorr(dat[4:10], dat$CoupleID)
+a <- suppressWarnings(wbCorr(dat[4:10], dat$CoupleID))
+
+# Test Plots
+suppressWarnings(plot(a, 'w'))
+suppressWarnings(plot(a, 'between'))
+suppressWarnings(plot(a, which = 'within'))
+suppressWarnings(plot(a, 'w', which = 'between'))

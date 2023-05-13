@@ -34,7 +34,8 @@
 #'
 #' @export
 get_table <- function(object, which = c('within', 'between')) {
-  which <- match.arg(which, choices = c('within', 'w', 'between', 'b'), several.ok = TRUE) # Check for valid inputs
+  which <- match.arg(which, choices = c('within', 'w', 'between', 'b'),
+                     several.ok = TRUE) # Check for valid inputs
   output_list <- list()
   if ('within' %in% which | 'w' %in% which) {
     output_list[['within']] <- object@within$table
