@@ -1,4 +1,5 @@
 custom_upper_panel <- function(x, y,
+                               method,
                                auto_type,
                                var_type,
                                wbCorrObject,
