@@ -36,17 +36,14 @@ wbcorr(
 Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
 (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
 to determine confidence intervals and p-values.'spearman': Spearman correlation
-method uses the Fisher z-transformation for confidence intervals and p-values (unless bootstrap is enabled),
-assuming normally distributed data. 'spearman-jackknife': Spearman-Jackknife
-correlation method employs the Euclidean jackknife technique to compute
+method uses the Fisher z-transformation for confidence intervals and p-values.
+'spearman-jackknife': Employs the Euclidean jackknife technique to compute
 confidence intervals, providing more robust confidence intervals in the presence of
 non-normal data or outliers. Note that p-values are not available
-when this method is selected. 'auto' uses pearson for numeric variables and
-spearman for correlations involving at least one factors. Still check your
-assumptions.}
+when this method is selected.}
 
-\item{bootstrap}{Performs a bias-corrected and accelerated (BCa) bootstrap to compute both confidence
-intervals, as well as p-values (default: FALSE). Recommended, but slow.}
+\item{bootstrap}{Performs a bias-corrected and accelerated (BCa) parametric bootstrap to compute confidence
+intervals and p-values. Recommended for non-normal data, but slow. (default: FALSE).}
 
 \item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
 
@@ -63,13 +60,13 @@ Use  get_ICC() in order to get all intra class correlations.
 }
 \description{
 The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
-p-values, and confidence intervals for a given dataset and clustering variable.
+p-values, and confidence intervals for a given dataset and clustering variable. The object can be plotted.
 }
 \details{
 Calculates within- and between-cluster correlations for a given dataframe and clustering variable.
 Only recommended for continuous or binary variables.
 
-Inspired by the psych::statsBy function, wbCorr allows you to easily calculate and extract within-
+Inspired by the psych::statsBy function, wbCorr allows you to easily calculate, extract, and plot within-
 and between-cluster correlations for further analysis.
 }
 \examples{
