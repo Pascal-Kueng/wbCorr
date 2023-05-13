@@ -12,7 +12,7 @@ check_assumptions <- function(col, name, method) {
   if (is.factor(col)) {
     if (nlevels(col) == 2) {
       warning(paste("The factor", name, "coded as binary ordinal variable. Centering will make this a continuous variable if it varies on more than 1 level. Make sure to check the interpretation."))
-      return(list(col = as.numeric(col), type = 'binary', warning = ""))
+      return(list(col = as.numeric(col), type = 'binary', warning = "None"))
     }
     if (is.ordered(col)) {
       warning(paste("The factor", name, "coded as non-binary ordinal variable. Centering may not be meaningful and correlations may not be interpretable. Consider dummy-coding for each level."))

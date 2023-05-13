@@ -294,7 +294,7 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
 #' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.
 #' @param plot_NA Boolean. Whether variables that have no variation on the selected level should be plotted or not.
-#' @param standardize Booleam. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
+#' @param standardize Boolean. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
 #' correlation.
 #' @param outlier_detection If FALSE, outliers will not be marked in red. Otherwise you may provide the method. Choose from: 'zscore', 'mad', or 'tukey'.
 #' @param outlier_threshold If 'recommended', the threshold for 'zscore' and 'mad' will be set to 3, and for 'tukey' to 1.5. You can provide and other numeric here.

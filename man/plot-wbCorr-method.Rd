@@ -29,7 +29,7 @@
 
 \item{plot_NA}{Boolean. Whether variables that have no variation on the selected level should be plotted or not.}
 
-\item{standardize}{Booleam. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
+\item{standardize}{Boolean. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
 correlation.}
 
 \item{outlier_detection}{If FALSE, outliers will not be marked in red. Otherwise you may provide the method. Choose from: 'zscore', 'mad', or 'tukey'.}
