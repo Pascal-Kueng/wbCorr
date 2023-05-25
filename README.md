@@ -83,6 +83,9 @@ matrices <- summary(myObject)
 
 print(tables)
 print(matrices)
+
+plot(myObject, 'w')
+plot(myObject, 'b')
 ```
 
 ## Citation
