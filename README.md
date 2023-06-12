@@ -5,7 +5,7 @@ This functionality is particularly beneficial for longitudinal data analysis.
 
 The package accomplishes this by centering the variables at both within- and between-cluster levels, followed by computing the correlations on the transformed dataframes. To determine significance tests and confidence intervals, the degrees of freedom for within-cluster correlations rely on the total number of complete pairs across all observations, while the degrees of freedom for between-cluster correlations depend on the total number of clusters.  
 
-Note. In most cases this is not appropriate for categorical data. Only use data than can be meaningfully centered around it's mean. 
+Note. In most cases this is not appropriate for categorical data. Only use data than can be meaningfully centered around it's mean (e.g., interval and ratio data). 
 
 ## Installation
 You can install this package by running the following inside an R-terminal:
