@@ -105,9 +105,11 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
     object@between$correlations)
 
   combined_df_wb <- combine_matrices(as.matrix(df_summary_within),
-                                     as.matrix(df_summary_between))
+                                     as.matrix(df_summary_between),
+                                     object@ICC)
   combined_df_bw <- combine_matrices(as.matrix(df_summary_between),
-                                     as.matrix(df_summary_within))
+                                     as.matrix(df_summary_within),
+                                     object@ICC)
 
   return_list <- list()
   if ('within' %in% which | 'w' %in% which) {
@@ -118,9 +120,9 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
   }
   if ('merge' %in% which | 'm' %in% which | 'merged' %in% which) {
     return_list[['merged_wb']] <- combined_df_wb
-    return_list[['note_wb']] <- "Top-right triangle: Within-correlations. Bottom-left triangle: Between-correlations."
+    return_list[['note_wb']] <- "Top-right triangle: Within-correlations. Bottom-left triangle: Between-correlations. Diagonal: ICC"
     return_list[['merged_bw']] <- combined_df_bw
-    return_list[['note_bw']] <- "Top-right triangle: Between-correlations. Bottom-left triangle: Within-correlations."
+    return_list[['note_bw']] <- "Top-right triangle: Between-correlations. Bottom-left triangle: Within-correlations. Diagonal: ICC"
 
   } else if ('merge_bw' %in% which | 'bw' %in% which) {
     return_list[['merged_bw']] <- combined_df_bw

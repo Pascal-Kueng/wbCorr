@@ -31,12 +31,13 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
+  diag(df_summary) <- '1'
   return(as.data.frame(df_summary))
 }
 
 
 # placing within- and between correlations above and below diagonal
-combine_matrices <- function(within_matrix, between_matrix) {
+combine_matrices <- function(within_matrix, between_matrix, ICC) {
   combined_matrix <- within_matrix
 
   for (i in 1:nrow(combined_matrix)) {
@@ -46,7 +47,20 @@ combine_matrices <- function(within_matrix, between_matrix) {
       }
     }
   }
-  diag(combined_matrix) <- "-"
+  diag(combined_matrix) <- '[NA]'
+  combined_matrix <- replace_with_ICC(combined_matrix, ICC)
   return(as.data.frame(combined_matrix))
 }
 
+# replacing diagonal with ICC
+replace_with_ICC <- function(combined_matrix, ICCs) {
+  # Place ICCs on the diagonal of the correlation matrix:
+  for (i in 1:nrow(ICCs)) {
+    var_name <- ICCs$variable[i]
+    if (var_name %in% rownames(combined_matrix)) {
+      combined_matrix[var_name, var_name] <- sprintf("[%0.2f]", ICCs$ICC[i])
+    }
+  }
+
+  return(combined_matrix)
+}
