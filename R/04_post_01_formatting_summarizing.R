@@ -58,7 +58,7 @@ replace_with_ICC <- function(combined_matrix, ICCs) {
   for (i in 1:nrow(ICCs)) {
     var_name <- ICCs$variable[i]
     if (var_name %in% rownames(combined_matrix)) {
-      combined_matrix[var_name, var_name] <- paste0('[',ICCs$ICC[i], ']')
+      combined_matrix[var_name, var_name] <- sprintf("[%0.2f]", ICCs$ICC[i])
     }
   }
 
