@@ -132,7 +132,7 @@ wbCorr <- function(data, cluster,
   # Calculate ICCs
   ICC <- data.frame()
   if (ICCs) {
-    ICC <- compute_ICC1(input_data, cluster_var)
+    ICC <- compute_ICC1(within_df, between_df)
   }
 
 
