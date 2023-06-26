@@ -68,7 +68,8 @@ wbCorr <- function(data, cluster,
                    method = "pearson",
                    bootstrap = FALSE,
                    nboot = 1000,
-                   weighted_between_statistics = FALSE) {
+                   weighted_between_statistics = FALSE,
+                   ICCs = TRUE) {
 
     # input validation and preparation
   input_data <- data
@@ -129,7 +130,11 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  ICC <- compute_ICC1(input_data, cluster_var)
+  ICC <- data.frame()
+  if (ICCs) {
+    ICC <- compute_ICC1(input_data, cluster_var)
+  }
+
 
   # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
@@ -235,12 +240,13 @@ methods::setMethod("print", signature("wbCorr"), function(x, ...) {
   # printing...
   print_section("Within-Cluster Correlations:", x@within$table)
   print_section("Between-Cluster Correlations:", x@between$table)
-  print_section("Intraclass Correlation Coefficients:", x@ICC)
+  if (length(x@ICC) > 0) {
+    print_section("Intraclass Correlation Coefficients:", x@ICC)
+  }
 
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
   cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
   cat("\nAccess full ICC list with get_ICC(object)\n")
-
 })
 
 
