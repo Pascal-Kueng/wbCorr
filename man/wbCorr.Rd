@@ -12,8 +12,7 @@ wbCorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
-  weighted_between_statistics = FALSE,
-  ICCs = TRUE
+  weighted_between_statistics = FALSE
 )
 
 wbcorr(
@@ -23,8 +22,7 @@ wbcorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
-  weighted_between_statistics = FALSE,
-  ICCs = TRUE
+  weighted_between_statistics = FALSE
 )
 }
 \arguments{
