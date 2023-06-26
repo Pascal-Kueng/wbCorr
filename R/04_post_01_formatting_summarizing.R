@@ -31,6 +31,7 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
+  diag(df_summary) <- '1'
   return(as.data.frame(df_summary))
 }
 
