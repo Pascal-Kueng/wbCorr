@@ -13,14 +13,11 @@ compute_ICC1 <- function(input_data, cluster_var) {
 
 
   for (name in colnames(input_data)) {
-    if (name == 'cluster_var' || !is.numeric(input_data[[name]])) { # Check if the variable is numeric
-      next
-    }
 
     formula <- as.formula(paste0("`", name, "` ~ 1"))
     random_formula <- as.formula(paste0("~ 1 | cluster_var"))
 
-    ICC <- NA
+    ICC <- 'NA'
     tryCatch({
       model <- suppressMessages(suppressWarnings(
         nlme::lme(fixed = formula, data = input_data, random = random_formula, na.action = 'na.omit')))
@@ -32,7 +29,7 @@ compute_ICC1 <- function(input_data, cluster_var) {
       ICC <- round(between_variance / (between_variance + residual_variance),2)
     }, error = function (e) {
       warning(paste("Could not compute ICC for variable", name, "due to singularity. Most likely it is 0 or 1."))
-      ICC <- NA
+      ICC <- 'NA'
     })
 
     ICCs <- rbind(ICCs, data.frame(variable = name, ICC = ICC)) # Add the result to the data frame
