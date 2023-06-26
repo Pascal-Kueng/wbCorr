@@ -1,10 +1,11 @@
 # wbCorr: Bivariate Within- and Between-Cluster Correlations
 
-The wbCorr package efficiently decomposes the variance of input variables into their within- and between-cluster components, and subsequently computes the corresponding bivariate correlations for each level independently. This functionality is particularly beneficial for longitudinal data analysis.
+The wbCorr package efficiently decomposes the variance of numeric variables into their within- and between-cluster components, and subsequently computes the corresponding bivariate correlations for each level independently. Results can be plotted.
+This functionality is particularly beneficial for longitudinal data analysis.
 
 The package accomplishes this by centering the variables at both within- and between-cluster levels, followed by computing the correlations on the transformed dataframes. To determine significance tests and confidence intervals, the degrees of freedom for within-cluster correlations rely on the total number of complete pairs across all observations, while the degrees of freedom for between-cluster correlations depend on the total number of clusters.  
 
-Bootstrapping now supported!
+Note. In most cases this is not appropriate for categorical data. Only use data than can be meaningfully centered around it's mean (e.g., interval and ratio data). 
 
 ## Installation
 You can install this package by running the following inside an R-terminal:
@@ -17,7 +18,8 @@ remotes::install_github('Pascal-Kueng/wbCorr')
 ## Usage
 1. Create an object using the `wbCorr()` function. Printing the object shows the head of the tables.  
 2. To access the full tables, use the `get_tables()` function on the object. 
-3. To retrieve correlation matrices, use `summary()` on the object.  
+3. To retrieve correlation matrices, use `summary()` on the object. 
+4. Plot all correlations in a grid, using `plot()` on the object.  
 
 ### Check documentation
 ```R
@@ -83,6 +85,9 @@ matrices <- summary(myObject)
 
 print(tables)
 print(matrices)
+
+plot(myObject, 'w')
+plot(myObject, 'b')
 ```
 
 ## Citation
