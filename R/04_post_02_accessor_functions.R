@@ -105,9 +105,11 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
     object@between$correlations)
 
   combined_df_wb <- combine_matrices(as.matrix(df_summary_within),
-                                     as.matrix(df_summary_between))
+                                     as.matrix(df_summary_between),
+                                     object@ICC)
   combined_df_bw <- combine_matrices(as.matrix(df_summary_between),
-                                     as.matrix(df_summary_within))
+                                     as.matrix(df_summary_within),
+                                     object@ICC)
 
   return_list <- list()
   if ('within' %in% which | 'w' %in% which) {

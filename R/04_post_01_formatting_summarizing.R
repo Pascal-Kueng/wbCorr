@@ -36,7 +36,7 @@ summarize_table <- function(p_values, correlations) {
 
 
 # placing within- and between correlations above and below diagonal
-combine_matrices <- function(within_matrix, between_matrix) {
+combine_matrices <- function(within_matrix, between_matrix, ICC) {
   combined_matrix <- within_matrix
 
   for (i in 1:nrow(combined_matrix)) {
@@ -46,7 +46,20 @@ combine_matrices <- function(within_matrix, between_matrix) {
       }
     }
   }
-  diag(combined_matrix) <- "-"
+  diag(combined_matrix) <- '[NA]'
+  combined_matrix <- replace_with_ICC(combined_matrix, ICC)
   return(as.data.frame(combined_matrix))
 }
 
+# replacing diagonal with ICC
+replace_with_ICC <- function(combined_matrix, ICCs) {
+  # Place ICCs on the diagonal of the correlation matrix:
+  for (i in 1:nrow(ICCs)) {
+    var_name <- ICCs$variable[i]
+    if (var_name %in% rownames(combined_matrix)) {
+      combined_matrix[var_name, var_name] <- paste0('[',ICCs$ICC[i], ']')
+    }
+  }
+
+  return(combined_matrix)
+}
