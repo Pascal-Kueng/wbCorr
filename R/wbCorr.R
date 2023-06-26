@@ -68,8 +68,7 @@ wbCorr <- function(data, cluster,
                    method = "pearson",
                    bootstrap = FALSE,
                    nboot = 1000,
-                   weighted_between_statistics = FALSE,
-                   ICCs = TRUE) {
+                   weighted_between_statistics = FALSE) {
 
     # input validation and preparation
   input_data <- data
@@ -133,10 +132,7 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  ICC <- data.frame()
-  if (ICCs) {
-    ICC <- compute_ICC1(within_df, between_df_weighted)
-  }
+  ICC <- compute_ICC1(within_df, between_df_weighted)
 
 
   # Store everything in three sections of the object
