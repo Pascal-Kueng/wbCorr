@@ -24,7 +24,7 @@
 #' without missing data and an equal number of measurements per person. TRUE only supports continuous variables (default: FALSE).
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
-#' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices.
+#' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
 #' Use  get_ICC() in order to get all intra class correlations (ICC(1,1)).
 #'
 #' @description

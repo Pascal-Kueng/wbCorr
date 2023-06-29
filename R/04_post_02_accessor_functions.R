@@ -57,6 +57,7 @@ get_tables <- get_table
 
 #' @title Return matrices for within- and/or between-cluster correlations.
 #' @description You can use summary(), get_matrices(), or get_matrix() interchangeably.
+#' Merged matrices include the ICC on the diagonal.
 #' For more detailed statistics, use get_table().
 #'
 #' @param object A wbCorr object, created by the wbCorr() function.
@@ -66,7 +67,7 @@ get_tables <- get_table
 #' Default is c('within', 'between', 'merge').
 #' @param ... Additional arguments passed to the base summary method
 #'
-#' @return A list containing the selected matrices of within- and/or between-cluster correlations.
+#' @return A list containing the selected matrices of within- and/or between-cluster correlations, and ICCs on the diagonals for merged matrices.
 #' @seealso \code{\link[=get_table]{get_tables}}, \code{\link[=wbCorr]{wbCorr}}
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
