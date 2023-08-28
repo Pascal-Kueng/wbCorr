@@ -26,6 +26,7 @@
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 #' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
 #' Use  get_ICC() in order to get all intra class correlations (ICC(1,1)).
+#' Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
 #'
 #' @description
 #' The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
@@ -39,7 +40,8 @@
 #' \code{\link[=get_table]{get_table}},
 #' \code{\link[=summary.wbCorr]{summary}},
 #' \code{\link[=get_ICC]{get_ICC}},
-#' \code{\link[=plot.wbCorr]{plot}}
+#' \code{\link[=plot.wbCorr]{plot}},
+#' \code{\link[=to_excel]{to_excel}}
 #'
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -60,6 +62,9 @@
 #' # Plot the centered variables against each other
 #' plot(correlations, 'within')
 #' plot(correlations, which = 'b')
+#'
+#' # Store the list of correlation matrices to excel
+#' to_excel(matrices)
 #'
 #'
 #' @export
