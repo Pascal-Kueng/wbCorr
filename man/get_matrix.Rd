@@ -24,10 +24,11 @@ Default is c('within', 'between', 'merge').}
 \item{...}{Additional arguments passed to the base summary method}
 }
 \value{
-A list containing the selected matrices of within- and/or between-cluster correlations.
+A list containing the selected matrices of within- and/or between-cluster correlations, and ICCs on the diagonals for merged matrices.
 }
 \description{
 You can use summary(), get_matrices(), or get_matrix() interchangeably.
+Merged matrices include the ICC on the diagonal.
 For more detailed statistics, use get_table().
 }
 \examples{
