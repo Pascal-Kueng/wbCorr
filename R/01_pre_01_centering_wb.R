@@ -59,5 +59,5 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     df_between$Group.1 <- NULL
   }
 
-  return(list(between = df_between, within = df_within, var_type = var_type, warnings = warnings))
+  return(list(between = df_between, within = df_within, var_type = var_type, warnings = warnings, input_data_cleaned = input_data))
 }

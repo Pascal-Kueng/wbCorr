@@ -26,7 +26,7 @@ compute_ICC1_alt <- function(within_df, full_df) {
   for (name in colnames(within_df)) {
 
     within_var <- var(within_df[[name]], na.rm = TRUE)
-    total_var <- var(full_df[[name]], na.rm = TRUE)
+    total_var <- var(as.numeric(full_df[[name]]), na.rm = TRUE)
 
     ICC <- 1 - (within_var / total_var)
 
@@ -35,3 +35,4 @@ compute_ICC1_alt <- function(within_df, full_df) {
 
   return(ICCs)
 }
+

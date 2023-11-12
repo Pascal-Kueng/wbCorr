@@ -89,6 +89,7 @@ wbCorr <- function(data, cluster,
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
+  input_data_cleaned <- centered_df$input_data_cleaned[-1]
   var_type <- centered_df$var_type
   warnings <- centered_df$warnings
 
@@ -137,7 +138,8 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  ICC <- compute_ICC1(within_df, between_df_weighted)
+  #ICC <- compute_ICC1(within_df, between_df_weighted)
+  ICC <- compute_ICC1_alt(within_df, input_data)
 
 
   # Store everything in three sections of the object
