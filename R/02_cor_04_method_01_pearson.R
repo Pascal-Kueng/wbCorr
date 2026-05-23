@@ -6,7 +6,29 @@ cor_pearson <- function(col_i, col_j, degrees_freedom, confidence_level) {
   correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
                                                   method = 'pearson'))
 
-  if (is.na(correlation_coefficient)) {
+  cor_pearson_from_r(correlation_coefficient, degrees_freedom, confidence_level)
+}
+
+cor_pearson_from_r <- function(correlation_coefficient, degrees_freedom, confidence_level) {
+
+  if (is.na(correlation_coefficient) ||
+      is.na(degrees_freedom) ||
+      degrees_freedom <= 0 ||
+      abs(correlation_coefficient) >= 1) {
+    if (!is.na(correlation_coefficient) &&
+        !is.na(degrees_freedom) &&
+        degrees_freedom > 0 &&
+        abs(correlation_coefficient) == 1) {
+      test_statistic <- sign(correlation_coefficient) * Inf
+      p_value <- 0
+      lower_bound <- correlation_coefficient
+      upper_bound <- correlation_coefficient
+      return(list(correlation_coefficient = correlation_coefficient,
+                  test_statistic = test_statistic,
+                  p_value = p_value,
+                  lower_bound = lower_bound,
+                  upper_bound = upper_bound))
+    }
     return(list(correlation_coefficient = NA,
                 test_statistic = NA,
                 p_value = NA,

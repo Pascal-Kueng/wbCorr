@@ -12,7 +12,9 @@ wbCorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
-  weighted_between_statistics = FALSE
+  weighted_between_statistics = NULL,
+  between_weighting = c("equal_clusters", "cluster_size"),
+  between_inference = c("analytic", "none")
 )
 
 wbcorr(
@@ -22,7 +24,9 @@ wbcorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
-  weighted_between_statistics = FALSE
+  weighted_between_statistics = NULL,
+  between_weighting = c("equal_clusters", "cluster_size"),
+  between_inference = c("analytic", "none")
 )
 }
 \arguments{
@@ -47,10 +51,21 @@ intervals and p-values. Recommended for non-normal data, but slow. (default: FAL
 
 \item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
 
-\item{weighted_between_statistics}{A logical value. If FALSE, variables are centered between persons by
-simply taking the mean for each person and weighting them all the same, even if some
-contributed fewer measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
-without missing data and an equal number of measurements per person. TRUE only supports continuous variables (default: FALSE).}
+\item{weighted_between_statistics}{Deprecated logical alias for
+\code{between_weighting}. If TRUE, \code{between_weighting = "cluster_size"}; if
+FALSE, \code{between_weighting = "equal_clusters"}.}
+
+\item{between_weighting}{A string specifying the between-cluster estimand.
+\code{"equal_clusters"} correlates pair-specific cluster means with each cluster
+contributing equally. \code{"cluster_size"} computes a sample-size weighted
+correlation of pair-specific cluster means, using the number of complete
+observation pairs in each cluster as weights.}
+
+\item{between_inference}{A string specifying whether between-cluster
+p-values and confidence intervals are calculated analytically (\code{"analytic"})
+or omitted (\code{"none"}). Analytic inference for \code{"cluster_size"} weighted
+between correlations uses \code{k - 2} cluster-level degrees of freedom for
+Pearson correlations and is approximate.}
 }
 \value{
 A wbCorr object that contains within- and between-cluster statistics.
@@ -60,15 +75,38 @@ Use  get_ICC() in order to get all intra class correlations (ICC(1,1)).
 Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
 }
 \description{
-The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
-p-values, and confidence intervals for a given dataset and clustering variable. The object can be plotted.
+The wbCorr function creates a wbCorr object containing within- and
+between-cluster correlations, p-values, and confidence intervals for a given
+dataset and clustering variable. The object can be plotted.
 }
 \details{
-Calculates within- and between-cluster correlations for a given dataframe and clustering variable.
-Only recommended for continuous or binary variables.
+Calculates bivariate within- and between-cluster correlations for clustered
+data, such as repeated measures nested in persons, dyads, teams, or other
+groups. Only recommended for continuous or binary variables.
 
-Inspired by the psych::statsBy function, wbCorr allows you to easily calculate, extract, and plot within-
-and between-cluster correlations for further analysis.
+For every variable pair, wbCorr first keeps only rows where both variables
+and the cluster variable are observed. This means missing data are handled
+pairwise.
+
+The within-cluster correlation is the pooled residual correlation. For a
+given pair, each observed value is centered around its cluster mean for that
+same complete-pair row set, and the correlation is computed on the resulting
+residuals. For Pearson within-cluster correlations, analytic inference uses
+\code{N_pair - k_pair - 1} degrees of freedom, where \code{N_pair} is the number of
+complete observation pairs and \code{k_pair} is the number of clusters
+contributing at least one complete pair.
+
+The between-cluster correlation is computed from pair-specific cluster means.
+With \code{between_weighting = "equal_clusters"}, every cluster contributes one
+equally weighted mean. With \code{between_weighting = "cluster_size"}, cluster
+means are weighted by the number of complete observation pairs in that
+cluster. Analytic p-values and confidence intervals for cluster-size weighted
+between correlations are approximate; use \code{between_inference = "none"} to
+report only the weighted coefficient.
+
+Inspired by the psych::statsBy function, wbCorr allows you to calculate,
+extract, and plot within- and between-cluster correlations for further
+analysis.
 }
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -77,6 +115,11 @@ data("simdat_intensive_longitudinal")
 # create a wbCorr object:
 correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID')
+
+# optionally compute sample-size weighted between-cluster correlations:
+weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
+                     'participantID',
+                     between_weighting = 'cluster_size')
 
 # returns a list with full detailed tables of the correlations:
 tables <- get_table(correlations) # the get_tables() function is equivalent

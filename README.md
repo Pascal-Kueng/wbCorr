@@ -1,9 +1,12 @@
 # wbCorr: Bivariate Within- and Between-Cluster Correlations
 
-The wbCorr package efficiently decomposes the variance of numeric variables into their within- and between-cluster components, and subsequently computes the corresponding bivariate correlations for each level independently. Results can be plotted.
-This functionality is particularly beneficial for longitudinal data analysis.
+The wbCorr package computes bivariate within- and between-cluster correlations for clustered data, such as repeated measures nested in persons, dyads, teams, or other groups. Results can be inspected as tables, matrices, and plots.
 
-The package accomplishes this by centering the variables at both within- and between-cluster levels, followed by computing the correlations on the transformed dataframes. To determine significance tests and confidence intervals, the degrees of freedom for within-cluster correlations rely on the total number of complete pairs across all observations, while the degrees of freedom for between-cluster correlations depend on the total number of clusters.  
+For every variable pair, wbCorr first keeps only rows where both variables and the cluster variable are observed. This means missing data are handled pairwise.
+
+The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair.
+
+The between-cluster correlation is computed from pair-specific cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. Weighted between-cluster p-values and confidence intervals are marked as approximate; use `between_inference = "none"` to report only the weighted coefficient.
 
 Note. In most cases this is not appropriate for categorical data. Only use data than can be meaningfully centered around it's mean (e.g., interval and ratio data). 
 
@@ -24,6 +27,22 @@ remotes::install_github('Pascal-Kueng/wbCorr')
 ### Check documentation
 ```R
 ?wbCorr # view documentation
+```
+
+### Main estimand choices
+```R
+# Default: pooled within-cluster residual correlations and equal-cluster
+# between-cluster correlations.
+wbCorr(data, cluster = "person_id")
+
+# Between-cluster correlations weighted by the number of complete pairs in
+# each cluster.
+wbCorr(data, cluster = "person_id", between_weighting = "cluster_size")
+
+# Same weighted coefficient, but no approximate between-cluster p-values or CIs.
+wbCorr(data, cluster = "person_id",
+       between_weighting = "cluster_size",
+       between_inference = "none")
 ```
 
 #### Sample Output for get_table()

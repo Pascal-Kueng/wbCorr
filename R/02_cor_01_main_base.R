@@ -12,7 +12,15 @@ corAndPValues <- function(input_data,
                           var_type,
                           warnings,
                           bootstrap,
-                          nboot) {
+                          nboot,
+                          cluster_var = NULL,
+                          level = c('plain', 'within', 'between'),
+                          between_weighting = c('equal_clusters', 'cluster_size'),
+                          between_inference = c('analytic', 'none')) {
+  level <- match.arg(level)
+  between_weighting <- match.arg(between_weighting)
+  between_inference <- match.arg(between_inference)
+
   # initializing matrices and lists
   value_list <- initializing_values(input_data)
 
@@ -27,62 +35,63 @@ corAndPValues <- function(input_data,
     i <- idx_combinations[k, 1]
     j <- idx_combinations[k, 2]
 
-    col_i <- input_data[[i]]
-    col_j <- input_data[[j]]
+    pair_data <- prepare_correlation_pair(input_data[[i]],
+                                          input_data[[j]],
+                                          cluster_var,
+                                          level,
+                                          between_weighting)
+    col_i <- pair_data$col_i
+    col_j <- pair_data$col_j
+    weights <- pair_data$weights
+    n_comparisons <- pair_data$n_comparisons
+    k_pair <- pair_data$k_pair
 
 
     # Check if there are enough finite observations
-    if (is.null(col_i) || is.null(col_j) || (sum(!is.na(col_i) & !is.na(col_j))) < 3 ) { # Ignore correlations with insufficient finite observations
+    if (is.null(col_i) || is.null(col_j) ||
+        (sum(!is.na(col_i) & !is.na(col_j))) < 3 ) { # Ignore correlations with insufficient finite observations
       cor_matrix[i, j] <- cor_matrix[j, i] <- NA
       p_matrix[i, j] <- p_matrix[j, i] <- NA
       temp_ci_df <- data.frame(Parameter1 = names(input_data[i]),
                                Parameter2 = names(input_data[j]),
-                               CI_lower = lower_bound,
-                               correlation_coefficient = correlation_coefficient,
-                               CI_upper = upper_bound)
+                               CI_lower = NA,
+                               correlation_coefficient = NA,
+                               CI_upper = NA)
       conf_int_df <- rbind(conf_int_df, temp_ci_df)
       next
     }
 
-    # remove all pairwise cases when one variable is missing.
-    complete_cases <- complete.cases(col_i, col_j)
-    col_i <- col_i[complete_cases]
-    col_j <- col_j[complete_cases]
-    n_comparisons <- sum(complete_cases)
-
-    if (!is.null(n_clusters_between)) { # for between - person correlations
-      base_for_degrees_freedom <- n_clusters_between
-    } else { # for within- person correlations
-      base_for_degrees_freedom <- n_comparisons
-    }
-
-
     # set method
+    method_selected <- method
     if (auto_type) {
-      type_i <- var_type[[i]]
-      type_j <- var_type[[j]]
+      type_i <- var_type[[names(input_data)[i]]]
+      type_j <- var_type[[names(input_data)[j]]]
 
-      method <- 'pearson'
+      method_selected <- 'pearson'
       method_table <- "pearson's r"
 
 
       if (type_i == 'ordinal' | type_j == 'ordinal') {
-        method <- 'spearman'
+        method_selected <- 'spearman'
         method_table <- "spearman's rho"
       } else {
         if(type_i == 'binary' | type_j == 'binary') {
-          method <- 'pearson'
+          method_selected <- 'pearson'
           method_table <- "point-biserial"
           if (type_i == 'binary' & type_j  == 'binary') {
-            method <- 'pearson'
+            method_selected <- 'pearson'
             method_table <- "phi coefficient"
           }
         }
       }
+    } else if (method_selected == 'pearson') {
+      method_table <- "pearson's r"
+    } else if (method_selected %in% c('spearman', 'spearman-jackknife')) {
+      method_table <- "spearman's rho"
     }
 
-    warning_i <- warnings[[i]]
-    warning_j <- warnings[[j]]
+    warning_i <- warnings[[names(input_data)[i]]]
+    warning_j <- warnings[[names(input_data)[j]]]
 
     auto_warning <- 'None'
     if (!warning_j == 'None') {
@@ -93,24 +102,23 @@ corAndPValues <- function(input_data,
     }
 
     # Set degrees freedom
-    if (method == 'pearson') {
-      degrees_freedom <- base_for_degrees_freedom -2
+    if (method_selected == 'pearson') {
+      degrees_freedom <- correlation_degrees_freedom(method_selected,
+                                                     level,
+                                                     n_comparisons,
+                                                     k_pair,
+                                                     n_clusters_between)
       statistic_type <- 't-statistic'
-      if (!auto_type) {
-        method_table <- "spearman's rho"
-      }
-    } else if (method == 'spearman') {
-      degrees_freedom <- base_for_degrees_freedom - 3
+    } else if (method_selected == 'spearman') {
+      degrees_freedom <- correlation_degrees_freedom(method_selected,
+                                                     level,
+                                                     n_comparisons,
+                                                     k_pair,
+                                                     n_clusters_between)
       statistic_type <- 'z-statistic'
-      if (!auto_type) {
-        method_table <- "spearman's rho"
-      }
-    } else if (method == 'spearman-jackknife') {
+    } else if (method_selected == 'spearman-jackknife') {
       degrees_freedom <- NA
       statistic_type <- NA
-      if (!auto_type) {
-        method_table <- "spearman's rho"
-      }
     }
 
     else {
@@ -118,18 +126,51 @@ corAndPValues <- function(input_data,
       statistic_type <- NA
     }
 
-    correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
-                                                                          method,
-                                                                          degrees_freedom,
-                                                                          confidence_level,
-                                                                          bootstrap,
-                                                                          nboot)
+    if (level == 'between' && between_inference == 'none') {
+      cor_method <- if (method_selected == 'spearman-jackknife') {
+        'spearman'
+      } else {
+        method_selected
+      }
+      if (is.null(weights)) {
+        correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
+                                                        method = cor_method))
+      } else {
+        correlation_coefficient <- weighted_cor(col_i, col_j, weights, cor_method)
+      }
+      correlations_statistics_list <- list(correlation_coefficient = correlation_coefficient,
+                                           test_statistic = NA,
+                                           p_value = NA,
+                                           lower_bound = NA,
+                                           upper_bound = NA)
+    } else {
+      correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
+                                                                            method_selected,
+                                                                            degrees_freedom,
+                                                                            confidence_level,
+                                                                            bootstrap,
+                                                                            nboot,
+                                                                            weights = weights)
+    }
 
     correlation_coefficient <- correlations_statistics_list$correlation_coefficient
     test_statistic <- correlations_statistics_list$test_statistic
     p_value <- correlations_statistics_list$p_value
     lower_bound <- correlations_statistics_list$lower_bound
     upper_bound <- correlations_statistics_list$upper_bound
+
+    if (level == 'between' &&
+        between_weighting == 'cluster_size' &&
+        between_inference == 'analytic' &&
+        method_selected != 'spearman-jackknife') {
+      if (auto_warning == 'None') {
+        auto_warning <- 'weighted between inference approximate'
+      } else {
+        auto_warning <- paste(auto_warning,
+                              'weighted between inference approximate',
+                              sep = '; ')
+      }
+    }
 
     # populate matrices
     cor_matrix[i, j] <- cor_matrix[j, i] <- correlation_coefficient
@@ -182,4 +223,105 @@ corAndPValues <- function(input_data,
               correlation_coefficient = correlation_coefficient_df,
               confidence_intervals = conf_int_df,
               result_table = result_table))
+}
+
+prepare_correlation_pair <- function(col_i,
+                                     col_j,
+                                     cluster_var,
+                                     level,
+                                     between_weighting) {
+  if (level == 'plain') {
+    complete_cases <- complete.cases(col_i, col_j)
+    return(list(col_i = col_i[complete_cases],
+                col_j = col_j[complete_cases],
+                weights = NULL,
+                n_comparisons = sum(complete_cases),
+                k_pair = NA_integer_))
+  }
+
+  if (is.null(cluster_var)) {
+    stop("cluster_var is required for within- and between-cluster correlations.")
+  }
+
+  complete_cases <- complete.cases(col_i, col_j, cluster_var)
+  col_i <- col_i[complete_cases]
+  col_j <- col_j[complete_cases]
+  cluster_pair <- droplevels(as.factor(cluster_var[complete_cases]))
+  n_comparisons <- length(col_i)
+  k_pair <- nlevels(cluster_pair)
+
+  if (n_comparisons == 0 || k_pair == 0) {
+    return(list(col_i = numeric(0),
+                col_j = numeric(0),
+                weights = NULL,
+                n_comparisons = 0,
+                k_pair = 0))
+  }
+
+  if (level == 'within') {
+    mean_i <- ave(col_i, cluster_pair, FUN = mean)
+    mean_j <- ave(col_j, cluster_pair, FUN = mean)
+    return(list(col_i = col_i - mean_i,
+                col_j = col_j - mean_j,
+                weights = NULL,
+                n_comparisons = n_comparisons,
+                k_pair = k_pair))
+  }
+
+  pair_df <- data.frame(cluster = cluster_pair,
+                        col_i = col_i,
+                        col_j = col_j)
+  means <- aggregate(cbind(col_i, col_j) ~ cluster,
+                     data = pair_df,
+                     FUN = mean)
+  cluster_n <- aggregate(col_i ~ cluster,
+                         data = pair_df,
+                         FUN = length)
+  names(cluster_n)[names(cluster_n) == 'col_i'] <- 'weight'
+  means <- merge(means, cluster_n, by = 'cluster', sort = FALSE)
+
+  weights <- NULL
+  if (between_weighting == 'cluster_size') {
+    weights <- means$weight
+  }
+
+  list(col_i = means$col_i,
+       col_j = means$col_j,
+       weights = weights,
+       n_comparisons = nrow(means),
+       k_pair = nrow(means))
+}
+
+correlation_degrees_freedom <- function(method,
+                                        level,
+                                        n_comparisons,
+                                        k_pair,
+                                        n_clusters_between) {
+  if (method == 'pearson') {
+    if (level == 'within') {
+      return(n_comparisons - k_pair - 1)
+    }
+    if (level == 'between') {
+      return(k_pair - 2)
+    }
+    if (!is.null(n_clusters_between)) {
+      return(n_clusters_between - 2)
+    }
+    return(n_comparisons - 2)
+  }
+
+  if (method == 'spearman') {
+    if (level == 'within') {
+      return(n_comparisons - k_pair - 1)
+    }
+    if (level == 'between') {
+      return(k_pair - 3)
+    }
+    if (!is.null(n_clusters_between)) {
+      return(n_clusters_between - 3)
+    }
+    return(n_comparisons - 3)
+  }
+
+  NA
 }

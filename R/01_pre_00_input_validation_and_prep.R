@@ -9,14 +9,14 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
   if (!method %in% c("pearson", "spearman", "spearman-jackknife", "auto")) {
     stop("Invalid correlation method. Choose one of: 'pearson', 'spearman', and 'spearman-jackknife'.")
   }
-  if (method == 'spearman-jackknife' & weighted_between_statistics == TRUE) {
-    stop("weighted_between_statistics not supported for jackknife CIs.")
+  if (method == 'spearman-jackknife' & isTRUE(weighted_between_statistics)) {
+    stop("cluster-size weighted between statistics are not supported for jackknife CIs.")
   }
   if (method == 'spearman-jackknife' & bootstrap == TRUE) {
     stop("Jackknife and bootstraping can't both be active at once.")
   }
-  if (bootstrap == TRUE & weighted_between_statistics == TRUE) {
-    stop("weighted between-statistics not supported with bootstraping.")
+  if (bootstrap == TRUE & isTRUE(weighted_between_statistics)) {
+    stop("cluster-size weighted between statistics are not supported with bootstraping.")
   }
 
   # Determine Cluster Variable
@@ -46,4 +46,22 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
   cluster_var <- as.factor(input_data[[cluster]])
   input_data[[cluster]] <- NULL
   return(cluster_var)
+}
+
+remove_cluster_columns <- function(input_data, cluster, cluster_var) {
+  if (length(cluster) == 1 && is.character(cluster) && cluster %in% colnames(input_data)) {
+    input_data[[cluster]] <- NULL
+    return(input_data)
+  }
+
+  cluster_codes <- as.numeric(as.factor(cluster_var))
+  for (name in colnames(input_data)) {
+    column_codes <- as.numeric(as.factor(input_data[[name]]))
+    if (length(column_codes) == length(cluster_codes) &&
+        all(column_codes == cluster_codes, na.rm = TRUE)) {
+      input_data[[name]] <- NULL
+    }
+  }
+
+  input_data
 }

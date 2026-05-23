@@ -1,7 +1,8 @@
 #' wbCorr
 #'
-#' Calculates within- and between-cluster correlations for a given dataframe and clustering variable.
-#' Only recommended for continuous or binary variables.
+#' Calculates bivariate within- and between-cluster correlations for clustered
+#' data, such as repeated measures nested in persons, dyads, teams, or other
+#' groups. Only recommended for continuous or binary variables.
 #'
 #' @param data A dataframe containing numeric variables for which correlations will be calculated.
 #' @param cluster A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.
@@ -18,10 +19,19 @@
 #' @param bootstrap Performs a bias-corrected and accelerated (BCa) parametric bootstrap to compute confidence
 #' intervals and p-values. Recommended for non-normal data, but slow. (default: FALSE).
 #' @param nboot Specifies the amount of bootstrap samples (default: 1000).
-#' @param weighted_between_statistics A logical value. If FALSE, variables are centered between persons by
-#' simply taking the mean for each person and weighting them all the same, even if some
-#' contributed fewer measurement points. If TRUE, correlations are weighted. These methods will be equivalent in datasets
-#' without missing data and an equal number of measurements per person. TRUE only supports continuous variables (default: FALSE).
+#' @param weighted_between_statistics Deprecated logical alias for
+#' `between_weighting`. If TRUE, `between_weighting = "cluster_size"`; if
+#' FALSE, `between_weighting = "equal_clusters"`.
+#' @param between_weighting A string specifying the between-cluster estimand.
+#' `"equal_clusters"` correlates pair-specific cluster means with each cluster
+#' contributing equally. `"cluster_size"` computes a sample-size weighted
+#' correlation of pair-specific cluster means, using the number of complete
+#' observation pairs in each cluster as weights.
+#' @param between_inference A string specifying whether between-cluster
+#' p-values and confidence intervals are calculated analytically (`"analytic"`)
+#' or omitted (`"none"`). Analytic inference for `"cluster_size"` weighted
+#' between correlations uses `k - 2` cluster-level degrees of freedom for
+#' Pearson correlations and is approximate.
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 #' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
@@ -29,12 +39,34 @@
 #' Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
 #'
 #' @description
-#' The wbCorr function creates a wbCorr object containing within- and between-cluster correlations,
-#' p-values, and confidence intervals for a given dataset and clustering variable. The object can be plotted.
+#' The wbCorr function creates a wbCorr object containing within- and
+#' between-cluster correlations, p-values, and confidence intervals for a given
+#' dataset and clustering variable. The object can be plotted.
 #'
 #' @details
-#' Inspired by the psych::statsBy function, wbCorr allows you to easily calculate, extract, and plot within-
-#' and between-cluster correlations for further analysis.
+#' For every variable pair, wbCorr first keeps only rows where both variables
+#' and the cluster variable are observed. This means missing data are handled
+#' pairwise.
+#'
+#' The within-cluster correlation is the pooled residual correlation. For a
+#' given pair, each observed value is centered around its cluster mean for that
+#' same complete-pair row set, and the correlation is computed on the resulting
+#' residuals. For Pearson within-cluster correlations, analytic inference uses
+#' `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of
+#' complete observation pairs and `k_pair` is the number of clusters
+#' contributing at least one complete pair.
+#'
+#' The between-cluster correlation is computed from pair-specific cluster means.
+#' With `between_weighting = "equal_clusters"`, every cluster contributes one
+#' equally weighted mean. With `between_weighting = "cluster_size"`, cluster
+#' means are weighted by the number of complete observation pairs in that
+#' cluster. Analytic p-values and confidence intervals for cluster-size weighted
+#' between correlations are approximate; use `between_inference = "none"` to
+#' report only the weighted coefficient.
+#'
+#' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
+#' extract, and plot within- and between-cluster correlations for further
+#' analysis.
 #'
 #' @seealso
 #' \code{\link[=get_table]{get_table}},
@@ -50,6 +82,11 @@
 #' # create a wbCorr object:
 #' correlations <- wbCorr(simdat_intensive_longitudinal,
 #'                      'participantID')
+#'
+#' # optionally compute sample-size weighted between-cluster correlations:
+#' weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
+#'                      'participantID',
+#'                      between_weighting = 'cluster_size')
 #'
 #' # returns a list with full detailed tables of the correlations:
 #' tables <- get_table(correlations) # the get_tables() function is equivalent
@@ -73,28 +110,40 @@ wbCorr <- function(data, cluster,
                    method = "pearson",
                    bootstrap = FALSE,
                    nboot = 1000,
-                   weighted_between_statistics = FALSE) {
+                   weighted_between_statistics = NULL,
+                   between_weighting = c("equal_clusters", "cluster_size"),
+                   between_inference = c("analytic", "none")) {
 
     # input validation and preparation
   input_data <- data
+
+  if (!is.null(weighted_between_statistics) && missing(between_weighting)) {
+    between_weighting <- if (isTRUE(weighted_between_statistics)) {
+      "cluster_size"
+    } else {
+      "equal_clusters"
+    }
+  }
+  between_weighting <- match.arg(between_weighting)
+  between_inference <- match.arg(between_inference)
+  cluster_size_between <- between_weighting == "cluster_size"
+
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
-                                           weighted_between_statistics,
+                                           cluster_size_between,
                                            bootstrap)
+  input_data <- remove_cluster_columns(input_data, cluster, cluster_var)
 
   cluster <- 'cluster'
 
   # Split variance into between- and within
   centered_df <- wbCenter(input_data, cluster_var, method,
-                          weighted_between_statistics)
+                          cluster_size_between)
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
-  input_data_cleaned <- centered_df$input_data_cleaned[-1]
+  input_data_cleaned <- centered_df$input_data_cleaned
   var_type <- centered_df$var_type
   warnings <- centered_df$warnings
-
-  between_df_weighted <- wbCenter(input_data, cluster_var, method,
-                                  weighted_between_statistics = TRUE)$between[-1]
 
   centered_data <- list(within_df = within_df, between_df = between_df)
 
@@ -105,24 +154,28 @@ wbCorr <- function(data, cluster,
   }
 
   # Calculate correlations, p-values, and confidence intervals.
-  within_cors <- corAndPValues(within_df,
+  within_cors <- corAndPValues(input_data_cleaned,
                                confidence_level = confidence_level,
                                method = method,
                                auto_type = auto_type,
                                var_type = var_type,
                                warnings = warnings,
                                bootstrap = bootstrap,
-                               nboot = nboot)
-  between_cors <- corAndPValues(between_df,
-                                n_clusters_between = nlevels(as.factor(
-                                    centered_df$between$cluster)),
+                               nboot = nboot,
+                               cluster_var = cluster_var,
+                               level = 'within')
+  between_cors <- corAndPValues(input_data_cleaned,
                                 confidence_level = confidence_level,
                                 method = method,
                                 auto_type = auto_type,
                                 var_type = var_type,
                                 warnings = warnings,
                                 bootstrap = bootstrap,
-                                nboot = nboot)
+                                nboot = nboot,
+                                cluster_var = cluster_var,
+                                level = 'between',
+                                between_weighting = between_weighting,
+                                between_inference = between_inference)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
@@ -138,7 +191,6 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  #ICC <- compute_ICC1(within_df, between_df_weighted)
   ICC <- compute_ICC1_alt(within_df, input_data)
 
 
@@ -158,7 +210,9 @@ wbCorr <- function(data, cluster,
                    method = method,
                    bootstrap = bootstrap,
                    nboot = nboot,
-                   weighted_between_statistics = weighted_between_statistics,
+                   weighted_between_statistics = cluster_size_between,
+                   between_weighting = between_weighting,
+                   between_inference = between_inference,
                    auto_type = auto_type,
                    var_type = var_type)
 
