@@ -66,6 +66,7 @@ test_that("between weighting option is explicit and backwards compatible", {
                                    weighted_between_statistics = TRUE))
 
   expect_equal(equal@settings$between_weighting, "equal_clusters")
+  expect_equal(equal@settings$centering_rows, "pairwise_complete")
   expect_equal(weighted@settings$between_weighting, "cluster_size")
   expect_equal(alias@settings$between_weighting, "cluster_size")
   expect_equal(weighted@between$correlations, alias@between$correlations)

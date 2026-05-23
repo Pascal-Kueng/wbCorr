@@ -2,11 +2,15 @@
 
 The wbCorr package computes bivariate within- and between-cluster correlations for clustered data, such as repeated measures nested in persons, dyads, teams, or other groups. Results can be inspected as tables, matrices, and plots.
 
-For every variable pair, wbCorr first keeps only rows where both variables and the cluster variable are observed. This means missing data are handled pairwise.
+For every variable pair, wbCorr computes the correlation on rows where both variables and the cluster variable are observed. This means missing data are handled pairwise for the bivariate association.
 
 The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair.
 
-The between-cluster correlation is computed from pair-specific cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. Weighted between-cluster p-values and confidence intervals are marked as approximate; use `between_inference = "none"` to report only the weighted coefficient.
+The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. Weighted between-cluster p-values and confidence intervals are marked as approximate; use `between_inference = "none"` to report only the weighted coefficient.
+
+By default, `centering_rows = "pairwise_complete"` estimates cluster means from the same complete-pair row set used for the correlation. This keeps the within residuals centered for the actual pairwise sample and makes the between correlation a correlation of matched pair-specific cluster means.
+
+Alternatively, `centering_rows = "all_available"` estimates each variable's cluster mean from all available rows for that variable. This can make each univariate cluster mean more stable when data are missing, and it mirrors a common multilevel-model preprocessing workflow where person means are created before the model applies complete-case filtering. That workflow is fine and defensible in multilevel models. In wbCorr, however, the variables are treated symmetrically as a descriptive bivariate decomposition, so all-available centering means the two cluster means in a pair may be based on different occasions. For that reason, pairwise-complete centering remains the default, and analytic inference with all-available centering is marked as approximate.
 
 Note. In most cases this is not appropriate for categorical data. Only use data than can be meaningfully centered around it's mean (e.g., interval and ratio data). 
 
@@ -43,6 +47,10 @@ wbCorr(data, cluster = "person_id", between_weighting = "cluster_size")
 wbCorr(data, cluster = "person_id",
        between_weighting = "cluster_size",
        between_inference = "none")
+
+# Estimate cluster means from all rows available for each variable, similar to
+# common multilevel-model preprocessing.
+wbCorr(data, cluster = "person_id", centering_rows = "all_available")
 ```
 
 #### Sample Output for get_table()

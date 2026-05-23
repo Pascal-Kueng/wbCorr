@@ -14,7 +14,8 @@ wbCorr(
   nboot = 1000,
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
-  between_inference = c("analytic", "none")
+  between_inference = c("analytic", "none"),
+  centering_rows = c("pairwise_complete", "all_available")
 )
 
 wbcorr(
@@ -26,7 +27,8 @@ wbcorr(
   nboot = 1000,
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
-  between_inference = c("analytic", "none")
+  between_inference = c("analytic", "none"),
+  centering_rows = c("pairwise_complete", "all_available")
 )
 }
 \arguments{
@@ -66,6 +68,13 @@ p-values and confidence intervals are calculated analytically (\code{"analytic"}
 or omitted (\code{"none"}). Analytic inference for \code{"cluster_size"} weighted
 between correlations uses \code{k - 2} cluster-level degrees of freedom for
 Pearson correlations and is approximate.}
+
+\item{centering_rows}{A string specifying which rows are used to estimate
+cluster means for within- and between-cluster decomposition.
+\code{"pairwise_complete"} uses only rows where both variables in the current pair
+are observed. \code{"all_available"} estimates each variable's cluster mean from
+all available rows for that variable, then correlates the pair on complete
+rows.}
 }
 \value{
 A wbCorr object that contains within- and between-cluster statistics.
@@ -84,9 +93,23 @@ Calculates bivariate within- and between-cluster correlations for clustered
 data, such as repeated measures nested in persons, dyads, teams, or other
 groups. Only recommended for continuous or binary variables.
 
-For every variable pair, wbCorr first keeps only rows where both variables
-and the cluster variable are observed. This means missing data are handled
-pairwise.
+For every variable pair, correlations are computed on rows where both
+variables and the cluster variable are observed. By default,
+\code{centering_rows = "pairwise_complete"} also estimates cluster means from this
+same complete-pair row set. This keeps the within residuals centered for the
+actual pairwise sample and makes the between correlation a correlation of
+matched pair-specific cluster means.
+
+With \code{centering_rows = "all_available"}, each variable's cluster mean is
+estimated from all available rows for that variable before the pairwise
+correlation is computed. This can make the cluster means more stable when
+data are missing. It also mirrors a common multilevel-model preprocessing
+workflow, where person means are often created before the model applies
+complete-case filtering. That workflow is defensible in multilevel models.
+In wbCorr, however, the variables are treated symmetrically as a descriptive
+bivariate decomposition, so all-available centering means the two cluster
+means in a pair may be based on different occasions. For that reason,
+\code{"pairwise_complete"} is the default.
 
 The within-cluster correlation is the pooled residual correlation. For a
 given pair, each observed value is centered around its cluster mean for that
@@ -120,6 +143,11 @@ correlations <- wbCorr(simdat_intensive_longitudinal,
 weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID',
                      between_weighting = 'cluster_size')
+
+# optionally estimate cluster means from all rows available for each variable:
+all_available_correlations <- wbCorr(simdat_intensive_longitudinal,
+                     'participantID',
+                     centering_rows = 'all_available')
 
 # returns a list with full detailed tables of the correlations:
 tables <- get_table(correlations) # the get_tables() function is equivalent

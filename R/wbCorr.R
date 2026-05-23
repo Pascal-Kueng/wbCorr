@@ -32,6 +32,12 @@
 #' or omitted (`"none"`). Analytic inference for `"cluster_size"` weighted
 #' between correlations uses `k - 2` cluster-level degrees of freedom for
 #' Pearson correlations and is approximate.
+#' @param centering_rows A string specifying which rows are used to estimate
+#' cluster means for within- and between-cluster decomposition.
+#' `"pairwise_complete"` uses only rows where both variables in the current pair
+#' are observed. `"all_available"` estimates each variable's cluster mean from
+#' all available rows for that variable, then correlates the pair on complete
+#' rows.
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 #' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
@@ -44,9 +50,23 @@
 #' dataset and clustering variable. The object can be plotted.
 #'
 #' @details
-#' For every variable pair, wbCorr first keeps only rows where both variables
-#' and the cluster variable are observed. This means missing data are handled
-#' pairwise.
+#' For every variable pair, correlations are computed on rows where both
+#' variables and the cluster variable are observed. By default,
+#' `centering_rows = "pairwise_complete"` also estimates cluster means from this
+#' same complete-pair row set. This keeps the within residuals centered for the
+#' actual pairwise sample and makes the between correlation a correlation of
+#' matched pair-specific cluster means.
+#'
+#' With `centering_rows = "all_available"`, each variable's cluster mean is
+#' estimated from all available rows for that variable before the pairwise
+#' correlation is computed. This can make the cluster means more stable when
+#' data are missing. It also mirrors a common multilevel-model preprocessing
+#' workflow, where person means are often created before the model applies
+#' complete-case filtering. That workflow is defensible in multilevel models.
+#' In wbCorr, however, the variables are treated symmetrically as a descriptive
+#' bivariate decomposition, so all-available centering means the two cluster
+#' means in a pair may be based on different occasions. For that reason,
+#' `"pairwise_complete"` is the default.
 #'
 #' The within-cluster correlation is the pooled residual correlation. For a
 #' given pair, each observed value is centered around its cluster mean for that
@@ -88,6 +108,11 @@
 #'                      'participantID',
 #'                      between_weighting = 'cluster_size')
 #'
+#' # optionally estimate cluster means from all rows available for each variable:
+#' all_available_correlations <- wbCorr(simdat_intensive_longitudinal,
+#'                      'participantID',
+#'                      centering_rows = 'all_available')
+#'
 #' # returns a list with full detailed tables of the correlations:
 #' tables <- get_table(correlations) # the get_tables() function is equivalent
 #' print(tables)
@@ -112,7 +137,8 @@ wbCorr <- function(data, cluster,
                    nboot = 1000,
                    weighted_between_statistics = NULL,
                    between_weighting = c("equal_clusters", "cluster_size"),
-                   between_inference = c("analytic", "none")) {
+                   between_inference = c("analytic", "none"),
+                   centering_rows = c("pairwise_complete", "all_available")) {
 
     # input validation and preparation
   input_data <- data
@@ -126,6 +152,7 @@ wbCorr <- function(data, cluster,
   }
   between_weighting <- match.arg(between_weighting)
   between_inference <- match.arg(between_inference)
+  centering_rows <- match.arg(centering_rows)
   cluster_size_between <- between_weighting == "cluster_size"
 
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
@@ -163,7 +190,8 @@ wbCorr <- function(data, cluster,
                                bootstrap = bootstrap,
                                nboot = nboot,
                                cluster_var = cluster_var,
-                               level = 'within')
+                               level = 'within',
+                               centering_rows = centering_rows)
   between_cors <- corAndPValues(input_data_cleaned,
                                 confidence_level = confidence_level,
                                 method = method,
@@ -175,7 +203,8 @@ wbCorr <- function(data, cluster,
                                 cluster_var = cluster_var,
                                 level = 'between',
                                 between_weighting = between_weighting,
-                                between_inference = between_inference)
+                                between_inference = between_inference,
+                                centering_rows = centering_rows)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
@@ -213,6 +242,7 @@ wbCorr <- function(data, cluster,
                    weighted_between_statistics = cluster_size_between,
                    between_weighting = between_weighting,
                    between_inference = between_inference,
+                   centering_rows = centering_rows,
                    auto_type = auto_type,
                    var_type = var_type)
 

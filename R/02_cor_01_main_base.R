@@ -16,10 +16,12 @@ corAndPValues <- function(input_data,
                           cluster_var = NULL,
                           level = c('plain', 'within', 'between'),
                           between_weighting = c('equal_clusters', 'cluster_size'),
-                          between_inference = c('analytic', 'none')) {
+                          between_inference = c('analytic', 'none'),
+                          centering_rows = c('pairwise_complete', 'all_available')) {
   level <- match.arg(level)
   between_weighting <- match.arg(between_weighting)
   between_inference <- match.arg(between_inference)
+  centering_rows <- match.arg(centering_rows)
 
   # initializing matrices and lists
   value_list <- initializing_values(input_data)
@@ -39,7 +41,8 @@ corAndPValues <- function(input_data,
                                           input_data[[j]],
                                           cluster_var,
                                           level,
-                                          between_weighting)
+                                          between_weighting,
+                                          centering_rows)
     col_i <- pair_data$col_i
     col_j <- pair_data$col_j
     weights <- pair_data$weights
@@ -163,13 +166,15 @@ corAndPValues <- function(input_data,
         between_weighting == 'cluster_size' &&
         between_inference == 'analytic' &&
         method_selected != 'spearman-jackknife') {
-      if (auto_warning == 'None') {
-        auto_warning <- 'weighted between inference approximate'
-      } else {
-        auto_warning <- paste(auto_warning,
-                              'weighted between inference approximate',
-                              sep = '; ')
-      }
+      auto_warning <- append_cor_warning(auto_warning,
+                                         'weighted between inference approximate')
+    }
+
+    if (centering_rows == 'all_available' &&
+        level %in% c('within', 'between') &&
+        method_selected != 'spearman-jackknife') {
+      auto_warning <- append_cor_warning(auto_warning,
+                                         'all-available centering uses variable-specific mean rows; analytic inference approximate')
     }
 
     # populate matrices
@@ -229,7 +234,8 @@ prepare_correlation_pair <- function(col_i,
                                      col_j,
                                      cluster_var,
                                      level,
-                                     between_weighting) {
+                                     between_weighting,
+                                     centering_rows) {
   if (level == 'plain') {
     complete_cases <- complete.cases(col_i, col_j)
     return(list(col_i = col_i[complete_cases],
@@ -243,11 +249,11 @@ prepare_correlation_pair <- function(col_i,
     stop("cluster_var is required for within- and between-cluster correlations.")
   }
 
-  complete_cases <- complete.cases(col_i, col_j, cluster_var)
-  col_i <- col_i[complete_cases]
-  col_j <- col_j[complete_cases]
-  cluster_pair <- droplevels(as.factor(cluster_var[complete_cases]))
-  n_comparisons <- length(col_i)
+  complete_pair_cases <- complete.cases(col_i, col_j, cluster_var)
+  col_i_pair <- col_i[complete_pair_cases]
+  col_j_pair <- col_j[complete_pair_cases]
+  cluster_pair <- droplevels(as.factor(cluster_var[complete_pair_cases]))
+  n_comparisons <- length(col_i_pair)
   k_pair <- nlevels(cluster_pair)
 
   if (n_comparisons == 0 || k_pair == 0) {
@@ -259,25 +265,42 @@ prepare_correlation_pair <- function(col_i,
   }
 
   if (level == 'within') {
-    mean_i <- ave(col_i, cluster_pair, FUN = mean)
-    mean_j <- ave(col_j, cluster_pair, FUN = mean)
-    return(list(col_i = col_i - mean_i,
-                col_j = col_j - mean_j,
+    if (centering_rows == 'all_available') {
+      mean_i <- cluster_means_for_pair_rows(col_i, cluster_var, cluster_pair)
+      mean_j <- cluster_means_for_pair_rows(col_j, cluster_var, cluster_pair)
+    } else {
+      mean_i <- ave(col_i_pair, cluster_pair, FUN = mean)
+      mean_j <- ave(col_j_pair, cluster_pair, FUN = mean)
+    }
+
+    return(list(col_i = col_i_pair - mean_i,
+                col_j = col_j_pair - mean_j,
                 weights = NULL,
                 n_comparisons = n_comparisons,
                 k_pair = k_pair))
   }
 
   pair_df <- data.frame(cluster = cluster_pair,
-                        col_i = col_i,
-                        col_j = col_j)
-  means <- aggregate(cbind(col_i, col_j) ~ cluster,
-                     data = pair_df,
-                     FUN = mean)
+                        col_i = col_i_pair,
+                        col_j = col_j_pair)
   cluster_n <- aggregate(col_i ~ cluster,
                          data = pair_df,
                          FUN = length)
   names(cluster_n)[names(cluster_n) == 'col_i'] <- 'weight'
+
+  if (centering_rows == 'all_available') {
+    clusters <- as.character(cluster_n$cluster)
+    mean_i_by_cluster <- cluster_mean_lookup(col_i, cluster_var)
+    mean_j_by_cluster <- cluster_mean_lookup(col_j, cluster_var)
+    means <- data.frame(cluster = cluster_n$cluster,
+                        col_i = as.numeric(mean_i_by_cluster[clusters]),
+                        col_j = as.numeric(mean_j_by_cluster[clusters]))
+  } else {
+    means <- aggregate(cbind(col_i, col_j) ~ cluster,
+                       data = pair_df,
+                       FUN = mean)
+  }
+
   means <- merge(means, cluster_n, by = 'cluster', sort = FALSE)
 
   weights <- NULL
@@ -290,6 +313,26 @@ prepare_correlation_pair <- function(col_i,
        weights = weights,
        n_comparisons = nrow(means),
        k_pair = nrow(means))
+}
+
+cluster_mean_lookup <- function(col, cluster_var) {
+  valid_rows <- complete.cases(col, cluster_var)
+  tapply(col[valid_rows], as.factor(cluster_var[valid_rows]), mean)
+}
+
+cluster_means_for_pair_rows <- function(col, cluster_var, cluster_pair) {
+  mean_by_cluster <- cluster_mean_lookup(col, cluster_var)
+  as.numeric(mean_by_cluster[as.character(cluster_pair)])
+}
+
+append_cor_warning <- function(current_warning, new_warning) {
+  if (is.null(current_warning) ||
+      is.na(current_warning) ||
+      current_warning == 'None') {
+    return(new_warning)
+  }
+
+  paste(current_warning, new_warning, sep = '; ')
 }
 
 correlation_degrees_freedom <- function(method,

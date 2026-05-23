@@ -51,3 +51,37 @@ test_that("between weighting is explicit and based on pair-specific cluster mean
   expect_match(weighted@between$table$warning,
                "weighted between inference approximate")
 })
+
+test_that("all_available centering uses variable-specific cluster mean rows", {
+  dat <- data.frame(
+    id = c(1, 1, 1, 2, 2, 2, 3, 3, 3),
+    x = c(1, 2, 100, 2, 4, 6, 3, NA, 9),
+    y = c(1, NA, 3, 2, 4, 8, NA, 8, 12)
+  )
+
+  pairwise <- wbCorr(dat, cluster = "id")
+  all_available <- wbCorr(dat, cluster = "id",
+                          centering_rows = "all_available")
+
+  valid <- complete.cases(dat$x, dat$y, dat$id)
+  pair <- dat[valid, ]
+  x_means <- tapply(dat$x, dat$id, mean, na.rm = TRUE)
+  y_means <- tapply(dat$y, dat$id, mean, na.rm = TRUE)
+  x_resid <- pair$x - as.numeric(x_means[as.character(pair$id)])
+  y_resid <- pair$y - as.numeric(y_means[as.character(pair$id)])
+  expected_within <- cor(x_resid, y_resid)
+
+  complete_pair_clusters <- unique(pair$id)
+  expected_between <- cor(
+    as.numeric(x_means[as.character(complete_pair_clusters)]),
+    as.numeric(y_means[as.character(complete_pair_clusters)])
+  )
+
+  expect_equal(all_available@settings$centering_rows, "all_available")
+  expect_equal(all_available@within$correlations["x", "y"], expected_within)
+  expect_equal(all_available@between$correlations["x", "y"], expected_between)
+  expect_false(isTRUE(all.equal(pairwise@within$correlations["x", "y"],
+                                all_available@within$correlations["x", "y"])))
+  expect_match(all_available@within$table$warning,
+               "all-available centering uses variable-specific mean rows")
+})
