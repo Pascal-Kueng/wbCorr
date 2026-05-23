@@ -1,3 +1,5 @@
+> Check installation steps and usage examples below the technical implementation
+
 # wbCorr: Bivariate Within- and Between-Cluster Correlations
 
 The wbCorr package computes bivariate within- and between-cluster correlations for clustered data, such as repeated measures nested in persons, dyads, teams, or other groups. Results can be inspected as tables, matrices, and plots.
