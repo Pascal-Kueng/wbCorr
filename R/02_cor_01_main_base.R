@@ -17,11 +17,13 @@ corAndPValues <- function(input_data,
                           level = c('plain', 'within', 'between'),
                           between_weighting = c('equal_clusters', 'cluster_size'),
                           between_inference = c('analytic', 'none'),
-                          centering_rows = c('pairwise_complete', 'all_available')) {
+                          centering_rows = c('pairwise_complete', 'all_available'),
+                          inference = c('analytic', 'none', 'cluster_bootstrap')) {
   level <- match.arg(level)
   between_weighting <- match.arg(between_weighting)
   between_inference <- match.arg(between_inference)
   centering_rows <- match.arg(centering_rows)
+  inference <- match.arg(inference)
 
   # initializing matrices and lists
   value_list <- initializing_values(input_data)
@@ -129,7 +131,8 @@ corAndPValues <- function(input_data,
       statistic_type <- NA
     }
 
-    if (level == 'between' && between_inference == 'none') {
+    if (inference == 'none' ||
+        (level == 'between' && between_inference == 'none')) {
       cor_method <- if (method_selected == 'spearman-jackknife') {
         'spearman'
       } else {
@@ -146,12 +149,34 @@ corAndPValues <- function(input_data,
                                            p_value = NA,
                                            lower_bound = NA,
                                            upper_bound = NA)
+      statistic_type <- NA
+      degrees_freedom <- NA
+    } else if (inference == 'cluster_bootstrap') {
+      correlations_statistics_list <- cluster_bootstrap_statistics(
+        input_data = input_data,
+        column_i = i,
+        column_j = j,
+        cluster_var = cluster_var,
+        level = level,
+        between_weighting = between_weighting,
+        centering_rows = centering_rows,
+        method = method_selected,
+        confidence_level = confidence_level,
+        nboot = nboot,
+        observed_correlation = if (is.null(weights)) {
+          suppressWarnings(cor(col_i, col_j, method = method_selected))
+        } else {
+          weighted_cor(col_i, col_j, weights, method_selected)
+        }
+      )
+      statistic_type <- NA
+      degrees_freedom <- NA
     } else {
       correlations_statistics_list <- calculate_correlations_and_statistics(col_i, col_j,
                                                                             method_selected,
                                                                             degrees_freedom,
                                                                             confidence_level,
-                                                                            bootstrap,
+                                                                            FALSE,
                                                                             nboot,
                                                                             weights = weights)
     }
@@ -164,6 +189,7 @@ corAndPValues <- function(input_data,
 
     if (level == 'between' &&
         between_weighting == 'cluster_size' &&
+        inference == 'analytic' &&
         between_inference == 'analytic' &&
         method_selected != 'spearman-jackknife') {
       auto_warning <- append_cor_warning(auto_warning,
@@ -172,6 +198,7 @@ corAndPValues <- function(input_data,
 
     if (centering_rows == 'all_available' &&
         level %in% c('within', 'between') &&
+        inference == 'analytic' &&
         method_selected != 'spearman-jackknife') {
       auto_warning <- append_cor_warning(auto_warning,
                                          'all-available centering uses variable-specific mean rows; analytic inference approximate')
@@ -191,6 +218,12 @@ corAndPValues <- function(input_data,
     colnames(temp_ci_df) <- colnames(conf_int_df)
     conf_int_df <- rbind(conf_int_df, temp_ci_df)
 
+    ci_text <- if (is.na(lower_bound) && is.na(upper_bound)) {
+      NA_character_
+    } else {
+      sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound)
+    }
+
     # populate big dataframe
     temp_df <- data.frame(Parameter1 = names(input_data[i]),
                           Parameter2 = names(input_data[j]),
@@ -200,7 +233,7 @@ corAndPValues <- function(input_data,
                           statistic_type = statistic_type,
                           statistic = round(test_statistic, 2),
                           df = degrees_freedom,
-                          CI = sprintf('[%0.2f, %0.2f]', lower_bound, upper_bound),
+                          CI = ci_text,
                           p = p_value)
     result_table <- rbind(result_table, temp_df)
   }
@@ -222,7 +255,12 @@ corAndPValues <- function(input_data,
 
 
 
-  result_table <- format_result_table(result_table, method, auto_type, var_type, confidence_level, bootstrap)
+  result_table <- format_result_table(result_table,
+                                      method,
+                                      auto_type,
+                                      var_type,
+                                      confidence_level,
+                                      inference)
 
   return(list(p_value = p_value_df,
               correlation_coefficient = correlation_coefficient_df,
@@ -333,6 +371,107 @@ append_cor_warning <- function(current_warning, new_warning) {
   }
 
   paste(current_warning, new_warning, sep = '; ')
+}
+
+cluster_bootstrap_statistics <- function(input_data,
+                                         column_i,
+                                         column_j,
+                                         cluster_var,
+                                         level,
+                                         between_weighting,
+                                         centering_rows,
+                                         method,
+                                         confidence_level,
+                                         nboot,
+                                         observed_correlation) {
+  if (is.null(cluster_var)) {
+    stop("cluster_var is required for cluster bootstrap inference.")
+  }
+  if (method == 'spearman-jackknife') {
+    stop("Use method = 'spearman' with inference = 'cluster_bootstrap'.")
+  }
+
+  cluster_factor <- droplevels(as.factor(cluster_var))
+  clusters <- levels(cluster_factor)
+  n_clusters <- length(clusters)
+
+  if (n_clusters < 3 || is.na(observed_correlation)) {
+    return(list(correlation_coefficient = observed_correlation,
+                test_statistic = NA,
+                p_value = NA,
+                lower_bound = NA,
+                upper_bound = NA))
+  }
+
+  boot_correlations <- rep(NA_real_, nboot)
+  for (boot_idx in seq_len(nboot)) {
+    sampled_clusters <- sample(clusters, size = n_clusters, replace = TRUE)
+    boot_i <- numeric(0)
+    boot_j <- numeric(0)
+    boot_cluster <- character(0)
+
+    for (sample_idx in seq_along(sampled_clusters)) {
+      rows <- which(cluster_factor == sampled_clusters[sample_idx])
+      boot_i <- c(boot_i, input_data[[column_i]][rows])
+      boot_j <- c(boot_j, input_data[[column_j]][rows])
+      boot_cluster <- c(boot_cluster, rep(paste0('boot_', sample_idx),
+                                          length(rows)))
+    }
+
+    boot_pair <- prepare_correlation_pair(boot_i,
+                                          boot_j,
+                                          as.factor(boot_cluster),
+                                          level,
+                                          between_weighting,
+                                          centering_rows)
+    boot_correlations[boot_idx] <- correlation_from_pair(boot_pair, method)
+  }
+
+  valid_boot <- boot_correlations[!is.na(boot_correlations)]
+  if (length(valid_boot) < 10) {
+    return(list(correlation_coefficient = observed_correlation,
+                test_statistic = NA,
+                p_value = NA,
+                lower_bound = NA,
+                upper_bound = NA))
+  }
+
+  alpha <- 1 - confidence_level
+  lower_bound <- as.numeric(quantile(valid_boot,
+                                     probs = alpha / 2,
+                                     na.rm = TRUE,
+                                     names = FALSE))
+  upper_bound <- as.numeric(quantile(valid_boot,
+                                     probs = 1 - alpha / 2,
+                                     na.rm = TRUE,
+                                     names = FALSE))
+  p_value <- min(2 * min(mean(valid_boot <= 0),
+                         mean(valid_boot >= 0)),
+                 1)
+
+  list(correlation_coefficient = observed_correlation,
+       test_statistic = NA,
+       p_value = p_value,
+       lower_bound = lower_bound,
+       upper_bound = upper_bound)
+}
+
+correlation_from_pair <- function(pair_data, method) {
+  if (length(pair_data$col_i) < 3 ||
+      sum(!is.na(pair_data$col_i) & !is.na(pair_data$col_j)) < 3) {
+    return(NA_real_)
+  }
+
+  if (is.null(pair_data$weights)) {
+    return(suppressWarnings(cor(pair_data$col_i,
+                                pair_data$col_j,
+                                method = method)))
+  }
+
+  weighted_cor(pair_data$col_i,
+               pair_data$col_j,
+               pair_data$weights,
+               method)
 }
 
 correlation_degrees_freedom <- function(method,

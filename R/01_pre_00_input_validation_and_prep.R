@@ -15,9 +15,6 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
   if (method == 'spearman-jackknife' & bootstrap == TRUE) {
     stop("Jackknife and bootstraping can't both be active at once.")
   }
-  if (bootstrap == TRUE & isTRUE(weighted_between_statistics)) {
-    stop("cluster-size weighted between statistics are not supported with bootstraping.")
-  }
 
   # Determine Cluster Variable
   if (is.null(cluster)) {

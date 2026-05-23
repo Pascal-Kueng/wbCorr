@@ -5,7 +5,7 @@ test_that("within correlations use pair-specific centering and df", {
     y = c(1, NA, 3, 2, 4, 8, NA, 8, 12)
   )
 
-  cors <- wbCorr(dat, cluster = "id")
+  cors <- suppressWarnings(wbCorr(dat, cluster = "id"))
 
   valid <- complete.cases(dat$x, dat$y, dat$id)
   pair <- dat[valid, ]
@@ -26,11 +26,11 @@ test_that("between weighting is explicit and based on pair-specific cluster mean
     y = c(1, NA, 3, 2, 4, 8, NA, 8, 12)
   )
 
-  equal <- wbCorr(dat, cluster = "id")
-  weighted <- wbCorr(dat, cluster = "id",
-                     between_weighting = "cluster_size")
-  alias <- wbCorr(dat, cluster = "id",
-                  weighted_between_statistics = TRUE)
+  equal <- suppressWarnings(wbCorr(dat, cluster = "id"))
+  weighted <- suppressWarnings(wbCorr(dat, cluster = "id",
+                                      between_weighting = "cluster_size"))
+  alias <- suppressWarnings(wbCorr(dat, cluster = "id",
+                                   weighted_between_statistics = TRUE))
 
   valid <- complete.cases(dat$x, dat$y, dat$id)
   pair <- dat[valid, ]
@@ -59,9 +59,9 @@ test_that("all_available centering uses variable-specific cluster mean rows", {
     y = c(1, NA, 3, 2, 4, 8, NA, 8, 12)
   )
 
-  pairwise <- wbCorr(dat, cluster = "id")
-  all_available <- wbCorr(dat, cluster = "id",
-                          centering_rows = "all_available")
+  pairwise <- suppressWarnings(wbCorr(dat, cluster = "id"))
+  all_available <- suppressWarnings(wbCorr(dat, cluster = "id",
+                                           centering_rows = "all_available"))
 
   valid <- complete.cases(dat$x, dat$y, dat$id)
   pair <- dat[valid, ]

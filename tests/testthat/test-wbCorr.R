@@ -87,6 +87,79 @@ test_that("between inference can be omitted", {
   expect_true(is.na(cors@between$confidence_intervals$CI_lower[4]))
 })
 
+test_that("analytic inference warns and cluster bootstrap returns bootstrap intervals", {
+  data("simdat_intensive_longitudinal")
+
+  expect_warning(
+    wbCorr(simdat_intensive_longitudinal,
+           cluster = "participantID",
+           nboot = 20),
+    "Analytic p-values"
+  )
+
+  set.seed(1)
+  boot <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                  cluster = "participantID",
+                                  inference = "cluster_bootstrap",
+                                  nboot = 20))
+  analytic <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                      cluster = "participantID"))
+
+  expect_equal(boot@settings$inference, "cluster_bootstrap")
+  expect_equal(boot@within$correlations, analytic@within$correlations)
+  expect_equal(boot@between$correlations, analytic@between$correlations)
+  expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@within$table))
+  expect_true("Cluster bootstrap p" %in% colnames(boot@within$table))
+  expect_false(is.na(boot@within$confidence_intervals$CI_lower[1]))
+})
+
+test_that("cluster bootstrap supports weighted between correlations", {
+  data("simdat_intensive_longitudinal")
+
+  set.seed(1)
+  boot <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                  cluster = "participantID",
+                                  between_weighting = "cluster_size",
+                                  inference = "cluster_bootstrap",
+                                  nboot = 20))
+  weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                      cluster = "participantID",
+                                      between_weighting = "cluster_size"))
+
+  expect_equal(boot@settings$between_weighting, "cluster_size")
+  expect_equal(boot@between$correlations, weighted@between$correlations)
+  expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@between$table))
+  expect_false(is.na(boot@between$confidence_intervals$CI_lower[4]))
+})
+
+test_that("deprecated bootstrap argument maps to cluster bootstrap", {
+  data("simdat_intensive_longitudinal")
+
+  expect_warning(
+    legacy <- wbCorr(simdat_intensive_longitudinal,
+                     cluster = "participantID",
+                     bootstrap = TRUE,
+                     nboot = 20),
+    "bootstrap = TRUE is deprecated"
+  )
+
+  expect_equal(legacy@settings$inference, "cluster_bootstrap")
+  expect_true("Cluster bootstrap 95% CI" %in% colnames(legacy@within$table))
+})
+
+test_that("global inference none omits inferential columns", {
+  data("simdat_intensive_longitudinal")
+
+  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
+                                  cluster = "participantID",
+                                  inference = "none"))
+
+  expect_equal(cors@settings$inference, "none")
+  expect_false("p" %in% colnames(cors@within$table))
+  expect_false(any(grepl("CI", colnames(cors@within$table))))
+  expect_true(is.na(cors@within$p_values["var1", "var2"]))
+})
+
 test_that("accessors return tables and matrices", {
   data("simdat_intensive_longitudinal")
 

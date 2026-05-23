@@ -1,7 +1,7 @@
 
 
 
-format_result_table <- function(result_table, method, auto_type, var_type, confidence_level, bootstrap) {
+format_result_table <- function(result_table, method, auto_type, var_type, confidence_level, inference) {
 
   # For all
   ci_name <- paste0(confidence_level * 100, "% CI")
@@ -13,7 +13,7 @@ format_result_table <- function(result_table, method, auto_type, var_type, confi
   if (!auto_type) {
     if (method == 'pearson') {
       colnames(result_table)[colnames(result_table) == "coefficient"] <- "pearson's r"
-      if (bootstrap) {
+      if (inference != 'analytic') {
         result_table$statistic <- NULL
       } else {
         colnames(result_table)[colnames(result_table) == "statistic"] <- "t-statistic"
@@ -22,7 +22,7 @@ format_result_table <- function(result_table, method, auto_type, var_type, confi
       result_table[['statistic type']] <- NULL
     } else if (method == 'spearman') {
       colnames(result_table)[colnames(result_table) == "coefficient"] <- "spearman's rho"
-      if (bootstrap) {
+      if (inference != 'analytic') {
         result_table$statistic <- NULL
       } else {
         colnames(result_table)[colnames(result_table) == "statistic"] <- "z-statistic"
@@ -56,11 +56,13 @@ format_result_table <- function(result_table, method, auto_type, var_type, confi
                                   ifelse(result_table$p < .05, sprintf("%.3f*", result_table$p),
                                          sprintf("%.3f", result_table$p))))
 
-  if (bootstrap) {
+  if (inference != 'analytic') {
     result_table$df <- NULL
     result_table[['statistic type']] <- NULL
-    colnames(result_table)[colnames(result_table) == ci_name] <- paste("BCa", ci_name)
-    colnames(result_table)[colnames(result_table) == "p"] <- "BCa p"
+    if (inference == 'cluster_bootstrap') {
+      colnames(result_table)[colnames(result_table) == ci_name] <- paste("Cluster bootstrap", ci_name)
+      colnames(result_table)[colnames(result_table) == "p"] <- "Cluster bootstrap p"
+    }
     for (name in colnames(result_table)) {
       if (all(is.na(result_table[[name]]))) {
         result_table[[name]] <- NULL

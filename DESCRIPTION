@@ -1,6 +1,6 @@
 Package: wbCorr
 Title: Bivariate Within- and Between-Cluster Correlations
-Version: 0.2.0
+Version: 0.3.0
 Date: 2026-05-23
 Authors@R: 
     c(person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", 

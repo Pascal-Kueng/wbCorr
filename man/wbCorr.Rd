@@ -12,6 +12,7 @@ wbCorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
+  inference = c("analytic", "none", "cluster_bootstrap"),
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
@@ -25,6 +26,7 @@ wbcorr(
   method = "pearson",
   bootstrap = FALSE,
   nboot = 1000,
+  inference = c("analytic", "none", "cluster_bootstrap"),
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
@@ -48,10 +50,16 @@ confidence intervals, providing more robust confidence intervals in the presence
 non-normal data or outliers. Note that p-values are not available
 when this method is selected.}
 
-\item{bootstrap}{Performs a bias-corrected and accelerated (BCa) parametric bootstrap to compute confidence
-intervals and p-values. Recommended for non-normal data, but slow. (default: FALSE).}
+\item{bootstrap}{Deprecated logical alias for
+\code{inference = "cluster_bootstrap"}.}
 
 \item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
+
+\item{inference}{A string specifying how p-values and confidence intervals
+are calculated. \code{"analytic"} uses the usual correlation-test approximation.
+\code{"none"} returns coefficients without p-values or confidence intervals.
+\code{"cluster_bootstrap"} resamples top-level clusters with replacement and
+recomputes the full decomposition in each bootstrap sample.}
 
 \item{weighted_between_statistics}{Deprecated logical alias for
 \code{between_weighting}. If TRUE, \code{between_weighting = "cluster_size"}; if
@@ -67,7 +75,8 @@ observation pairs in each cluster as weights.}
 p-values and confidence intervals are calculated analytically (\code{"analytic"})
 or omitted (\code{"none"}). Analytic inference for \code{"cluster_size"} weighted
 between correlations uses \code{k - 2} cluster-level degrees of freedom for
-Pearson correlations and is approximate.}
+Pearson correlations and is approximate. Ignored when
+\code{inference = "none"} or \code{inference = "cluster_bootstrap"}.}
 
 \item{centering_rows}{A string specifying which rows are used to estimate
 cluster means for within- and between-cluster decomposition.
@@ -117,7 +126,10 @@ same complete-pair row set, and the correlation is computed on the resulting
 residuals. For Pearson within-cluster correlations, analytic inference uses
 \code{N_pair - k_pair - 1} degrees of freedom, where \code{N_pair} is the number of
 complete observation pairs and \code{k_pair} is the number of clusters
-contributing at least one complete pair.
+contributing at least one complete pair. This analytic test is a working
+approximation because residual pairs can still be dependent within clusters;
+for publication-level inference in intensive longitudinal data, prefer
+\code{inference = "cluster_bootstrap"}.
 
 The between-cluster correlation is computed from pair-specific cluster means.
 With \code{between_weighting = "equal_clusters"}, every cluster contributes one
@@ -126,6 +138,12 @@ means are weighted by the number of complete observation pairs in that
 cluster. Analytic p-values and confidence intervals for cluster-size weighted
 between correlations are approximate; use \code{between_inference = "none"} to
 report only the weighted coefficient.
+
+With \code{inference = "cluster_bootstrap"}, wbCorr resamples whole top-level
+clusters, recomputes the selected within- and between-cluster correlations,
+and reports percentile bootstrap confidence intervals. This keeps the
+package's descriptive estimands while avoiding row-level independence
+assumptions.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 extract, and plot within- and between-cluster correlations for further
@@ -143,6 +161,12 @@ correlations <- wbCorr(simdat_intensive_longitudinal,
 weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID',
                      between_weighting = 'cluster_size')
+
+# recommended for publication-level inference in EMA/daily diary data:
+bootstrapped_correlations <- wbCorr(simdat_intensive_longitudinal,
+                     'participantID',
+                     inference = 'cluster_bootstrap',
+                     nboot = 1000)
 
 # optionally estimate cluster means from all rows available for each variable:
 all_available_correlations <- wbCorr(simdat_intensive_longitudinal,

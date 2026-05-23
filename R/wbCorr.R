@@ -16,9 +16,14 @@
 #' confidence intervals, providing more robust confidence intervals in the presence of
 #' non-normal data or outliers. Note that p-values are not available
 #' when this method is selected.
-#' @param bootstrap Performs a bias-corrected and accelerated (BCa) parametric bootstrap to compute confidence
-#' intervals and p-values. Recommended for non-normal data, but slow. (default: FALSE).
+#' @param bootstrap Deprecated logical alias for
+#' `inference = "cluster_bootstrap"`.
 #' @param nboot Specifies the amount of bootstrap samples (default: 1000).
+#' @param inference A string specifying how p-values and confidence intervals
+#' are calculated. `"analytic"` uses the usual correlation-test approximation.
+#' `"none"` returns coefficients without p-values or confidence intervals.
+#' `"cluster_bootstrap"` resamples top-level clusters with replacement and
+#' recomputes the full decomposition in each bootstrap sample.
 #' @param weighted_between_statistics Deprecated logical alias for
 #' `between_weighting`. If TRUE, `between_weighting = "cluster_size"`; if
 #' FALSE, `between_weighting = "equal_clusters"`.
@@ -31,7 +36,8 @@
 #' p-values and confidence intervals are calculated analytically (`"analytic"`)
 #' or omitted (`"none"`). Analytic inference for `"cluster_size"` weighted
 #' between correlations uses `k - 2` cluster-level degrees of freedom for
-#' Pearson correlations and is approximate.
+#' Pearson correlations and is approximate. Ignored when
+#' `inference = "none"` or `inference = "cluster_bootstrap"`.
 #' @param centering_rows A string specifying which rows are used to estimate
 #' cluster means for within- and between-cluster decomposition.
 #' `"pairwise_complete"` uses only rows where both variables in the current pair
@@ -74,7 +80,10 @@
 #' residuals. For Pearson within-cluster correlations, analytic inference uses
 #' `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of
 #' complete observation pairs and `k_pair` is the number of clusters
-#' contributing at least one complete pair.
+#' contributing at least one complete pair. This analytic test is a working
+#' approximation because residual pairs can still be dependent within clusters;
+#' for publication-level inference in intensive longitudinal data, prefer
+#' `inference = "cluster_bootstrap"`.
 #'
 #' The between-cluster correlation is computed from pair-specific cluster means.
 #' With `between_weighting = "equal_clusters"`, every cluster contributes one
@@ -83,6 +92,12 @@
 #' cluster. Analytic p-values and confidence intervals for cluster-size weighted
 #' between correlations are approximate; use `between_inference = "none"` to
 #' report only the weighted coefficient.
+#'
+#' With `inference = "cluster_bootstrap"`, wbCorr resamples whole top-level
+#' clusters, recomputes the selected within- and between-cluster correlations,
+#' and reports percentile bootstrap confidence intervals. This keeps the
+#' package's descriptive estimands while avoiding row-level independence
+#' assumptions.
 #'
 #' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 #' extract, and plot within- and between-cluster correlations for further
@@ -107,6 +122,12 @@
 #' weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
 #'                      'participantID',
 #'                      between_weighting = 'cluster_size')
+#'
+#' # recommended for publication-level inference in EMA/daily diary data:
+#' bootstrapped_correlations <- wbCorr(simdat_intensive_longitudinal,
+#'                      'participantID',
+#'                      inference = 'cluster_bootstrap',
+#'                      nboot = 1000)
 #'
 #' # optionally estimate cluster means from all rows available for each variable:
 #' all_available_correlations <- wbCorr(simdat_intensive_longitudinal,
@@ -135,6 +156,7 @@ wbCorr <- function(data, cluster,
                    method = "pearson",
                    bootstrap = FALSE,
                    nboot = 1000,
+                   inference = c("analytic", "none", "cluster_bootstrap"),
                    weighted_between_statistics = NULL,
                    between_weighting = c("equal_clusters", "cluster_size"),
                    between_inference = c("analytic", "none"),
@@ -142,6 +164,28 @@ wbCorr <- function(data, cluster,
 
     # input validation and preparation
   input_data <- data
+
+  legacy_bootstrap_requested <- isTRUE(bootstrap)
+  if (legacy_bootstrap_requested && missing(inference)) {
+    inference <- "cluster_bootstrap"
+    warning("bootstrap = TRUE is deprecated; using inference = 'cluster_bootstrap'.",
+            call. = FALSE)
+  }
+
+  inference <- match.arg(inference)
+  if (legacy_bootstrap_requested &&
+      !missing(inference) &&
+      inference != "cluster_bootstrap") {
+    warning("bootstrap = TRUE is deprecated and ignored because inference is not 'cluster_bootstrap'.",
+            call. = FALSE)
+  }
+  if (inference == "analytic") {
+    warning("Analytic p-values and confidence intervals are working approximations for clustered data; use inference = 'cluster_bootstrap' for publication-level inference.",
+            call. = FALSE)
+  }
+  if (inference == "cluster_bootstrap" && method == "spearman-jackknife") {
+    stop("Use method = 'spearman' with inference = 'cluster_bootstrap'.")
+  }
 
   if (!is.null(weighted_between_statistics) && missing(between_weighting)) {
     between_weighting <- if (isTRUE(weighted_between_statistics)) {
@@ -157,7 +201,7 @@ wbCorr <- function(data, cluster,
 
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
                                            cluster_size_between,
-                                           bootstrap)
+                                           inference == "cluster_bootstrap")
   input_data <- remove_cluster_columns(input_data, cluster, cluster_var)
 
   cluster <- 'cluster'
@@ -191,7 +235,8 @@ wbCorr <- function(data, cluster,
                                nboot = nboot,
                                cluster_var = cluster_var,
                                level = 'within',
-                               centering_rows = centering_rows)
+                               centering_rows = centering_rows,
+                               inference = inference)
   between_cors <- corAndPValues(input_data_cleaned,
                                 confidence_level = confidence_level,
                                 method = method,
@@ -204,7 +249,8 @@ wbCorr <- function(data, cluster,
                                 level = 'between',
                                 between_weighting = between_weighting,
                                 between_inference = between_inference,
-                                centering_rows = centering_rows)
+                                centering_rows = centering_rows,
+                                inference = inference)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
@@ -239,6 +285,7 @@ wbCorr <- function(data, cluster,
                    method = method,
                    bootstrap = bootstrap,
                    nboot = nboot,
+                   inference = inference,
                    weighted_between_statistics = cluster_size_between,
                    between_weighting = between_weighting,
                    between_inference = between_inference,

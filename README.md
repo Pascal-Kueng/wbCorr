@@ -8,9 +8,11 @@ The wbCorr package computes bivariate within- and between-cluster correlations f
 
 For every variable pair, wbCorr computes the correlation on rows where both variables and the cluster variable are observed. This means missing data are handled pairwise for the bivariate association.
 
-The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair.
+The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair. These analytic tests are working approximations for clustered data because residual pairs may still be dependent within clusters.
 
-The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. Weighted between-cluster p-values and confidence intervals are marked as approximate; use `between_inference = "none"` to report only the weighted coefficient.
+The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster.
+
+For publication-level inference in intensive longitudinal data, prefer `inference = "cluster_bootstrap"`. This resamples whole top-level clusters, recomputes the selected decomposition in each bootstrap sample, and reports percentile bootstrap confidence intervals. Use `inference = "none"` to report coefficients without p-values or confidence intervals.
 
 By default, `centering_rows = "pairwise_complete"` estimates cluster means from the same complete-pair row set used for the correlation. This keeps the within residuals centered for the actual pairwise sample and makes the between correlation a correlation of matched pair-specific cluster means.
 
@@ -40,7 +42,9 @@ data("simdat_intensive_longitudinal")
 
 correlations <- wbCorr(
   data = simdat_intensive_longitudinal,
-  cluster = "participantID"
+  cluster = "participantID",
+  inference = "cluster_bootstrap",
+  nboot = 1000
 )
 
 print(correlations)
@@ -63,21 +67,26 @@ plot(correlations, "between")
 
 ### Common choices
 ```R
-# Default: pooled within-cluster residual correlations and equal-cluster
-# between-cluster correlations.
+# Default coefficients with analytic, approximate p-values and CIs.
 wbCorr(simdat_intensive_longitudinal, cluster = "participantID")
+
+# Recommended for publication-level inference in EMA/daily diary data:
+# resample participants and recompute all correlations.
+wbCorr(simdat_intensive_longitudinal,
+       cluster = "participantID",
+       inference = "cluster_bootstrap",
+       nboot = 1000)
+
+# Coefficients only, without p-values or CIs.
+wbCorr(simdat_intensive_longitudinal,
+       cluster = "participantID",
+       inference = "none")
 
 # Between-cluster correlations weighted by the number of complete pairs in
 # each cluster.
 wbCorr(simdat_intensive_longitudinal,
        cluster = "participantID",
        between_weighting = "cluster_size")
-
-# Same weighted coefficient, but no approximate between-cluster p-values or CIs.
-wbCorr(simdat_intensive_longitudinal,
-       cluster = "participantID",
-       between_weighting = "cluster_size",
-       between_inference = "none")
 
 # Estimate cluster means from all rows available for each variable, similar to
 # common multilevel-model preprocessing.
