@@ -1,6 +1,6 @@
 citHeader("To cite wbCorr in publications use:")
 
-note <- sprintf("R package version %s. %s", packageVersion("wbCorr"), "https://github.com/Pascal-Kueng/wbCorr")
+note <- sprintf("R package version %s. %s", meta$Version, "https://github.com/Pascal-Kueng/wbCorr")
 
 bibentry(bibtype = "Manual",
          title = "wbCorr: Bivariate Within- and Between-Cluster Correlations",

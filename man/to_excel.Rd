@@ -30,7 +30,7 @@ correlations <- wbCorr(data = simdat_intensive_longitudinal,
 # Returns a correlation matrix with stars for p-values:
 matrices <- get_matrix(correlations) # summary(correlations) works too.
 
-to_excel(matrices)
+to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 
 }
 \seealso{

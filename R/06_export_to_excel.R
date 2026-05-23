@@ -19,7 +19,7 @@
 #' # Returns a correlation matrix with stars for p-values:
 #' matrices <- get_matrix(correlations) # summary(correlations) works too.
 #'
-#' to_excel(matrices)
+#' to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 #'
 #' @export
 to_excel <- function(SummaryObject,

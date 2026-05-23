@@ -1,12 +1,11 @@
 Package: wbCorr
 Title: Bivariate Within- and Between-Cluster Correlations
-Version: 0.3.0
+Version: 0.3.1
 Date: 2026-05-23
 Authors@R: 
     c(person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", 
              role = c("aut", "cre", "cph"),
              comment = c(ORCID = "0000-0001-7346-9414")))
-cph: Pascal Küng
 Description: The wbCorr package separates the variance of variables
     provided into their within- and between-cluster components, and
     calculates the respective bivariate correlations for both levels
@@ -21,10 +20,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests: 
+    httr,
     spelling,
     testthat (>= 3.0.0)
 Imports:
-    methods, httr, remotes, writexl
+    methods, writexl
 Config/testthat/edition: 3
 Language: en-US
 URL: https://github.com/Pascal-Kueng/wbCorr

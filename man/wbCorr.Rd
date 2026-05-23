@@ -163,10 +163,12 @@ weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
                      between_weighting = 'cluster_size')
 
 # recommended for publication-level inference in EMA/daily diary data:
+\dontrun{
 bootstrapped_correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID',
                      inference = 'cluster_bootstrap',
                      nboot = 1000)
+}
 
 # optionally estimate cluster means from all rows available for each variable:
 all_available_correlations <- wbCorr(simdat_intensive_longitudinal,
@@ -186,7 +188,7 @@ plot(correlations, 'within')
 plot(correlations, which = 'b')
 
 # Store the list of correlation matrices to excel
-to_excel(matrices)
+to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 
 
 }
