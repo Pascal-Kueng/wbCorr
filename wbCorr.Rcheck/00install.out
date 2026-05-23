@@ -1,0 +1,33 @@
+* installing *source* package ‘wbCorr’ ...
+** this is package ‘wbCorr’ version ‘0.2.0’
+** using staged installation
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+  converting help for package ‘wbCorr’
+    finding HTML links ... done
+    get_ICC                                 html  
+    get_matrix                              html  
+    get_table                               html  
+    plot-wbCorr-method                      html  
+    print.wbCorr                            html  
+    show.wbCorr                             html  
+    simdat_intensive_longitudinal           html  
+    to_excel                                html  
+    update_wbCorr                           html  
+    wbCorr-class                            html  
+    wbCorr                                  html  
+** building package indices
+** testing if installed package can be loaded from temporary location
+Current package version: 0.2.0
+Latest package version on GitHub: 0.1.22
+Latest version already installed.
+** testing if installed package can be loaded from final location
+Current package version: 0.2.0
+Latest package version on GitHub: 0.1.22
+Latest version already installed.
+** testing if installed package keeps a record of temporary installation path
+* DONE (wbCorr)

@@ -20,13 +20,17 @@ Description: The wbCorr package separates the variance of variables
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Suggests: 
-    spelling,
-    testthat (>= 3.0.0)
-Imports:
-    methods, httr, remotes, writexl
+Suggests: spelling, testthat (>= 3.0.0)
+Imports: methods, httr, remotes, writexl
 Config/testthat/edition: 3
 Language: en-US
 URL: https://github.com/Pascal-Kueng/wbCorr
 BugReports: https://github.com/Pascal-Kueng/wbCorr/issues
 Config/roxygen2/version: 8.0.0
+NeedsCompilation: no
+Packaged: 2026-05-23 16:22:43 UTC; pascalkueng
+Author: Pascal Küng [aut, cre, cph] (ORCID:
+    <https://orcid.org/0000-0001-7346-9414>)
+Maintainer: Pascal Küng <pascal.kueng@psychologie.uzh.ch>
+Depends: R (>= 3.5.0)
+Built: R 4.6.0; ; 2026-05-23 16:22:58 UTC; unix

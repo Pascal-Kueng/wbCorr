@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><title>R: Saves the passed summary or table to excel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>to_excel {wbCorr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Saves the passed summary or table to excel</h2>
+
+<h3>Description</h3>
+
+<p>Use <code>to_excel(get_matrix(wbCorrObject))</code> or <code>to_excel(get_table(wbCorrObject))</code> to save
+the provided table/matrix to an excel file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>to_excel(SummaryObject, path = file.path(getwd(), "wbCorr.xlsx"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="SummaryObject">SummaryObject</code></td>
+<td>
+<p>A summary or matrix object, such as those returned by <code>get_matrix()</code> or <code>get_table()</code>.</p>
+</td></tr>
+<tr><td><code id="path">path</code></td>
+<td>
+<p>Specify the filename and a path. If no path is provided, the file will be saved to the
+current working directory.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Writes an Excel file (.xlsx) to disk.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../wbCorr/help/get_table.html">get_tables</a></code>, <code><a href="../../wbCorr/help/wbCorr.html">wbCorr</a></code>, <code><a href="../../wbCorr/help/get_matrix.html">get_matrix</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'># Importing our simulated example dataset with pre-specified within- and between- correlations
+data("simdat_intensive_longitudinal")
+
+# Create object:
+correlations &lt;- wbCorr(data = simdat_intensive_longitudinal,
+                      cluster = 'participantID')
+
+# Returns a correlation matrix with stars for p-values:
+matrices &lt;- get_matrix(correlations) # summary(correlations) works too.
+
+to_excel(matrices)
+
+</code></pre>
+
+<hr><div style="text-align: center;">[Package <em>wbCorr</em> version 0.2.0 <a href="00Index.html">Index</a>]</div></main>
+
+</div>
+</body></html>

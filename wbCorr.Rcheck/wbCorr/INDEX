@@ -1,0 +1,15 @@
+get_ICC                 Return all ICCs for the original variables.
+get_matrix              Return matrices for within- and/or
+                        between-cluster correlations.
+get_table               Retrieve full tables for both within- and/or
+                        between-cluster correlations for a wbCorr
+                        object.
+plot,wbCorr-method      Plot within- and between associations
+print,wbCorr-method     Print Method for the wbCorr Class
+show,wbCorr-method      Show Method for the wbCorr Class
+simdat_intensive_longitudinal
+                        Simulated Intensive Longitudinal Dataset
+to_excel                Saves the passed summary or table to excel
+update_wbCorr           Check for updates of wbCorr
+wbCorr                  wbCorr
+wbCorr-class            wbCorr Class

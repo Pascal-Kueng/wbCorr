@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head><title>R: Return all ICCs for the original variables.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>get_ICC {wbCorr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Return all ICCs for the original variables.</h2>
+
+<h3>Description</h3>
+
+<p>You can use get_ICC() or get_ICCs() interchangeably.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>get_ICC(object)
+
+get_ICCs(object)
+
+get_icc(object)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="object">object</code></td>
+<td>
+<p>A wbCorr object, created by the wbCorr() function.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A dataframe with ICCs for all variables. ICC is obtained by fitting
+mixed effects models and extracting the variance components. Then, the formula
+between- variance / total- variance is applied.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../wbCorr/help/wbCorr.html">wbCorr</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'># importing our simulated example dataset with pre-specified within- and between- correlations
+data("simdat_intensive_longitudinal")
+
+# create object:
+correlations &lt;- wbCorr(data = simdat_intensive_longitudinal,
+                      cluster = 'participantID')
+
+# returns the ICCs:
+ICCs &lt;- get_ICC(correlations)
+print(ICCs)
+
+</code></pre>
+
+<hr><div style="text-align: center;">[Package <em>wbCorr</em> version 0.2.0 <a href="00Index.html">Index</a>]</div></main>
+
+</div>
+</body></html>

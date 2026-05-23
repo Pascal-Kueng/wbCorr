@@ -1,0 +1,451 @@
+Hmm ... looks like a package
+Converting parsed Rd's to LaTeX .
+Creating pdf output from LaTeX ...
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+(./Rd2.tex
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file Rd2.aux.
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
+No file Rd2.toc.
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
+dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips
+/inconsolata/i4-t1-0.enc}]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 85--85
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2{/usr/share/t
+exlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 143--143
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 151--151
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[3]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 199--199
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[4] [5] [6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [7]
+Overfull \hbox (27.70834pt too wide) in paragraph at lines 423--424
+[]\T1/ptm/m/n/10 A sum-mary or ma-trix ob-ject, such as those re-turned by []\T
+1/zi4/m/n/10 get_matrix() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 get_table()[]\T1
+/ptm/m/n/10 . 
+
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 440--440
+ []\T1/zi4/m/n/9 # Importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[8] [9]
+Overfull \hbox (6.45943pt too wide) in paragraph at lines 544--547
+[]\T1/ptm/m/n/10 Deprecated log-i-cal alias for []\T1/zi4/m/n/10 between_weight
+ing[]\T1/ptm/m/n/10 . If TRUE, []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (32.65752pt too wide) in paragraph at lines 548--553
+\T1/ptm/m/n/10 lates pair-specific clus-ter means with each clus-ter con-tribut
+-ing equally. []\T1/zi4/m/n/10 "cluster_size"
+[10]
+Overfull \hbox (21.04718pt too wide) in paragraph at lines 600--607
+[]\T1/ptm/m/n/10 The between-cluster cor-re-la-tion is com-puted from pair-spec
+ific clus-ter means. With []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (15.0088pt too wide) in paragraph at lines 600--607
+\T1/zi4/m/n/10 = "equal_clusters"[]\T1/ptm/m/n/10 , ev-ery clus-ter con-tribute
+s one equally weighted mean. With []\T1/zi4/m/n/10 between_weighting
+[11]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 631--631
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 653--653
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[12]
+No file Rd2.ind.
+[13] (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
+utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (13 pages, 102943 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.18 [TeX Live 2026] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (39 entries accepted, 0 rejected).
+Sorting entries....done (233 comparisons).
+Generating output file Rd2.ind....done (61 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+(./Rd2.tex
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.aux)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.out)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.out)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex
+/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}{
+/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 85--85
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2{/usr/share/t
+exlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 143--143
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 151--151
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[3]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 199--199
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[4] [5] [6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [7]
+Overfull \hbox (27.70834pt too wide) in paragraph at lines 423--424
+[]\T1/ptm/m/n/10 A sum-mary or ma-trix ob-ject, such as those re-turned by []\T
+1/zi4/m/n/10 get_matrix() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 get_table()[]\T1
+/ptm/m/n/10 . 
+
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 440--440
+ []\T1/zi4/m/n/9 # Importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[8] [9]
+Overfull \hbox (6.45943pt too wide) in paragraph at lines 544--547
+[]\T1/ptm/m/n/10 Deprecated log-i-cal alias for []\T1/zi4/m/n/10 between_weight
+ing[]\T1/ptm/m/n/10 . If TRUE, []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (32.65752pt too wide) in paragraph at lines 548--553
+\T1/ptm/m/n/10 lates pair-specific clus-ter means with each clus-ter con-tribut
+-ing equally. []\T1/zi4/m/n/10 "cluster_size"
+[10]
+Overfull \hbox (21.04718pt too wide) in paragraph at lines 600--607
+[]\T1/ptm/m/n/10 The between-cluster cor-re-la-tion is com-puted from pair-spec
+ific clus-ter means. With []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (15.0088pt too wide) in paragraph at lines 600--607
+\T1/zi4/m/n/10 = "equal_clusters"[]\T1/ptm/m/n/10 , ev-ery clus-ter con-tribute
+s one equally weighted mean. With []\T1/zi4/m/n/10 between_weighting
+[11]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 631--631
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 653--653
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[12] (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.ind [13]
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 5.
+
+[14]) (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
+utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (14 pages, 108091 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.18 [TeX Live 2026] (kpathsea + Thai support).
+Scanning input file Rd2.idx....done (39 entries accepted, 0 rejected).
+Sorting entries....done (233 comparisons).
+Generating output file Rd2.ind....done (61 lines written, 0 warnings).
+Output written in Rd2.ind.
+Transcript written in Rd2.ilg.
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+(./Rd2.tex
+(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
+(/usr/share/R/texmf/tex/latex/Rd.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/mathrsfs.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
+`inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
+(/usr/share/texlive/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex)))))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))))
+(/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
+Writing index file Rd2.idx
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.aux)
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.out)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.out)
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
+(/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.toc [1{/var/lib/texmf/fonts/map/pdftex
+/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}{
+/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 85--85
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [2{/usr/share/t
+exlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 143--143
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 151--151
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[3]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 199--199
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[4] [5] [6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [7]
+Overfull \hbox (27.70834pt too wide) in paragraph at lines 423--424
+[]\T1/ptm/m/n/10 A sum-mary or ma-trix ob-ject, such as those re-turned by []\T
+1/zi4/m/n/10 get_matrix() []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 get_table()[]\T1
+/ptm/m/n/10 . 
+
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 440--440
+ []\T1/zi4/m/n/9 # Importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+[8] [9]
+Overfull \hbox (6.45943pt too wide) in paragraph at lines 544--547
+[]\T1/ptm/m/n/10 Deprecated log-i-cal alias for []\T1/zi4/m/n/10 between_weight
+ing[]\T1/ptm/m/n/10 . If TRUE, []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (32.65752pt too wide) in paragraph at lines 548--553
+\T1/ptm/m/n/10 lates pair-specific clus-ter means with each clus-ter con-tribut
+-ing equally. []\T1/zi4/m/n/10 "cluster_size"
+[10]
+Overfull \hbox (21.04718pt too wide) in paragraph at lines 600--607
+[]\T1/ptm/m/n/10 The between-cluster cor-re-la-tion is com-puted from pair-spec
+ific clus-ter means. With []\T1/zi4/m/n/10 between_weighting
+
+Overfull \hbox (15.0088pt too wide) in paragraph at lines 600--607
+\T1/zi4/m/n/10 = "equal_clusters"[]\T1/ptm/m/n/10 , ev-ery clus-ter con-tribute
+s one equally weighted mean. With []\T1/zi4/m/n/10 between_weighting
+[11]
+Overfull \hbox (11.24715pt too wide) in paragraph at lines 631--631
+ []\T1/zi4/m/n/9 # importing our simulated example dataset with pre-specified w
+ithin- and between- correlations 
+
+Overfull \hbox (21.75021pt too wide) in paragraph at lines 653--653
+ []\T1/zi4/m/n/9 matrices <- summary(correlations) # the get_matrix() and get_m
+atrices() functions are equivalent[] 
+[12] (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.ind [13]
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 5.
+
+[14]) (/tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60/Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)</usr/share/texlive/texmf-d
+ist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/
+utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (14 pages, 108535 bytes).
+Transcript written on Rd2.log.
+Saving output to ‘wbCorr-manual.pdf’ ...
+Done
+You may want to clean up by 'rm -Rf /tmp/RtmpQsRTDt/Rd2pdf115702d2c2c60'
