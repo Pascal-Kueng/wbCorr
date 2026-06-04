@@ -46,6 +46,11 @@ correlation.}
 
 \item{...}{further options to be passed to the base plot (pairs) function.}
 }
+\value{
+Invisibly returns the supplied \code{wbCorr} object. Called for the
+side effect of drawing a pairs plot of the selected within- or
+between-cluster centered variables.
+}
 \description{
 Plots the centered variables of the provided dataframe against each other.
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)

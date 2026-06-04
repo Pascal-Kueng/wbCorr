@@ -123,12 +123,12 @@
 #'                      'participantID',
 #'                      between_weighting = 'cluster_size')
 #'
-#' # recommended for publication-level inference in EMA/daily diary data:
-#' \dontrun{
+#' # quick cluster-bootstrap example; use more bootstrap samples in applied work:
+#' \donttest{
 #' bootstrapped_correlations <- wbCorr(simdat_intensive_longitudinal,
 #'                      'participantID',
 #'                      inference = 'cluster_bootstrap',
-#'                      nboot = 1000)
+#'                      nboot = 20)
 #' }
 #'
 #' # optionally estimate cluster means from all rows available for each variable:
@@ -344,6 +344,9 @@ wbcorr <- wbCorr
 #' @description Prints a summary of the \code{wbCorr} object.
 #' @param x A \code{wbCorr} object.
 #' @param ... Additional arguments, currently unused.
+#' @return Invisibly returns the supplied \code{wbCorr} object. Called for the
+#' side effect of printing a compact summary of the within-cluster table,
+#' between-cluster table, and ICC table.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
 #' @aliases print.wbCorr
 #' @rdname print.wbCorr
@@ -386,6 +389,7 @@ methods::setMethod("print", signature("wbCorr"), function(x, ...) {
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
   cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
   cat("\nAccess full ICC list with get_ICC(object)\n")
+  invisible(x)
 })
 
 
@@ -398,6 +402,8 @@ methods::setMethod("print", signature("wbCorr"), function(x, ...) {
 #' @description Shows a summary of the \code{wbCorr} object, equivalent to the print method.
 #'
 #' @param object A \code{wbCorr} object.
+#' @return Invisibly returns the supplied \code{wbCorr} object. Called for the
+#' side effect of showing the same compact summary as \code{print()}.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}, \code{\link[=print.wbCorr]{print.wbCorr}}
 #' @aliases show.wbCorr
 #' @rdname show.wbCorr
@@ -445,6 +451,9 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @param dot_lwd Graphical parameter. Set size of the points.
 #' @param reg_lwd Graphical parameter. Set thickness of the regression line.
 #' @param ... further options to be passed to the base plot (pairs) function.
+#' @return Invisibly returns the supplied \code{wbCorr} object. Called for the
+#' side effect of drawing a pairs plot of the selected within- or
+#' between-cluster centered variables.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
 #' @export
 #' @aliases plot.wbCorr

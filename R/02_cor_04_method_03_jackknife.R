@@ -1,6 +1,4 @@
 cor_jackknife <- function(col_i, col_j, confidence_level) {
-  set.seed(42)
-
   correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
                                                   method = 'spearman'))
 

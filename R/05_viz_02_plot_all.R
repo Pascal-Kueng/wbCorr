@@ -123,4 +123,5 @@ wb_plot <- function(x, y, which = NULL,
                                                                ...),
           ...)
   }
+  invisible(x)
 }

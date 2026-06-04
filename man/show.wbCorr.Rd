@@ -10,6 +10,10 @@
 \arguments{
 \item{object}{A \code{wbCorr} object.}
 }
+\value{
+Invisibly returns the supplied \code{wbCorr} object. Called for the
+side effect of showing the same compact summary as \code{print()}.
+}
 \description{
 Shows a summary of the \code{wbCorr} object, equivalent to the print method.
 }

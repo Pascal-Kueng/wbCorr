@@ -1,8 +1,6 @@
 
 #' @importFrom stats quantile
 cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot) {
-  set.seed(42)
-
   correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
                                                   method = method))
   if (is.na(correlation_coefficient)) {

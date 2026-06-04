@@ -12,6 +12,11 @@
 
 \item{...}{Additional arguments, currently unused.}
 }
+\value{
+Invisibly returns the supplied \code{wbCorr} object. Called for the
+side effect of printing a compact summary of the within-cluster table,
+between-cluster table, and ICC table.
+}
 \description{
 Prints a summary of the \code{wbCorr} object.
 }

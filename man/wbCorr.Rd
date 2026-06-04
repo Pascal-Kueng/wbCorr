@@ -162,12 +162,12 @@ weighted_correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID',
                      between_weighting = 'cluster_size')
 
-# recommended for publication-level inference in EMA/daily diary data:
-\dontrun{
+# quick cluster-bootstrap example; use more bootstrap samples in applied work:
+\donttest{
 bootstrapped_correlations <- wbCorr(simdat_intensive_longitudinal,
                      'participantID',
                      inference = 'cluster_bootstrap',
-                     nboot = 1000)
+                     nboot = 20)
 }
 
 # optionally estimate cluster means from all rows available for each variable:
