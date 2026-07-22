@@ -1,12 +1,25 @@
 citHeader("To cite wbCorr in publications use:")
 
-note <- sprintf("R package version %s. %s", meta$Version, "https://github.com/Pascal-Kueng/wbCorr")
+date <- meta[["Date/Publication"]]
+if (is.null(date)) {
+  date <- meta[["Date"]]
+}
+year <- if (is.null(date)) "2026" else substr(date, 1, 4)
+note <- sprintf("R package version %s", meta$Version)
+url <- "https://CRAN.R-project.org/package=wbCorr"
+doi <- "10.32614/CRAN.package.wbCorr"
 
 bibentry(bibtype = "Manual",
          title = "wbCorr: Bivariate Within- and Between-Cluster Correlations",
          author = c(person("Pascal", "Küng")),
          organization = "University of Zürich",
-         year = "2023",
-         note = note)
-
-textVersion = sprintf("Küng, P.(2023). wbCorr: Bivariate Within- and Between-Cluster Correlations. %s", note)
+         year = year,
+         note = note,
+         url = url,
+         doi = doi,
+         textVersion = sprintf(
+           "Küng, P. (%s). wbCorr: Bivariate Within- and Between-Cluster Correlations (%s). https://doi.org/%s",
+           year,
+           note,
+           doi
+         ))

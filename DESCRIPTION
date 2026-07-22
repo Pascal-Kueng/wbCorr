@@ -1,7 +1,6 @@
 Package: wbCorr
 Title: Bivariate Within- and Between-Cluster Correlations
-Version: 0.3.1
-Date: 2026-05-23
+Version: 0.3.1.9000
 Authors@R: 
     c(person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", 
              role = c("aut", "cre", "cph"),
@@ -21,6 +20,8 @@ Description: Separates supplied variables into within- and
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 3.5.0)
 Suggests: 
     httr,
     spelling,
