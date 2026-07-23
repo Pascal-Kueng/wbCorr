@@ -9,7 +9,7 @@ documentation.
 
 * Fedora Linux 44, R 4.6.1 (`R CMD check --as-cran --run-donttest`)
 * GitHub Actions: macOS, Windows, and Ubuntu; R-devel, release, and oldrel-1
-* win-builder: R-devel (submitted; result pending)
+* win-builder: R-devel (2026-07-22 r90289, Windows Server 2022)
 
 ## R CMD check results
 
