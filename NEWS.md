@@ -46,6 +46,9 @@
   check coverage.
 * Added a pkgdown website workflow and a vignette introducing the distinction
   between within- and between-cluster correlations.
+* Removed obsolete self-generated test fixtures, a generated plot file, and
+  tracked R session history. Added safeguards against including regenerated
+  session or graphics artifacts in the repository and source package.
 * Corrected the bundled-data documentation to report 5,000 observations from
   100 participants measured over 50 days.
 * Added repository citation metadata and a DOI badge that use the permanent

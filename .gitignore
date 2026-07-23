@@ -1,4 +1,8 @@
 .Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+Rplots.pdf
 inst/doc
 wbCorr_*.tar.gz
 *.Rcheck
