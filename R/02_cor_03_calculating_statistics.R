@@ -50,7 +50,7 @@ weighted_cor <- function(col_i, col_j, weights, method = 'pearson') {
   col_j <- col_j[complete_cases]
   weights <- weights[complete_cases]
 
-  if (length(col_i) < 3 || sum(weights) <= 0) {
+  if (length(col_i) < 2 || sum(weights) <= 0) {
     return(NA_real_)
   }
 

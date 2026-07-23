@@ -107,7 +107,8 @@ test_that("analytic inference warns and cluster bootstrap returns bootstrap inte
   expect_equal(boot@within$correlations, analytic@within$correlations)
   expect_equal(boot@between$correlations, analytic@between$correlations)
   expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@within$table))
-  expect_true("Cluster bootstrap p" %in% colnames(boot@within$table))
+  expect_false("Cluster bootstrap p" %in% colnames(boot@within$table))
+  expect_true(all(is.na(boot@within$p_values)))
   expect_false(is.na(boot@within$confidence_intervals$CI_lower[1]))
 })
 

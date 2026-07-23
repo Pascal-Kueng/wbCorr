@@ -63,11 +63,12 @@ is rejected because deleting individual rows does not respect clustering.}
 1000). The minimum permits quick tests; use substantially more replicates
 for substantive analyses and assess Monte Carlo stability.}
 
-\item{inference}{A string specifying how p-values and confidence intervals
-are calculated. \code{"analytic"} uses the usual correlation-test approximation.
-\code{"none"} returns coefficients without p-values or confidence intervals.
-\code{"cluster_bootstrap"} resamples top-level clusters with replacement and
-recomputes the full decomposition in each bootstrap sample.}
+\item{inference}{A string specifying inferential output. \code{"analytic"} uses
+the documented correlation-test approximation for Pearson p-values and
+confidence intervals. \code{"none"} returns coefficients only.
+\code{"cluster_bootstrap"} resamples top-level clusters with replacement,
+recomputes the full decomposition, and reports percentile confidence
+intervals. Bootstrap p-values are not reported.}
 
 \item{weighted_between_statistics}{Deprecated logical alias for
 \code{between_weighting}. If TRUE, \code{between_weighting = "cluster_size"}; if
@@ -127,6 +128,18 @@ variables and the cluster variable are observed. By default,
 same complete-pair row set. This keeps the within residuals centered for the
 actual pairwise sample and makes the between correlation a correlation of
 matched pair-specific cluster means.
+
+Detailed tables always retain one row for every requested unordered pair.
+\code{n_obs} is the number of jointly observed raw rows with a nonmissing cluster
+identifier, and \code{n_clusters} is the number of clusters contributing at least
+one such row. Under \code{centering_rows = "all_available"}, additional unpaired
+rows can contribute to the variable-specific means, but \code{n_obs} remains the
+joint pair-row count. \code{status} describes coefficient estimability (\code{"ok"} or
+\code{"not_estimable"}) and \code{reason} gives a stable failure code.
+\code{inference_status} separately records \code{"not_requested"}, \code{"ok"},
+\code{"partial"}, or \code{"unavailable"}, with details in \code{inference_reason}.
+A descriptive coefficient requires two analysis units with positive
+variance; inferential output can require more.
 
 With \code{centering_rows = "all_available"}, each variable's cluster mean is
 estimated from all available rows for that variable before the pairwise
@@ -191,7 +204,19 @@ and reports first-order percentile bootstrap confidence intervals. This
 keeps the package's descriptive estimands while avoiding row-level
 independence assumptions. Interval accuracy assumes independent clusters
 and adequate numbers of clusters and bootstrap replicates; the technical
-minimum of 10 replicates is not a recommendation for substantive analyses.
+minimum of 10 valid replicates is not a recommendation for substantive
+analyses. \code{n_boot_attempted} and \code{n_boot_valid} report Monte Carlo yield.
+Bootstrap is skipped when fewer than three clusters contribute. An interval
+is unavailable with fewer than 10 finite replicate coefficients, and is
+marked \code{"partial"} when invalid replicates had to be excluded. No bootstrap
+p-value is reported because wbCorr does not currently implement a validated
+null-resampling test for these clustered estimands.
+
+Correlation-matrix diagonals are 1 only when the variable has at least two
+usable values and positive variance at that level; otherwise they are \code{NA}.
+P-value diagonals are always \code{NA}. Merged summary matrices continue to show
+the variable's ICC on the diagonal instead of a level-specific self-
+correlation.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 extract, and plot within- and between-cluster correlations for further
@@ -244,6 +269,18 @@ to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
 within-cluster Spearman rank correlations. \emph{Statistics in Medicine}.
 \doi{10.1002/sim.10326}
+
+Hall, P., & Wilson, S. R. (1991). Two guidelines for bootstrap hypothesis
+testing. \emph{Biometrics, 47}(2), 757-762. \doi{10.2307/2532163}
+
+Martin, M. A. (2007). Bootstrap hypothesis testing for some common
+statistical problems: A critical evaluation of size and power properties.
+\emph{Computational Statistics & Data Analysis, 51}(12), 6321-6342.
+\doi{10.1016/j.csda.2007.01.020}
+
+Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
+the number of bootstrap repetitions. \emph{Econometrica, 68}(1), 23-51.
+\doi{10.1111/1468-0262.00092}
 }
 \seealso{
 \code{\link[=get_table]{get_table}},

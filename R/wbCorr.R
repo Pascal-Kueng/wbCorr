@@ -27,11 +27,12 @@
 #' @param nboot A whole number of bootstrap samples, at least 10 (default:
 #' 1000). The minimum permits quick tests; use substantially more replicates
 #' for substantive analyses and assess Monte Carlo stability.
-#' @param inference A string specifying how p-values and confidence intervals
-#' are calculated. `"analytic"` uses the usual correlation-test approximation.
-#' `"none"` returns coefficients without p-values or confidence intervals.
-#' `"cluster_bootstrap"` resamples top-level clusters with replacement and
-#' recomputes the full decomposition in each bootstrap sample.
+#' @param inference A string specifying inferential output. `"analytic"` uses
+#' the documented correlation-test approximation for Pearson p-values and
+#' confidence intervals. `"none"` returns coefficients only.
+#' `"cluster_bootstrap"` resamples top-level clusters with replacement,
+#' recomputes the full decomposition, and reports percentile confidence
+#' intervals. Bootstrap p-values are not reported.
 #' @param weighted_between_statistics Deprecated logical alias for
 #' `between_weighting`. If TRUE, `between_weighting = "cluster_size"`; if
 #' FALSE, `between_weighting = "equal_clusters"`.
@@ -81,6 +82,18 @@
 #' same complete-pair row set. This keeps the within residuals centered for the
 #' actual pairwise sample and makes the between correlation a correlation of
 #' matched pair-specific cluster means.
+#'
+#' Detailed tables always retain one row for every requested unordered pair.
+#' `n_obs` is the number of jointly observed raw rows with a nonmissing cluster
+#' identifier, and `n_clusters` is the number of clusters contributing at least
+#' one such row. Under `centering_rows = "all_available"`, additional unpaired
+#' rows can contribute to the variable-specific means, but `n_obs` remains the
+#' joint pair-row count. `status` describes coefficient estimability (`"ok"` or
+#' `"not_estimable"`) and `reason` gives a stable failure code.
+#' `inference_status` separately records `"not_requested"`, `"ok"`,
+#' `"partial"`, or `"unavailable"`, with details in `inference_reason`.
+#' A descriptive coefficient requires two analysis units with positive
+#' variance; inferential output can require more.
 #'
 #' With `centering_rows = "all_available"`, each variable's cluster mean is
 #' estimated from all available rows for that variable before the pairwise
@@ -145,7 +158,19 @@
 #' keeps the package's descriptive estimands while avoiding row-level
 #' independence assumptions. Interval accuracy assumes independent clusters
 #' and adequate numbers of clusters and bootstrap replicates; the technical
-#' minimum of 10 replicates is not a recommendation for substantive analyses.
+#' minimum of 10 valid replicates is not a recommendation for substantive
+#' analyses. `n_boot_attempted` and `n_boot_valid` report Monte Carlo yield.
+#' Bootstrap is skipped when fewer than three clusters contribute. An interval
+#' is unavailable with fewer than 10 finite replicate coefficients, and is
+#' marked `"partial"` when invalid replicates had to be excluded. No bootstrap
+#' p-value is reported because wbCorr does not currently implement a validated
+#' null-resampling test for these clustered estimands.
+#'
+#' Correlation-matrix diagonals are 1 only when the variable has at least two
+#' usable values and positive variance at that level; otherwise they are `NA`.
+#' P-value diagonals are always `NA`. Merged summary matrices continue to show
+#' the variable's ICC on the diagonal instead of a level-specific self-
+#' correlation.
 #'
 #' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 #' extract, and plot within- and between-cluster correlations for further
@@ -154,6 +179,18 @@
 #' @references Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
 #' within-cluster Spearman rank correlations. *Statistics in Medicine*.
 #' \doi{10.1002/sim.10326}
+#'
+#' Hall, P., & Wilson, S. R. (1991). Two guidelines for bootstrap hypothesis
+#' testing. *Biometrics, 47*(2), 757-762. \doi{10.2307/2532163}
+#'
+#' Martin, M. A. (2007). Bootstrap hypothesis testing for some common
+#' statistical problems: A critical evaluation of size and power properties.
+#' *Computational Statistics & Data Analysis, 51*(12), 6321-6342.
+#' \doi{10.1016/j.csda.2007.01.020}
+#'
+#' Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
+#' the number of bootstrap repetitions. *Econometrica, 68*(1), 23-51.
+#' \doi{10.1111/1468-0262.00092}
 #'
 #' @seealso
 #' \code{\link[=get_table]{get_table}},
@@ -243,6 +280,7 @@ wbCorr <- function(data, cluster,
                                      c("analytic", "none", "cluster_bootstrap"),
                                      "inference",
                                      inference_missing && !legacy_bootstrap_requested)
+  requested_inference <- inference
   if (legacy_bootstrap_requested &&
       !inference_missing &&
       inference != "cluster_bootstrap") {
@@ -345,7 +383,8 @@ wbCorr <- function(data, cluster,
                                cluster_var = cluster_var,
                                level = 'within',
                                centering_rows = centering_rows,
-                               inference = inference)
+                               inference = inference,
+                               requested_inference = requested_inference)
   between_cors <- corAndPValues(input_data_cleaned,
                                 confidence_level = confidence_level,
                                 method = method,
@@ -360,7 +399,8 @@ wbCorr <- function(data, cluster,
                                 between_inference = between_inference,
                                 weighted_analytic_requested = weighted_analytic_requested,
                                 centering_rows = centering_rows,
-                                inference = inference)
+                                inference = inference,
+                                requested_inference = requested_inference)
 
   within_corr_coefs <- within_cors$correlation_coefficient
   between_corr_coefs <- between_cors$correlation_coefficient
@@ -396,6 +436,7 @@ wbCorr <- function(data, cluster,
                    bootstrap = bootstrap,
                    nboot = nboot,
                    inference = inference,
+                   requested_inference = requested_inference,
                    weighted_between_statistics = cluster_size_between,
                    between_weighting = between_weighting,
                    between_inference = between_inference,

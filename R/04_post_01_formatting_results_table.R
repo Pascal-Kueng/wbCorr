@@ -67,9 +67,13 @@ format_result_table <- function(result_table, method, auto_type, var_type,
     result_table[['statistic type']] <- NULL
     if (inference == 'cluster_bootstrap') {
       colnames(result_table)[colnames(result_table) == ci_name] <- paste("Cluster bootstrap", ci_name)
-      colnames(result_table)[colnames(result_table) == "p"] <- "Cluster bootstrap p"
     }
-    for (name in colnames(result_table)) {
+    optional_inference_columns <- c(
+      "statistic", "t-statistic", "z-statistic", "df", "p",
+      ci_name, paste("Cluster bootstrap", ci_name)
+    )
+    for (name in intersect(optional_inference_columns,
+                           colnames(result_table))) {
       if (all(is.na(result_table[[name]]))) {
         result_table[[name]] <- NULL
       }

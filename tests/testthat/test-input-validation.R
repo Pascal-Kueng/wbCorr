@@ -158,6 +158,15 @@ test_that("non-finite outcomes are treated consistently as missing", {
   expect_equal(negative@within$correlations, reference@within$correlations)
   expect_equal(negative@between$correlations, reference@between$correlations)
   expect_equal(negative@ICC, reference@ICC)
+
+  both <- validation_data()
+  both$x[1] <- Inf
+  both$y[2] <- -Inf
+  both_result <- suppressWarnings(wbCorr(both, "id", inference = "none"))
+  expect_match(both_result@within$table$warning,
+               "x non-finite values treated as missing")
+  expect_match(both_result@within$table$warning,
+               "y non-finite values treated as missing")
 })
 
 

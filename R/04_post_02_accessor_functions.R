@@ -10,7 +10,10 @@
 #' @param which A character vector indicating which correlation table to return.
 #' Options are 'within' or 'w', and 'between' or 'b'.
 #'
-#' @return A list containing the selected tables of within- and/or between-cluster correlations.
+#' @return A list containing the selected detailed tables of within- and/or
+#' between-cluster correlations. Each table retains every requested pair and
+#' includes raw pair-row, contributing-cluster, bootstrap-yield, coefficient-
+#' status, and inference-status diagnostics; see [wbCorr()] for definitions.
 #'
 #' @seealso \code{\link[=summary.wbCorr]{summary}}, \code{\link[=wbCorr]{wbCorr}}
 #' @examples

@@ -37,6 +37,13 @@ test_that("analytic Spearman requests retain coefficients but omit inference", {
   point_only <- wbCorr(dat, "id", method = "spearman", inference = "none")
 
   expect_identical(result@settings$inference, "none")
+  expect_identical(result@settings$requested_inference, "analytic")
+  expect_identical(point_only@settings$requested_inference, "none")
+  expect_true(all(result@within$table$inference_status == "unavailable"))
+  expect_true(all(result@within$table$inference_reason ==
+                    "analytic_inference_unsupported_for_method"))
+  expect_true(all(point_only@within$table$inference_status ==
+                    "not_requested"))
   expect_equal(result@within$correlations, point_only@within$correlations)
   expect_equal(result@between$correlations, point_only@between$correlations)
   expect_true(all(is.na(result@within$p_values)))
@@ -171,6 +178,27 @@ test_that("Spearman bootstrap matches seeded whole-cluster resampling", {
                                                            "CI_upper")])),
     unname(quantile(between_draws, interval_probs, na.rm = TRUE))
   )
+  expect_identical(result@within$table$n_boot_attempted, nboot)
+  expect_identical(result@between$table$n_boot_attempted, nboot)
+  expect_identical(result@within$table$n_boot_valid,
+                   as.integer(sum(!is.na(within_draws))))
+  expect_identical(result@between$table$n_boot_valid,
+                   as.integer(sum(!is.na(between_draws))))
+
+  expected_status <- function(draws) {
+    n_valid <- sum(!is.na(draws))
+    if (n_valid < 10L) {
+      "unavailable"
+    } else if (n_valid < nboot) {
+      "partial"
+    } else {
+      "ok"
+    }
+  }
+  expect_identical(result@within$table$inference_status,
+                   expected_status(within_draws))
+  expect_identical(result@between$table$inference_status,
+                   expected_status(between_draws))
 })
 
 

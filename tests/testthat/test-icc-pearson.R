@@ -171,6 +171,9 @@ test_that("Pearson keeps coefficients when analytic inference is unavailable", {
   expect_false(is.na(analytic@between$p_values["x", "y"]))
   expect_true(is.na(analytic@between$confidence_intervals$CI_lower[1]))
   expect_true(is.na(analytic@between$confidence_intervals$CI_upper[1]))
+  expect_identical(analytic@between$table$inference_status, "partial")
+  expect_identical(analytic@between$table$inference_reason,
+                   "confidence_interval_unavailable_low_df")
 })
 
 

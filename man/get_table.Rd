@@ -16,7 +16,10 @@ get_tables(object, which = c("within", "between"))
 Options are 'within' or 'w', and 'between' or 'b'.}
 }
 \value{
-A list containing the selected tables of within- and/or between-cluster correlations.
+A list containing the selected detailed tables of within- and/or
+between-cluster correlations. Each table retains every requested pair and
+includes raw pair-row, contributing-cluster, bootstrap-yield, coefficient-
+status, and inference-status diagnostics; see \code{\link[=wbCorr]{wbCorr()}} for definitions.
 }
 \description{
 This function has an alias get_tables() which can be used interchangeably.
