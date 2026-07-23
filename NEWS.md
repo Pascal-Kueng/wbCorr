@@ -33,6 +33,8 @@
   provides an optional common-row analysis.
 * `get_matrix(..., numeric = TRUE)` now returns unrounded numeric within,
   between, and merged matrices, including unrounded ICC diagonals.
+* `print()` now provides concise, executable guidance for inspecting summaries
+  and extracting full tables, numeric matrices, and ICCs.
 * Plot panels now use the exact pair-specific rows, centering rule, method, and
   between-cluster weights used by the fitted object. Annotations come from the
   stored coefficient and p-value, and significance legends are omitted when

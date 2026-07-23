@@ -69,35 +69,36 @@ fit <- wbCorr(
   cluster = "person",
   inference = "none"
 )
-
-fit
 ```
 
-`get_table()` returns the full within- and between-cluster result tables.
+## Inspect the correlation matrices
 
-```{r tables}
-tables <- get_table(fit)
+For interactive use, `summary()` provides short selectors for the most useful
+correlation matrices. Request the within-cluster matrix with `"w"` and the
+between-cluster matrix with `"b"`.
 
-tables$within
-tables$between
+```{r summarize-levels}
+summary(fit, "w")
+summary(fit, "b")
 ```
 
 Here the within-person correlation is negative while the between-person
 correlation is positive. The distinction answers two different questions; one
 coefficient should not be substituted for the other.
 
-## Correlation matrices and plots
+For a compact combined display, use `"wb"`. Within-cluster correlations appear
+above the diagonal, between-cluster correlations appear below it, and ICCs
+appear on the diagonal. Use `"bw"` to reverse the two triangles.
 
-Use `summary()` or `get_matrix()` to retrieve matrices. The merged matrix places
-within-cluster correlations above the diagonal and between-cluster correlations
-below it.
-
-```{r matrices}
-matrices <- summary(fit)
-matrices$merged_wb
+```{r summarize-merged}
+summary(fit, "wb")
 ```
 
-The corresponding centered data can also be inspected visually.
+Calling `print(fit)` prints a compact preview of the detailed result tables.
+
+## Plot the two levels
+
+The corresponding centered data can be inspected visually.
 
 ```{r within-plot, fig.cap = "Within-person association after subtracting each person's variable means."}
 plot(fit, "within")
@@ -105,6 +106,21 @@ plot(fit, "within")
 
 ```{r between-plot, fig.cap = "Between-person association among person-level variable means."}
 plot(fit, "between")
+```
+
+## Extract results for further work
+
+The `summary()` shortcuts are convenient for inspection. For programmatic use,
+`get_table()` returns the full results and pair-specific diagnostics, while
+`get_matrix()` returns selected matrices. Set `numeric = TRUE` when unrounded
+numeric coefficients are needed for downstream calculations.
+
+```{r extract-results}
+tables <- get_table(fit)
+within_table <- tables$within
+
+within_matrix <- get_matrix(fit, "w", numeric = TRUE)$within
+merged_matrix <- get_matrix(fit, "wb", numeric = TRUE)$merged_wb
 ```
 
 ## Add uncertainty when needed

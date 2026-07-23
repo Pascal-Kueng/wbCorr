@@ -615,9 +615,6 @@ wbcorr <- wbCorr
 methods::setMethod("print", signature("wbCorr"), function(x, ...) {
   cat("\n---- wbCorr Object ----\n")
   cat("Call: ", deparse(x@call), "\n")
-  cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
-  cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
-  cat("\nAccess full ICC list with get_ICC(object)\n")
 
   # Function for printing a section of the object
   print_section <- function(title, data) {
@@ -636,9 +633,10 @@ methods::setMethod("print", signature("wbCorr"), function(x, ...) {
     print_section("Intraclass Correlation Coefficients:", x@ICC)
   }
 
+  cat("\nInspect matrices with summary(object, which = c('w', 'b', 'wb'))")
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
-  cat("\nAccess correlation matrices with summary(object, which = c('within', 'between', merge')")
-  cat("\nAccess full ICC list with get_ICC(object)\n")
+  cat("\nAccess matrices programmatically with get_matrix(object, numeric = TRUE)")
+  cat("\nAccess the full ICC table with get_ICC(object)\n")
   invisible(x)
 })
 

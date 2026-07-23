@@ -7,6 +7,8 @@
 
 The wbCorr package computes bivariate within- and between-cluster correlations for clustered data, such as repeated measures nested in persons, dyads, teams, or other groups. Results can be inspected as tables, matrices, and plots.
 
+[Read the introductory vignette: within- and between-cluster correlations](https://pascal-kueng.github.io/wbCorr/articles/within-between-correlations.html)
+
 ## Installation
 
 Install the released version from CRAN:
@@ -36,14 +38,9 @@ correlations <- wbCorr(
   nboot = 1000
 )
 
-print(correlations)
-
-tables <- get_table(correlations)
-matrices <- summary(correlations)
-
-tables$within
-tables$between
-matrices$merged_wb
+summary(correlations, "w")  # within-cluster correlation matrix
+summary(correlations, "b")  # between-cluster correlation matrix
+summary(correlations, "wb") # within above, between below, ICC on the diagonal
 
 plot(correlations, "within")
 plot(correlations, "between")
@@ -51,10 +48,11 @@ plot(correlations, "between")
 
 ## Usage
 
-1. Create an object using `wbCorr(data, cluster = "cluster_column")`. Printing the object shows the head of the tables.
-2. Retrieve full tables with `get_table()` or `get_tables()`.
-3. Retrieve correlation matrices with `summary()`, `get_matrix()`, or `get_matrices()`.
-4. Plot within- or between-cluster correlations with `plot()`.
+1. Create an object using `wbCorr(data, cluster = "cluster_column")`.
+2. Inspect formatted matrices with `summary(object, "w")`, `summary(object, "b")`, or `summary(object, "wb")`.
+3. Retrieve full tables with `get_table()` or `get_tables()`.
+4. Retrieve unrounded matrices for downstream calculations with `get_matrix(object, numeric = TRUE)`.
+5. Plot within- or between-cluster correlations with `plot()`.
 
 ### Check documentation
 
@@ -99,56 +97,26 @@ wbCorr(simdat_intensive_longitudinal,
        missing_data = "listwise")
 ```
 
-#### Sample output from `get_table()`
+### Extract results
 
-Calling `get_table()` on a `wbCorr` object returns two tables: one for within-cluster correlations and one for between-cluster correlations. The abridged display below omits the trailing count and status diagnostics described under Implementation details. See `?get_table` for more information and arguments.
+`get_table()` returns the detailed pairwise results and diagnostics. Use
+`summary()` for formatted display matrices and `get_matrix(..., numeric = TRUE)`
+for unrounded coefficients in downstream calculations.
 
-```text
-# Sample output
-> get_table(wbCorrObject)
-$within
-  Parameter1 Parameter2    r       95% CI t(1598)         p
-1       Var1       Var2 0.08 [0.03, 0.13]    3.25   0.001**
-2       Var1       Var3 0.25 [0.21, 0.30]   10.44 < .001***
-3       Var2       Var3 0.79 [0.77, 0.80]   50.89 < .001***
+```r
+tables <- get_table(correlations)
+tables$within
+tables$between
 
-$between
-  Parameter1 Parameter2     r         95% CI t(78)         p
-1       Var1       Var2 -0.59 [-0.72, -0.43] -6.48 < .001***
-2       Var1       Var3 -0.38 [-0.56, -0.18] -3.65 < .001***
-3       Var2       Var3 -0.03  [-0.25, 0.19] -0.24     0.814
-```
+summary(correlations, "wb")
 
-#### Sample output from `summary()` or `get_matrix()`
-
-Calling `summary()` or `get_matrix()` on a `wbCorr` object returns display-formatted correlation matrices. The merged matrices show within- and between-cluster correlations above and below the diagonal. Use `get_matrix(object, numeric = TRUE)` to retrieve unrounded numeric matrices for downstream calculations.
-
-```text
-> summary(wbCorrObject)
-$within
-        Var1    Var2    Var3
-Var1    1.00  0.08** 0.25***
-Var2  0.08**    1.00 0.79***
-Var3 0.25*** 0.79***    1.00
-
-$between
-         Var1     Var2     Var3
-Var1     1.00 -0.59*** -0.38***
-Var2 -0.59***     1.00    -0.03
-Var3 -0.38***    -0.03     1.00
-
-$merged_wb
-         Var1   Var2    Var3
-Var1     1.00 0.08** 0.25***
-Var2 -0.59***   1.00 0.79***
-Var3 -0.38***  -0.03    1.00
-
-$merged_bw
-        Var1     Var2     Var3
-Var1    1.00 -0.59*** -0.38***
-Var2  0.08**     1.00    -0.03
-Var3 0.25***  0.79***     1.00
-
+numeric_matrices <- get_matrix(
+  correlations,
+  which = c("w", "b", "wb"),
+  numeric = TRUE
+)
+numeric_matrices$within
+numeric_matrices$merged_wb
 ```
 
 ## Implementation details
