@@ -20,7 +20,7 @@ compute_icc1 <- function(input_data, cluster_var) {
 
 compute_icc1_anova <- function(values, cluster_var) {
   if (!is.numeric(values)) {
-    values <- as.numeric(droplevels(as.factor(values)))
+    stop("ICC inputs must be numeric after wbCorr preprocessing.", call. = FALSE)
   }
 
   valid_rows <- is.finite(values) & !is.na(cluster_var)

@@ -130,7 +130,15 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
   } else if ('merge_wb' %in% which | 'wb' %in% which) {
     return_list[['merged_wb']] <- combined_df_wb
   }
-  return_list[['note']] = '***p < 0.001, **p < 0.01, *p < 0.05'
+  has_off_diagonal_p <- function(p_values) {
+    p_matrix <- as.matrix(p_values)
+    diag(p_matrix) <- NA_real_
+    any(is.finite(p_matrix))
+  }
+  if (has_off_diagonal_p(object@within$p_values) ||
+      has_off_diagonal_p(object@between$p_values)) {
+    return_list[['note']] <- '***p < 0.001, **p < 0.01, *p < 0.05'
+  }
   return(return_list)
 }
 

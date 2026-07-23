@@ -79,15 +79,15 @@ corAndPValues <- function(input_data,
 
       if (type_i == 'ordinal' | type_j == 'ordinal') {
         method_selected <- 'spearman'
-        method_table <- "spearman's rho"
+        method_table <- if (level == 'within') {
+          "centered-score Spearman rho"
+        } else {
+          "cluster-mean Spearman rho"
+        }
       } else {
         if(type_i == 'binary' | type_j == 'binary') {
           method_selected <- 'pearson'
-          method_table <- "point-biserial"
-          if (type_i == 'binary' & type_j  == 'binary') {
-            method_selected <- 'pearson'
-            method_table <- "phi coefficient"
-          }
+          method_table <- "pearson's r"
         }
       }
     } else if (method_selected == 'pearson') {
@@ -252,6 +252,12 @@ corAndPValues <- function(input_data,
     }
   }
 
+  if (inference == 'none' ||
+      (level == 'between' && between_inference == 'none') ||
+      (method == 'spearman' && inference == 'cluster_bootstrap')) {
+    diag(p_matrix) <- NA_real_
+  }
+
   # Converting the other matrices to DFs
   p_value_df <- as.data.frame(p_matrix)
   correlation_coefficient_df <- as.data.frame(cor_matrix)
@@ -263,7 +269,8 @@ corAndPValues <- function(input_data,
                                       auto_type,
                                       var_type,
                                       confidence_level,
-                                      inference)
+                                      inference,
+                                      level)
 
   return(list(p_value = p_value_df,
               correlation_coefficient = correlation_coefficient_df,
@@ -448,9 +455,13 @@ cluster_bootstrap_statistics <- function(input_data,
                                      probs = 1 - alpha / 2,
                                      na.rm = TRUE,
                                      names = FALSE))
-  p_value <- min(2 * min(mean(valid_boot <= 0),
-                         mean(valid_boot >= 0)),
-                 1)
+  p_value <- if (method == 'spearman') {
+    NA_real_
+  } else {
+    min(2 * min(mean(valid_boot <= 0),
+                mean(valid_boot >= 0)),
+        1)
+  }
 
   list(correlation_coefficient = observed_correlation,
        test_statistic = NA,

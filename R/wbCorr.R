@@ -4,22 +4,29 @@
 #' data, such as repeated measures nested in persons, dyads, teams, or other
 #' groups. Only recommended for continuous or binary variables.
 #'
-#' @param data A dataframe containing numeric variables for which correlations will be calculated.
-#' @param cluster A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.
+#' @param data A data frame containing numeric variables, logical variables, or
+#' two-level factors for which correlations will be calculated.
+#' @param cluster An atomic vector with exactly one value per data row, or one
+#' string naming the cluster column in `data`. Missing identifiers are allowed,
+#' but at least one identifier must be observed; numeric identifiers cannot be
+#' `Inf`, `-Inf`, or `NaN`. When a vector is supplied, data columns containing
+#' the same identifiers and missing-value pattern are treated as duplicate
+#' cluster columns and excluded; pass a column name when the identifier is
+#' already in `data` to avoid ambiguity.
 #' @param confidence_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
 #' @param method A string indicating the correlation method to be used.
-#' Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
-#' (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
-#' for p-values and Fisher's z transformation for confidence intervals.
-#' 'spearman': Spearman correlation
-#' method uses the Fisher z-transformation for confidence intervals and p-values.
-#' 'spearman-jackknife': Employs the Euclidean jackknife technique to compute
-#' confidence intervals, providing more robust confidence intervals in the presence of
-#' non-normal data or outliers. Note that p-values are not available
-#' when this method is selected.
+#' Supported methods are `"pearson"`, `"spearman"`, and `"auto"` (default:
+#' `"pearson"`). Pearson uses t statistics and Fisher-z confidence intervals.
+#' Spearman reports a descriptive correlation of mean-centered scores within
+#' clusters and a correlation of cluster means between clusters. Analytic
+#' Spearman inference is unavailable; use `inference = "cluster_bootstrap"` for
+#' a whole-cluster bootstrap interval. The former `"spearman-jackknife"` option
+#' is rejected because deleting individual rows does not respect clustering.
 #' @param bootstrap Deprecated logical alias for
 #' `inference = "cluster_bootstrap"`.
-#' @param nboot Specifies the amount of bootstrap samples (default: 1000).
+#' @param nboot A whole number of bootstrap samples, at least 10 (default:
+#' 1000). The minimum permits quick tests; use substantially more replicates
+#' for substantive analyses and assess Monte Carlo stability.
 #' @param inference A string specifying how p-values and confidence intervals
 #' are calculated. `"analytic"` uses the usual correlation-test approximation.
 #' `"none"` returns coefficients without p-values or confidence intervals.
@@ -32,7 +39,9 @@
 #' `"equal_clusters"` correlates pair-specific cluster means with each cluster
 #' contributing equally. `"cluster_size"` computes a sample-size weighted
 #' correlation of pair-specific cluster means, using the number of complete
-#' observation pairs in each cluster as weights.
+#' observation pairs in each cluster as weights. Cluster-size weighting is not
+#' supported with `method = "spearman"` because no weighted-rank estimand is
+#' currently defined.
 #' @param between_inference A string specifying whether between-cluster
 #' p-values and confidence intervals are calculated analytically (`"analytic"`)
 #' or omitted (`"none"`). Analytic inference is unavailable for
@@ -58,6 +67,14 @@
 #' dataset and clustering variable. The object can be plotted.
 #'
 #' @details
+#' Logical variables are encoded as 0/1. Factors must declare exactly two
+#' levels and are encoded as 0/1 in declared factor-level order, so reversing
+#' the levels reverses correlations with other variables. Character variables
+#' must first be converted to factors with an explicit two-level order. Other
+#' factors are not accepted; use meaningful numeric scores for ordered
+#' variables or dummy-code nominal variables. Numeric `Inf`, `-Inf`, and `NaN`
+#' values are treated as missing before centering and estimation.
+#'
 #' For every variable pair, correlations are computed on rows where both
 #' variables and the cluster variable are observed. By default,
 #' `centering_rows = "pairwise_complete"` also estimates cluster means from this
@@ -83,8 +100,8 @@
 #' `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of
 #' complete observation pairs and `k_pair` is the number of clusters
 #' contributing at least one complete pair. This analytic test is a working
-#' approximation because residual pairs can still be dependent within clusters;
-#' for publication-level inference in intensive longitudinal data, prefer
+#' approximation because residual pairs can still be dependent within clusters.
+#' For resampling intervals that preserve the top-level dependence, use
 #' `inference = "cluster_bootstrap"`.
 #'
 #' The between-cluster correlation is computed from pair-specific cluster means.
@@ -101,6 +118,15 @@
 #' standard error is `1 / sqrt(df - 1)`. The interval is unavailable when
 #' `df <= 1`.
 #'
+#' With `method = "spearman"`, the within coefficient is Spearman's correlation
+#' of the pairwise mean-centered scores and the between coefficient is
+#' Spearman's correlation of the pairwise cluster means. These are descriptive
+#' mean-based decompositions, not the conditional-ridit and median-centroid
+#' clustered rank parameters of Tu, Li, and Shepherd (2025), and need not be
+#' invariant to monotone transformations of the original observations. wbCorr
+#' therefore does not attach analytic p-values or confidence intervals to these
+#' coefficients. Whole-cluster bootstrap confidence intervals are available.
+#'
 #' For each variable, wbCorr also reports the one-way random-effects,
 #' single-measure ICC(1,1). It is estimated from all finite observations for
 #' that variable using the ANOVA method of moments and an effective cluster size
@@ -115,13 +141,19 @@
 #'
 #' With `inference = "cluster_bootstrap"`, wbCorr resamples whole top-level
 #' clusters, recomputes the selected within- and between-cluster correlations,
-#' and reports percentile bootstrap confidence intervals. This keeps the
-#' package's descriptive estimands while avoiding row-level independence
-#' assumptions.
+#' and reports first-order percentile bootstrap confidence intervals. This
+#' keeps the package's descriptive estimands while avoiding row-level
+#' independence assumptions. Interval accuracy assumes independent clusters
+#' and adequate numbers of clusters and bootstrap replicates; the technical
+#' minimum of 10 replicates is not a recommendation for substantive analyses.
 #'
 #' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 #' extract, and plot within- and between-cluster correlations for further
 #' analysis.
+#'
+#' @references Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
+#' within-cluster Spearman rank correlations. *Statistics in Medicine*.
+#' \doi{10.1002/sim.10326}
 #'
 #' @seealso
 #' \code{\link[=get_table]{get_table}},
@@ -184,41 +216,85 @@ wbCorr <- function(data, cluster,
                    between_inference = c("analytic", "none"),
                    centering_rows = c("pairwise_complete", "all_available")) {
 
-    # input validation and preparation
+  inference_missing <- missing(inference)
+  between_weighting_missing <- missing(between_weighting)
+  between_inference_missing <- missing(between_inference)
+  centering_rows_missing <- missing(centering_rows)
+
+  # input validation and preparation
   input_data <- data
+  validate_wbcorr_inputs(input_data,
+                          cluster,
+                          confidence_level,
+                          method,
+                          bootstrap,
+                          nboot,
+                          weighted_between_statistics)
+  nboot <- as.integer(nboot)
 
   legacy_bootstrap_requested <- isTRUE(bootstrap)
-  if (legacy_bootstrap_requested && missing(inference)) {
+  if (legacy_bootstrap_requested && inference_missing) {
     inference <- "cluster_bootstrap"
     warning("bootstrap = TRUE is deprecated; using inference = 'cluster_bootstrap'.",
             call. = FALSE)
   }
 
-  inference <- match.arg(inference)
+  inference <- resolve_wbcorr_choice(inference,
+                                     c("analytic", "none", "cluster_bootstrap"),
+                                     "inference",
+                                     inference_missing && !legacy_bootstrap_requested)
   if (legacy_bootstrap_requested &&
-      !missing(inference) &&
+      !inference_missing &&
       inference != "cluster_bootstrap") {
     warning("bootstrap = TRUE is deprecated and ignored because inference is not 'cluster_bootstrap'.",
             call. = FALSE)
   }
-  if (inference == "analytic") {
-    warning("Analytic p-values and confidence intervals are working approximations for clustered data; use inference = 'cluster_bootstrap' for publication-level inference.",
-            call. = FALSE)
-  }
-  if (inference == "cluster_bootstrap" && method == "spearman-jackknife") {
-    stop("Use method = 'spearman' with inference = 'cluster_bootstrap'.")
-  }
-
-  if (!is.null(weighted_between_statistics) && missing(between_weighting)) {
+  if (!is.null(weighted_between_statistics) && between_weighting_missing) {
     between_weighting <- if (isTRUE(weighted_between_statistics)) {
       "cluster_size"
     } else {
       "equal_clusters"
     }
   }
-  between_weighting <- match.arg(between_weighting)
-  between_inference <- match.arg(between_inference)
-  centering_rows <- match.arg(centering_rows)
+  between_weighting <- resolve_wbcorr_choice(
+    between_weighting,
+    c("equal_clusters", "cluster_size"),
+    "between_weighting",
+    between_weighting_missing && is.null(weighted_between_statistics)
+  )
+  between_inference <- resolve_wbcorr_choice(
+    between_inference,
+    c("analytic", "none"),
+    "between_inference",
+    between_inference_missing
+  )
+  centering_rows <- resolve_wbcorr_choice(
+    centering_rows,
+    c("pairwise_complete", "all_available"),
+    "centering_rows",
+    centering_rows_missing
+  )
+
+  if (inference == "cluster_bootstrap" && method == "spearman-jackknife") {
+    stop("Use method = 'spearman' with inference = 'cluster_bootstrap'.")
+  }
+
+  if (method == "spearman-jackknife") {
+    stop("method = 'spearman-jackknife' is not supported for clustered data; use method = 'spearman' with inference = 'cluster_bootstrap'.",
+         call. = FALSE)
+  }
+  if (method == "spearman" && between_weighting == "cluster_size") {
+    stop("between_weighting = 'cluster_size' is not supported with method = 'spearman'; use equal-cluster Spearman or Pearson with an explicitly chosen weighting.",
+         call. = FALSE)
+  }
+  if (method == "spearman" && inference == "analytic") {
+    warning("Analytic inference is not supported for wbCorr's descriptive clustered Spearman coefficients; returning coefficients only. Use inference = 'cluster_bootstrap' for whole-cluster bootstrap intervals.",
+            call. = FALSE)
+    inference <- "none"
+  } else if (inference == "analytic") {
+    warning("Analytic p-values and confidence intervals are working approximations for clustered data; use inference = 'cluster_bootstrap' for whole-cluster resampling intervals.",
+            call. = FALSE)
+  }
 
   weighted_analytic_requested <- inference == "analytic" &&
     between_weighting == "cluster_size" &&
@@ -235,7 +311,7 @@ wbCorr <- function(data, cluster,
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
                                            cluster_size_between,
                                            inference == "cluster_bootstrap")
-  input_data <- remove_cluster_columns(input_data, cluster, cluster_var)
+  input_data <- remove_cluster_columns(input_data, cluster)
 
   cluster <- 'cluster'
 
@@ -466,10 +542,12 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #######################################################
 
 #' @title Plot within- and between associations
-#' @description Plots the centered variables of the provided dataframe against each other.
-#' Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
-#' or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
-#' A regression line is provided and the corresponding coefficient with significance displayed.
+#' @description Plots the centered variables of the provided data frame against
+#' each other. Choose either cluster means (`"between"`) or deviations from
+#' cluster means (`"within"`). Pearson plots include a regression line and
+#' slope; Spearman plots report rho without a linear-regression overlay.
+#' Significance stars are shown only when the fitted wbCorr object contains a
+#' p-value for that pair.
 #' @param x A wbCorr object to be plotted.
 #' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
 #' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.

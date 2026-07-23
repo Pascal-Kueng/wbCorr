@@ -7,44 +7,20 @@ cor_spearman <- function(col_i, col_j, degrees_freedom, confidence_level) {
 }
 
 cor_spearman_from_r <- function(correlation_coefficient, degrees_freedom, confidence_level) {
-  if (is.na(correlation_coefficient) ||
-      is.na(degrees_freedom) ||
-      degrees_freedom <= 0 ||
-      abs(correlation_coefficient) >= 1) {
-    if (!is.na(correlation_coefficient) &&
-        !is.na(degrees_freedom) &&
-        degrees_freedom > 0 &&
-        abs(correlation_coefficient) == 1) {
-      return(list(correlation_coefficient = correlation_coefficient,
-                  test_statistic = sign(correlation_coefficient) * Inf,
-                  p_value = 0,
-                  lower_bound = correlation_coefficient,
-                  upper_bound = correlation_coefficient))
-    }
-    return(list(correlation_coefficient = NA,
-                test_statistic = NA,
-                p_value = NA,
-                lower_bound = NA,
-                upper_bound = NA))
+  if (length(correlation_coefficient) != 1L ||
+      is.na(correlation_coefficient) ||
+      !is.finite(correlation_coefficient) ||
+      abs(correlation_coefficient) > 1 + sqrt(.Machine$double.eps)) {
+    correlation_coefficient <- NA_real_
+  } else {
+    correlation_coefficient <- max(-1, min(1, correlation_coefficient))
   }
 
-  # Fisher Z-transformation
-  se <- 1 / sqrt(degrees_freedom)
-
-  critical_value = qnorm(1 - (1 - confidence_level) / 2)
-  delta <- critical_value * se
-
-  z_score <- atanh(correlation_coefficient)
-  lower_bound <- tanh(z_score - delta)
-  upper_bound <- tanh(z_score + delta)
-
-  # p-values
-  test_statistic <- z_score / se
-  p_value <- 2 * pnorm(abs(test_statistic), lower.tail = FALSE)
-
-  return(list(correlation_coefficient = correlation_coefficient,
-              test_statistic = test_statistic,
-              p_value = p_value,
-              lower_bound = lower_bound,
-              upper_bound = upper_bound))
+  # No analytic sampling distribution is supported for the clustered
+  # centered-score and cluster-mean Spearman estimands used by wbCorr.
+  list(correlation_coefficient = correlation_coefficient,
+       test_statistic = NA_real_,
+       p_value = NA_real_,
+       lower_bound = NA_real_,
+       upper_bound = NA_real_)
 }

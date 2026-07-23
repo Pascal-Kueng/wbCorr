@@ -1,7 +1,8 @@
 
 
 
-format_result_table <- function(result_table, method, auto_type, var_type, confidence_level, inference) {
+format_result_table <- function(result_table, method, auto_type, var_type,
+                                confidence_level, inference, level) {
 
   # For all
   ci_name <- paste0(confidence_level * 100, "% CI")
@@ -21,7 +22,12 @@ format_result_table <- function(result_table, method, auto_type, var_type, confi
       result_table$method <- NULL
       result_table[['statistic type']] <- NULL
     } else if (method == 'spearman') {
-      colnames(result_table)[colnames(result_table) == "coefficient"] <- "spearman's rho"
+      coefficient_name <- if (level == 'within') {
+        "centered-score Spearman rho"
+      } else {
+        "cluster-mean Spearman rho"
+      }
+      colnames(result_table)[colnames(result_table) == "coefficient"] <- coefficient_name
       if (inference != 'analytic') {
         result_table$statistic <- NULL
       } else {

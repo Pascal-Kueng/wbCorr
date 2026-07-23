@@ -31,32 +31,24 @@ custom_upper_panel <- function(x, y,
   y <- y[valid_pairs]
 
   # prepare Tile
-  if (var(x) == 0 | var(y) == 0 | is.na(var(x)) | is.na(var(y))) {
+  if (length(x) < 3L || var(x) == 0 | var(y) == 0 | is.na(var(x)) | is.na(var(y))) {
     msg = "NA"
   } else {
-    linear_regression <- lm(y ~ x, na.action = 'na.omit')
-    coef_value <- coef(linear_regression)[2]
-    coef_value <- sprintf("%.2f", coef_value)
+    p_value <- wbCorrObject$p_values[x_name, y_name]
+    stars <- p_value_to_asterisks(p_value)
 
-    if (is_weighted) {
-      stars <- ""
-      } else {
-      p_value <- summary(linear_regression)$coefficients[2, 4]
-      stars <- ""
-      if (p_value < 0.001) {
-        stars <- "***"
-      } else if (p_value < 0.01) {
-        stars <- "**"
-      } else if (p_value < 0.05) {
-        stars <- "*"
-      }
-    }
-
-
-    if (standardize) {
-      msg <- paste0("beta = ", coef_value, stars)
+    if (method == "spearman") {
+      coefficient <- wbCorrObject$correlations[x_name, y_name]
+      msg <- paste0("rho = ", sprintf("%.2f", coefficient), stars)
     } else {
-      msg <- paste("b = ", coef_value, stars)
+      linear_regression <- lm(y ~ x, na.action = 'na.omit')
+      coefficient <- coef(linear_regression)[2]
+      coefficient <- sprintf("%.2f", coefficient)
+      if (standardize) {
+        msg <- paste0("beta = ", coefficient, stars)
+      } else {
+        msg <- paste0("b = ", coefficient, stars)
+      }
     }
   }
 
@@ -65,4 +57,5 @@ custom_upper_panel <- function(x, y,
   y_middle <- (usr_coords[3] + usr_coords[4]) / 2
 
   text(x_middle, y_middle, msg, ...)
+  invisible(msg)
 }

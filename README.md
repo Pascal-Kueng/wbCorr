@@ -68,7 +68,7 @@ plot(correlations, "between")
 # Default coefficients with analytic, approximate p-values and CIs.
 wbCorr(simdat_intensive_longitudinal, cluster = "participantID")
 
-# Recommended for publication-level inference in EMA/daily diary data:
+# Whole-cluster resampling intervals for EMA/daily diary data:
 # resample participants and recompute all correlations.
 wbCorr(simdat_intensive_longitudinal,
        cluster = "participantID",
@@ -149,19 +149,25 @@ Var3 0.25***  0.79***     1.00
 
 For every variable pair, wbCorr computes the correlation on rows where both variables and the cluster variable are observed. This means missing data are handled pairwise for the bivariate association.
 
+When the cluster identifier is a column in the analysis data, prefer `cluster = "column_name"`. If a separate vector is supplied, wbCorr excludes any data column containing the same identifiers and missing-value pattern, allowing common integer, numeric, factor, or character representations; a named column avoids ambiguity with a genuine outcome that happens to contain the same values.
+
+Logical inputs are encoded as 0/1. Factors must declare exactly two levels and are encoded as 0/1 in their declared level order; character inputs must first be converted to factors so that this orientation is explicit. Other categorical factors are not accepted: use meaningful numeric scores for ordered variables or dummy-code nominal variables. Numeric `Inf`, `-Inf`, and `NaN` values are treated as missing before estimation.
+
 The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair. Pearson p-values use the corresponding t test, while confidence intervals use Fisher's z transformation and are always bounded by -1 and 1. These analytic results are working approximations for clustered data because residual pairs may still be dependent within clusters.
 
 The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. The ordinary Pearson t test and Fisher-z interval do not apply to this weighted coefficient, so wbCorr omits analytic p-values and confidence intervals for it. Use `inference = "cluster_bootstrap"` when weighted inference is required.
 
+With `method = "spearman"`, wbCorr reports Spearman's correlation of mean-centered scores within clusters and Spearman's correlation of cluster means between clusters. These are descriptive mean-based decompositions, not the transformation-invariant clustered rank parameters of Tu, Li, and Shepherd (2025). Analytic and row-wise jackknife inference are therefore not provided. Use `inference = "cluster_bootstrap"` for a whole-cluster bootstrap interval. Cluster-size-weighted Spearman is not supported because wbCorr does not currently define a weighted-rank estimand.
+
 The ICC shown for each variable is the one-way random-effects, single-measure ICC(1,1). wbCorr estimates it from all finite observations for that variable with the ANOVA method of moments, including the unequal-cluster-size adjustment. A sample ICC can be negative when the between-cluster mean square is smaller than the within-cluster mean square; wbCorr retains that information instead of truncating it to zero. Under severe imbalance the raw ANOVA estimate can be less than -1. Its population interpretation assumes independent clusters, a common within-cluster variance, and noninformative cluster size and missingness. The ICC is `NA` when there are too few clusters, no within-cluster replication, or no variability.
 
-For publication-level inference in intensive longitudinal data, prefer `inference = "cluster_bootstrap"`. This resamples whole top-level clusters, recomputes the selected decomposition in each bootstrap sample, and reports percentile bootstrap confidence intervals. Use `inference = "none"` to report coefficients without p-values or confidence intervals.
+For resampling intervals that preserve top-level dependence, use `inference = "cluster_bootstrap"`. This resamples whole top-level clusters, recomputes the selected decomposition in each bootstrap sample, and reports first-order percentile intervals. Their accuracy assumes independent clusters and adequate numbers of clusters and bootstrap replicates. The technical minimum of 10 replicates is useful only for quick tests; use substantially more and assess Monte Carlo stability for substantive analyses. Use `inference = "none"` to report coefficients without p-values or confidence intervals.
 
 By default, `centering_rows = "pairwise_complete"` estimates cluster means from the same complete-pair row set used for the correlation. This keeps the within residuals centered for the actual pairwise sample and makes the between correlation a correlation of matched pair-specific cluster means.
 
 Alternatively, `centering_rows = "all_available"` estimates each variable's cluster mean from all available rows for that variable. This can make each univariate cluster mean more stable when data are missing, and it mirrors a common multilevel-model preprocessing workflow where person means are created before the model applies complete-case filtering. That workflow is fine and defensible in multilevel models. In wbCorr, however, the variables are treated symmetrically as a descriptive bivariate decomposition, so all-available centering means the two cluster means in a pair may be based on different occasions. For that reason, pairwise-complete centering remains the default, and analytic inference with all-available centering is marked as approximate.
 
-> Note. This decomposition is generally not appropriate for categorical variables. Use variables that can be meaningfully centered around their means (e.g., interval- or ratio-scaled data).
+> Note. This decomposition supports binary indicators because their cluster means are interpretable proportions. Multi-level categorical variables require meaningful numeric scoring or dummy coding before use.
 
 ## Citation
 

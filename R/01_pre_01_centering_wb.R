@@ -25,6 +25,7 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     # Check if we have variables that may violate assumptions.
     assumptions <- check_assumptions(col, name, method)
     col <- assumptions$col
+    input_data[[name]] <- col
     var_type[[name]] <- assumptions$type
     warnings[[name]] <- assumptions$warning
 
@@ -51,6 +52,11 @@ wbCenter <- function(input_data, cluster_var, method, weighted_between_statistic
     if (weighted_between_statistics) {
       df_between[is.na(df_within[name]), name] <- NA
     }
+  }
+
+  if (ncol(input_data) < 2L) {
+    stop("data must contain at least two supported analysis variables after removing the cluster column.",
+         call. = FALSE)
   }
 
   if (weighted_between_statistics == FALSE) {

@@ -14,7 +14,7 @@ test_that("cluster can be passed as a column name or vector", {
   expect_false("participantID" %in% colnames(by_name@between$correlations))
 })
 
-test_that("main correlation methods return complete bundled-data output", {
+test_that("supported correlation methods return complete bundled-data output", {
   data("simdat_intensive_longitudinal")
 
   pearson <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
@@ -22,13 +22,9 @@ test_that("main correlation methods return complete bundled-data output", {
   spearman <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
                                       cluster = "participantID",
                                       method = "spearman"))
-  jackknife <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                       cluster = "participantID",
-                                       method = "spearman-jackknife"))
 
   expect_s4_class(pearson, "wbCorr")
   expect_s4_class(spearman, "wbCorr")
-  expect_s4_class(jackknife, "wbCorr")
 
   expect_equal(dim(pearson@within$correlations), c(4L, 4L))
   expect_equal(dim(pearson@between$correlations), c(4L, 4L))
@@ -37,8 +33,6 @@ test_that("main correlation methods return complete bundled-data output", {
 
   expect_equal(nrow(spearman@within$table), 6L)
   expect_equal(nrow(spearman@between$table), 6L)
-  expect_equal(nrow(jackknife@within$table), 6L)
-  expect_equal(nrow(jackknife@between$table), 6L)
 })
 
 test_that("within Pearson df accounts for estimated cluster means", {

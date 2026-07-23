@@ -34,27 +34,34 @@ wbcorr(
 )
 }
 \arguments{
-\item{data}{A dataframe containing numeric variables for which correlations will be calculated.}
+\item{data}{A data frame containing numeric variables, logical variables, or
+two-level factors for which correlations will be calculated.}
 
-\item{cluster}{A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.}
+\item{cluster}{An atomic vector with exactly one value per data row, or one
+string naming the cluster column in \code{data}. Missing identifiers are allowed,
+but at least one identifier must be observed; numeric identifiers cannot be
+\code{Inf}, \code{-Inf}, or \code{NaN}. When a vector is supplied, data columns containing
+the same identifiers and missing-value pattern are treated as duplicate
+cluster columns and excluded; pass a column name when the identifier is
+already in \code{data} to avoid ambiguity.}
 
 \item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
 \item{method}{A string indicating the correlation method to be used.
-Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
-(default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
-for p-values and Fisher's z transformation for confidence intervals.
-'spearman': Spearman correlation
-method uses the Fisher z-transformation for confidence intervals and p-values.
-'spearman-jackknife': Employs the Euclidean jackknife technique to compute
-confidence intervals, providing more robust confidence intervals in the presence of
-non-normal data or outliers. Note that p-values are not available
-when this method is selected.}
+Supported methods are \code{"pearson"}, \code{"spearman"}, and \code{"auto"} (default:
+\code{"pearson"}). Pearson uses t statistics and Fisher-z confidence intervals.
+Spearman reports a descriptive correlation of mean-centered scores within
+clusters and a correlation of cluster means between clusters. Analytic
+Spearman inference is unavailable; use \code{inference = "cluster_bootstrap"} for
+a whole-cluster bootstrap interval. The former \code{"spearman-jackknife"} option
+is rejected because deleting individual rows does not respect clustering.}
 
 \item{bootstrap}{Deprecated logical alias for
 \code{inference = "cluster_bootstrap"}.}
 
-\item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
+\item{nboot}{A whole number of bootstrap samples, at least 10 (default:
+1000). The minimum permits quick tests; use substantially more replicates
+for substantive analyses and assess Monte Carlo stability.}
 
 \item{inference}{A string specifying how p-values and confidence intervals
 are calculated. \code{"analytic"} uses the usual correlation-test approximation.
@@ -70,7 +77,9 @@ FALSE, \code{between_weighting = "equal_clusters"}.}
 \code{"equal_clusters"} correlates pair-specific cluster means with each cluster
 contributing equally. \code{"cluster_size"} computes a sample-size weighted
 correlation of pair-specific cluster means, using the number of complete
-observation pairs in each cluster as weights.}
+observation pairs in each cluster as weights. Cluster-size weighting is not
+supported with \code{method = "spearman"} because no weighted-rank estimand is
+currently defined.}
 
 \item{between_inference}{A string specifying whether between-cluster
 p-values and confidence intervals are calculated analytically (\code{"analytic"})
@@ -104,6 +113,14 @@ Calculates bivariate within- and between-cluster correlations for clustered
 data, such as repeated measures nested in persons, dyads, teams, or other
 groups. Only recommended for continuous or binary variables.
 
+Logical variables are encoded as 0/1. Factors must declare exactly two
+levels and are encoded as 0/1 in declared factor-level order, so reversing
+the levels reverses correlations with other variables. Character variables
+must first be converted to factors with an explicit two-level order. Other
+factors are not accepted; use meaningful numeric scores for ordered
+variables or dummy-code nominal variables. Numeric \code{Inf}, \code{-Inf}, and \code{NaN}
+values are treated as missing before centering and estimation.
+
 For every variable pair, correlations are computed on rows where both
 variables and the cluster variable are observed. By default,
 \code{centering_rows = "pairwise_complete"} also estimates cluster means from this
@@ -129,8 +146,8 @@ residuals. For Pearson within-cluster correlations, analytic inference uses
 \code{N_pair - k_pair - 1} degrees of freedom, where \code{N_pair} is the number of
 complete observation pairs and \code{k_pair} is the number of clusters
 contributing at least one complete pair. This analytic test is a working
-approximation because residual pairs can still be dependent within clusters;
-for publication-level inference in intensive longitudinal data, prefer
+approximation because residual pairs can still be dependent within clusters.
+For resampling intervals that preserve the top-level dependence, use
 \code{inference = "cluster_bootstrap"}.
 
 The between-cluster correlation is computed from pair-specific cluster means.
@@ -147,6 +164,15 @@ Pearson analytic confidence intervals use Fisher's z transformation. If
 standard error is \code{1 / sqrt(df - 1)}. The interval is unavailable when
 \code{df <= 1}.
 
+With \code{method = "spearman"}, the within coefficient is Spearman's correlation
+of the pairwise mean-centered scores and the between coefficient is
+Spearman's correlation of the pairwise cluster means. These are descriptive
+mean-based decompositions, not the conditional-ridit and median-centroid
+clustered rank parameters of Tu, Li, and Shepherd (2025), and need not be
+invariant to monotone transformations of the original observations. wbCorr
+therefore does not attach analytic p-values or confidence intervals to these
+coefficients. Whole-cluster bootstrap confidence intervals are available.
+
 For each variable, wbCorr also reports the one-way random-effects,
 single-measure ICC(1,1). It is estimated from all finite observations for
 that variable using the ANOVA method of moments and an effective cluster size
@@ -161,9 +187,11 @@ variability is zero.
 
 With \code{inference = "cluster_bootstrap"}, wbCorr resamples whole top-level
 clusters, recomputes the selected within- and between-cluster correlations,
-and reports percentile bootstrap confidence intervals. This keeps the
-package's descriptive estimands while avoiding row-level independence
-assumptions.
+and reports first-order percentile bootstrap confidence intervals. This
+keeps the package's descriptive estimands while avoiding row-level
+independence assumptions. Interval accuracy assumes independent clusters
+and adequate numbers of clusters and bootstrap replicates; the technical
+minimum of 10 replicates is not a recommendation for substantive analyses.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 extract, and plot within- and between-cluster correlations for further
@@ -211,6 +239,11 @@ plot(correlations, which = 'b')
 to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 
 
+}
+\references{
+Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
+within-cluster Spearman rank correlations. \emph{Statistics in Medicine}.
+\doi{10.1002/sim.10326}
 }
 \seealso{
 \code{\link[=get_table]{get_table}},
