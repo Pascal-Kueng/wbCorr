@@ -26,13 +26,17 @@ Depends:
     R (>= 3.5.0)
 Suggests: 
     httr,
+    knitr,
     psych,
+    rmarkdown,
     spelling,
     testthat (>= 3.0.0)
 Imports:
     methods, writexl
 Config/testthat/edition: 3
 Language: en-US
-URL: https://github.com/Pascal-Kueng/wbCorr
+URL: https://pascal-kueng.github.io/wbCorr/,
+    https://github.com/Pascal-Kueng/wbCorr
 BugReports: https://github.com/Pascal-Kueng/wbCorr/issues
 Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr

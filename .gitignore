@@ -2,3 +2,4 @@
 inst/doc
 wbCorr_*.tar.gz
 *.Rcheck
+docs/

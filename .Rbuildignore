@@ -6,3 +6,5 @@
 ^.*\.Rcheck$
 ^\.github$
 ^CITATION\.cff$
+^_pkgdown\.yml$
+^docs$
