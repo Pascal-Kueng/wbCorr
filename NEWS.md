@@ -40,12 +40,14 @@
   stored coefficient and p-value, and significance legends are omitted when
   p-values were not requested or are unavailable.
 * `to_excel()` now accepts a data frame or matrix directly, supports mixed
-  lists of tabular objects, and errors clearly when there is nothing to write.
+  lists of tabular objects, errors clearly when there is nothing to write, and
+  invisibly returns the supplied output path.
 
 ## Development and release preparation
 
-* Added reference tests against `psych::ICC()` and expanded automated R CMD
-  check coverage.
+* Added reference tests against `psych::statsBy()` for within- and
+  between-cluster correlations and ICC(1,1), and expanded automated
+  regression-test coverage.
 * Added a pkgdown website workflow and a vignette introducing the distinction
   between within- and between-cluster correlations.
 * Removed obsolete self-generated test fixtures, a generated plot file, and

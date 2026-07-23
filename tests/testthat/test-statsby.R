@@ -44,4 +44,9 @@ test_that("complete-data correlations agree with psych::statsBy", {
     unname(theirs$rbg[psych_between_names, psych_between_names]),
     tolerance = 1e-10
   )
+  expect_equal(
+    unname(ours@ICC$ICC),
+    unname(theirs$ICC1[variables]),
+    tolerance = 1e-10
+  )
 })
