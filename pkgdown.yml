@@ -1,0 +1,9 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  within-between-correlations: within-between-correlations.html
+last_built: 2026-07-23T09:40Z
+urls:
+  reference: https://pascal-kueng.github.io/wbCorr/reference
+  article: https://pascal-kueng.github.io/wbCorr/articles
