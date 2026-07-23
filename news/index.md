@@ -1,6 +1,6 @@
 # Changelog
 
-## wbCorr 0.3.2 (development version)
+## wbCorr 0.3.2
 
 ### Statistical correctness
 
