@@ -5,3 +5,7 @@
 ^wbCorr_.*\.tar\.gz$
 ^.*\.Rcheck$
 ^\.github$
+^CITATION\.cff$
+^_pkgdown\.yml$
+^docs$
+(^|/)Rplots\.(pdf|ps)$

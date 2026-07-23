@@ -7,9 +7,11 @@ Authors@R:
              comment = c(ORCID = "0000-0001-7346-9414")))
 Description: Separates supplied variables into within- and
     between-cluster components and calculates bivariate correlations for
-    each level separately. The centered-score decomposition corresponds
-    to commonly used between- and within-cluster correlations discussed
-    by Tu et al. (2025) <doi:10.1002/sim.10326>. The package is also
+    each level separately. For Pearson correlations, the centered-score
+    decomposition corresponds to commonly used between- and within-cluster
+    correlations reviewed by Tu et al. (2025) <doi:10.1002/sim.10326>.
+    The package's descriptive Spearman option is distinct from the clustered
+    rank parameters introduced in that paper. The package is also
     motivated by the distinction between within- and between-person
     variation described by Curran and Bauer (2011)
     <doi:10.1146/annurev.psych.093008.100356> and by Hamaker (2024)
@@ -24,12 +26,17 @@ Depends:
     R (>= 3.5.0)
 Suggests: 
     httr,
+    knitr,
+    psych,
+    rmarkdown,
     spelling,
     testthat (>= 3.0.0)
 Imports:
     methods, writexl
 Config/testthat/edition: 3
 Language: en-US
-URL: https://github.com/Pascal-Kueng/wbCorr
+URL: https://pascal-kueng.github.io/wbCorr/,
+    https://github.com/Pascal-Kueng/wbCorr
 BugReports: https://github.com/Pascal-Kueng/wbCorr/issues
 Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr

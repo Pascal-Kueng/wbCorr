@@ -2,22 +2,28 @@
 % Please edit documentation in R/06_export_to_excel.R
 \name{to_excel}
 \alias{to_excel}
-\title{Saves the passed summary or table to excel}
+\title{Save tables or matrices to Excel}
 \usage{
 to_excel(SummaryObject, path = file.path(getwd(), "wbCorr.xlsx"))
 }
 \arguments{
-\item{SummaryObject}{A summary or matrix object, such as those returned by \code{get_matrix()} or \code{get_table()}.}
+\item{SummaryObject}{A data frame, matrix, or list containing data frames
+and/or matrices, including objects returned by \code{\link[=get_matrix]{get_matrix()}} or
+\code{\link[=get_table]{get_table()}}. Row names are written to a \code{RowName} column.}
 
-\item{path}{Specify the filename and a path. If no path is provided, the file will be saved to the
-current working directory.}
+\item{path}{A single non-missing file path. If omitted, \code{wbCorr.xlsx} is
+written to the current working directory.}
 }
 \value{
-Writes an Excel file (.xlsx) to disk.
+The output path, invisibly. The function writes an Excel workbook to
+disk and errors if no data frame or matrix was supplied.
 }
 \description{
-Use \code{to_excel(get_matrix(wbCorrObject))} or \code{to_excel(get_table(wbCorrObject))} to save
-the provided table/matrix to an excel file.
+Use \code{to_excel(get_matrix(wbCorrObject))} or
+\code{to_excel(get_table(wbCorrObject))} to save wbCorr output. A single data
+frame or matrix can also be passed directly. Lists may contain any mixture
+of data frames and matrices; other list elements, such as explanatory notes
+returned by \code{\link[=get_matrix]{get_matrix()}}, are ignored.
 }
 \examples{
 # Importing our simulated example dataset with pre-specified within- and between- correlations
@@ -31,6 +37,10 @@ correlations <- wbCorr(data = simdat_intensive_longitudinal,
 matrices <- get_matrix(correlations) # summary(correlations) works too.
 
 to_excel(matrices, path = tempfile(fileext = ".xlsx"))
+
+# A data frame or matrix can be exported directly:
+to_excel(data.frame(x = 1:3), path = tempfile(fileext = ".xlsx"))
+to_excel(matrix(1:4, nrow = 2), path = tempfile(fileext = ".xlsx"))
 
 }
 \seealso{

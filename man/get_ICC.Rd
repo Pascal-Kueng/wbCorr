@@ -16,9 +16,16 @@ get_icc(object)
 \item{object}{A wbCorr object, created by the wbCorr() function.}
 }
 \value{
-A dataframe with ICCs for all variables. ICC is obtained by fitting
-mixed effects models and extracting the variance components. Then, the formula
-between- variance / total- variance is applied.
+A data frame with the one-way random-effects, single-measure
+ICC(1,1) for every variable. Each ICC is estimated separately from all finite
+observations with a non-missing cluster identifier. The ANOVA
+method-of-moments estimator uses an effective cluster size for unbalanced
+clusters. Negative sample estimates are retained and can be less than -1 in
+severely unbalanced samples. The population interpretation assumes
+independent clusters, a common within-cluster variance, and noninformative
+cluster size and missingness. \code{NA} is returned when an ICC cannot be estimated
+because there are fewer than two clusters, no within-cluster replication, or
+zero total variability.
 }
 \description{
 You can use get_ICC() or get_ICCs() interchangeably.
@@ -35,6 +42,21 @@ correlations <- wbCorr(data = simdat_intensive_longitudinal,
 ICCs <- get_ICC(correlations)
 print(ICCs)
 
+}
+\references{
+Shrout, P. E., & Fleiss, J. L. (1979). Intraclass correlations:
+Uses in assessing rater reliability. \emph{Psychological Bulletin, 86}(2),
+420-428. \doi{10.1037/0033-2909.86.2.420}
+
+Ohyama, T. (2025). A comparison of confidence interval methods for the
+intraclass correlation coefficient based on the one-way random effects
+model. \emph{Japanese Journal of Statistics and Data Science, 8}, 587-602.
+\doi{10.1007/s42081-025-00292-3}
+
+Wang, C.-M., Yandell, B. S., & Rutledge, J. J. (1992). The dilemma of
+negative analysis of variance estimators of intraclass correlation.
+\emph{Theoretical and Applied Genetics, 85}, 79-88.
+\doi{10.1007/BF00223848}
 }
 \seealso{
 \code{\link[=wbCorr]{wbCorr}}

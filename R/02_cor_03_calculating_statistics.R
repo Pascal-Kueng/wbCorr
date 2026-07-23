@@ -19,9 +19,14 @@ calculate_correlations_and_statistics <- function(col_i, col_j,
   if (!is.null(weights)) {
     correlation_coefficient <- weighted_cor(col_i, col_j, weights, method)
     if (method == 'pearson') {
-      return(cor_pearson_from_r(correlation_coefficient,
-                                degrees_freedom,
-                                confidence_level))
+      # The ordinary Pearson t and Fisher-z formulas assume an unweighted
+      # correlation of iid pairs. Keep the weighted estimand, but do not attach
+      # unsupported analytic inference to it.
+      return(list(correlation_coefficient = correlation_coefficient,
+                  test_statistic = NA_real_,
+                  p_value = NA_real_,
+                  lower_bound = NA_real_,
+                  upper_bound = NA_real_))
     } else if (method == 'spearman') {
       return(cor_spearman_from_r(correlation_coefficient,
                                  degrees_freedom,
@@ -45,7 +50,7 @@ weighted_cor <- function(col_i, col_j, weights, method = 'pearson') {
   col_j <- col_j[complete_cases]
   weights <- weights[complete_cases]
 
-  if (length(col_i) < 3 || sum(weights) <= 0) {
+  if (length(col_i) < 2 || sum(weights) <= 0) {
     return(NA_real_)
   }
 

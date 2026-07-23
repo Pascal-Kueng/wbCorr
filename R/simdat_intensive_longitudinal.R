@@ -1,8 +1,9 @@
 #' Simulated Intensive Longitudinal Dataset
 #'
 #' A simulated intensive longitudinal dataset to test the package capabilities.
-#' This dataset contains 80 participants, day, and three variables (var1, var2, and var3)
-#' that are all correlated on both within- and between-levels.
+#' This dataset contains 5,000 observations from 100 participants measured on
+#' 50 days, plus three variables (var1, var2, and var3) that are correlated at
+#' both the within- and between-person levels.
 #'
 #' The within-person correlations are all positive:
 #' \itemize{
@@ -25,7 +26,7 @@
 #'   \item var3 & time: 0.4
 #' }
 #'
-#' @format A data frame with the following columns:
+#' @format A data frame with 5,000 rows and the following five columns:
 #' \describe{
 #'   \item{participantID}{Identifier for each participant (integer)}
 #'   \item{day}{Day variable varying only within-person (integer)}

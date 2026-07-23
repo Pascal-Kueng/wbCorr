@@ -6,7 +6,7 @@
 # Helper function to convert p-values to stars
 p_value_to_asterisks <- function(p_value) {
   if (is.na(p_value)){
-    return(NULL)
+    return("")
   } else if (p_value < 0.001) {
     return("***")
   } else if (p_value < 0.01) {
@@ -14,7 +14,7 @@ p_value_to_asterisks <- function(p_value) {
   } else if (p_value < 0.05) {
     return("*")
   } else {
-    return(NULL)
+    return("")
   }
 }
 
@@ -31,7 +31,8 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
-  diag(df_summary) <- '1'
+  correlation_diagonal <- diag(as.matrix(correlations))
+  diag(df_summary) <- ifelse(is.na(correlation_diagonal), "NA", "1.00")
   return(as.data.frame(df_summary))
 }
 

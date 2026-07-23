@@ -14,7 +14,7 @@ test_that("cluster can be passed as a column name or vector", {
   expect_false("participantID" %in% colnames(by_name@between$correlations))
 })
 
-test_that("main correlation methods return complete bundled-data output", {
+test_that("supported correlation methods return complete bundled-data output", {
   data("simdat_intensive_longitudinal")
 
   pearson <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
@@ -22,13 +22,9 @@ test_that("main correlation methods return complete bundled-data output", {
   spearman <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
                                       cluster = "participantID",
                                       method = "spearman"))
-  jackknife <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                       cluster = "participantID",
-                                       method = "spearman-jackknife"))
 
   expect_s4_class(pearson, "wbCorr")
   expect_s4_class(spearman, "wbCorr")
-  expect_s4_class(jackknife, "wbCorr")
 
   expect_equal(dim(pearson@within$correlations), c(4L, 4L))
   expect_equal(dim(pearson@between$correlations), c(4L, 4L))
@@ -37,8 +33,6 @@ test_that("main correlation methods return complete bundled-data output", {
 
   expect_equal(nrow(spearman@within$table), 6L)
   expect_equal(nrow(spearman@between$table), 6L)
-  expect_equal(nrow(jackknife@within$table), 6L)
-  expect_equal(nrow(jackknife@between$table), 6L)
 })
 
 test_that("within Pearson df accounts for estimated cluster means", {
@@ -69,9 +63,10 @@ test_that("between weighting option is explicit and backwards compatible", {
   expect_equal(equal@settings$centering_rows, "pairwise_complete")
   expect_equal(weighted@settings$between_weighting, "cluster_size")
   expect_equal(alias@settings$between_weighting, "cluster_size")
+  expect_equal(weighted@settings$between_inference, "none")
   expect_equal(weighted@between$correlations, alias@between$correlations)
   expect_match(weighted@between$table$warning[4],
-               "weighted between inference approximate")
+               "weighted between analytic inference unavailable")
 })
 
 test_that("between inference can be omitted", {
@@ -85,6 +80,9 @@ test_that("between inference can be omitted", {
   expect_false(is.na(cors@between$correlations["var1", "var2"]))
   expect_true(is.na(cors@between$p_values["var1", "var2"]))
   expect_true(is.na(cors@between$confidence_intervals$CI_lower[4]))
+  expect_false(any(grepl("analytic inference unavailable",
+                         cors@between$table$warning,
+                         fixed = TRUE)))
 })
 
 test_that("analytic inference warns and cluster bootstrap returns bootstrap intervals", {
@@ -109,7 +107,8 @@ test_that("analytic inference warns and cluster bootstrap returns bootstrap inte
   expect_equal(boot@within$correlations, analytic@within$correlations)
   expect_equal(boot@between$correlations, analytic@between$correlations)
   expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@within$table))
-  expect_true("Cluster bootstrap p" %in% colnames(boot@within$table))
+  expect_false("Cluster bootstrap p" %in% colnames(boot@within$table))
+  expect_true(all(is.na(boot@within$p_values)))
   expect_false(is.na(boot@within$confidence_intervals$CI_lower[1]))
 })
 

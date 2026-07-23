@@ -16,7 +16,8 @@ wbCorr(
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
-  centering_rows = c("pairwise_complete", "all_available")
+  centering_rows = c("pairwise_complete", "all_available"),
+  missing_data = c("pairwise", "listwise")
 )
 
 wbcorr(
@@ -30,36 +31,46 @@ wbcorr(
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
-  centering_rows = c("pairwise_complete", "all_available")
+  centering_rows = c("pairwise_complete", "all_available"),
+  missing_data = c("pairwise", "listwise")
 )
 }
 \arguments{
-\item{data}{A dataframe containing numeric variables for which correlations will be calculated.}
+\item{data}{A data frame containing numeric variables, logical variables, or
+two-level factors for which correlations will be calculated.}
 
-\item{cluster}{A vector representing the clustering variable or a string with the name of the column in data that contains the clustering variable.}
+\item{cluster}{An atomic vector with exactly one value per data row, or one
+string naming the cluster column in \code{data}. Missing identifiers are allowed,
+but at least one identifier must be observed; numeric identifiers cannot be
+\code{Inf}, \code{-Inf}, or \code{NaN}. When a vector is supplied, data columns containing
+the same identifiers and missing-value pattern are treated as duplicate
+cluster columns and excluded; pass a column name when the identifier is
+already in \code{data} to avoid ambiguity.}
 
 \item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
 \item{method}{A string indicating the correlation method to be used.
-Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
-(default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
-to determine confidence intervals and p-values.'spearman': Spearman correlation
-method uses the Fisher z-transformation for confidence intervals and p-values.
-'spearman-jackknife': Employs the Euclidean jackknife technique to compute
-confidence intervals, providing more robust confidence intervals in the presence of
-non-normal data or outliers. Note that p-values are not available
-when this method is selected.}
+Supported methods are \code{"pearson"}, \code{"spearman"}, and \code{"auto"} (default:
+\code{"pearson"}). Pearson uses t statistics and Fisher-z confidence intervals.
+Spearman reports a descriptive correlation of mean-centered scores within
+clusters and a correlation of cluster means between clusters. Analytic
+Spearman inference is unavailable; use \code{inference = "cluster_bootstrap"} for
+a whole-cluster bootstrap interval. The former \code{"spearman-jackknife"} option
+is rejected because deleting individual rows does not respect clustering.}
 
 \item{bootstrap}{Deprecated logical alias for
 \code{inference = "cluster_bootstrap"}.}
 
-\item{nboot}{Specifies the amount of bootstrap samples (default: 1000).}
+\item{nboot}{A whole number of bootstrap samples, at least 10 (default:
+1000). The minimum permits quick tests; use substantially more replicates
+for substantive analyses and assess Monte Carlo stability.}
 
-\item{inference}{A string specifying how p-values and confidence intervals
-are calculated. \code{"analytic"} uses the usual correlation-test approximation.
-\code{"none"} returns coefficients without p-values or confidence intervals.
-\code{"cluster_bootstrap"} resamples top-level clusters with replacement and
-recomputes the full decomposition in each bootstrap sample.}
+\item{inference}{A string specifying inferential output. \code{"analytic"} uses
+the documented correlation-test approximation for Pearson p-values and
+confidence intervals. \code{"none"} returns coefficients only.
+\code{"cluster_bootstrap"} resamples top-level clusters with replacement,
+recomputes the full decomposition, and reports percentile confidence
+intervals. Bootstrap p-values are not reported.}
 
 \item{weighted_between_statistics}{Deprecated logical alias for
 \code{between_weighting}. If TRUE, \code{between_weighting = "cluster_size"}; if
@@ -69,14 +80,17 @@ FALSE, \code{between_weighting = "equal_clusters"}.}
 \code{"equal_clusters"} correlates pair-specific cluster means with each cluster
 contributing equally. \code{"cluster_size"} computes a sample-size weighted
 correlation of pair-specific cluster means, using the number of complete
-observation pairs in each cluster as weights.}
+observation pairs in each cluster as weights. Cluster-size weighting is not
+supported with \code{method = "spearman"} because no weighted-rank estimand is
+currently defined.}
 
 \item{between_inference}{A string specifying whether between-cluster
 p-values and confidence intervals are calculated analytically (\code{"analytic"})
-or omitted (\code{"none"}). Analytic inference for \code{"cluster_size"} weighted
-between correlations uses \code{k - 2} cluster-level degrees of freedom for
-Pearson correlations and is approximate. Ignored when
-\code{inference = "none"} or \code{inference = "cluster_bootstrap"}.}
+or omitted (\code{"none"}). Analytic inference is unavailable for
+\code{between_weighting = "cluster_size"}; wbCorr preserves the weighted
+coefficient but omits its p-value and confidence interval. Use
+\code{inference = "cluster_bootstrap"} for weighted between-cluster inference.
+Ignored when \code{inference = "none"} or \code{inference = "cluster_bootstrap"}.}
 
 \item{centering_rows}{A string specifying which rows are used to estimate
 cluster means for within- and between-cluster decomposition.
@@ -84,12 +98,19 @@ cluster means for within- and between-cluster decomposition.
 are observed. \code{"all_available"} estimates each variable's cluster mean from
 all available rows for that variable, then correlates the pair on complete
 rows.}
+
+\item{missing_data}{A string specifying whether correlations use all
+available pairs (\code{"pairwise"}, the default) or first retain only rows that
+are complete across every supported analysis variable and the cluster
+identifier (\code{"listwise"}). Listwise deletion provides a common multivariate
+sample for users who require a coherent correlation matrix, at the cost of
+discarding partially observed rows.}
 }
 \value{
 A wbCorr object that contains within- and between-cluster statistics.
 Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
-Use  get_ICC() in order to get all intra class correlations (ICC(1,1)).
+Use get_ICC() to retrieve all intraclass correlations (ICC(1,1)).
 Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
 }
 \description{
@@ -102,12 +123,49 @@ Calculates bivariate within- and between-cluster correlations for clustered
 data, such as repeated measures nested in persons, dyads, teams, or other
 groups. Only recommended for continuous or binary variables.
 
-For every variable pair, correlations are computed on rows where both
-variables and the cluster variable are observed. By default,
+Logical variables are encoded as 0/1. Factors must declare exactly two
+levels and are encoded as 0/1 in declared factor-level order, so reversing
+the levels reverses correlations with other variables. Character variables
+must first be converted to factors with an explicit two-level order. Other
+factors are not accepted; use meaningful numeric scores for ordered
+variables or dummy-code nominal variables. Numeric \code{Inf}, \code{-Inf}, and \code{NaN}
+values are treated as missing before centering and estimation.
+
+By default, \code{missing_data = "pairwise"}, and every variable-pair correlation
+is computed on rows where both variables and the cluster variable are
+observed. Because different pairs can then use different rows, a completed
+pairwise correlation matrix need not be positive semidefinite. wbCorr checks
+both unrounded level-specific matrices, warns when a matrix is not positive
+semidefinite, and exposes the result through \code{\link[=get_matrix_diagnostics]{get_matrix_diagnostics()}}.
+
+With \code{missing_data = "listwise"}, rows missing any supported analysis
+variable or the cluster identifier are removed before correlation
+decomposition and inference. This gives all pairs a common raw-row sample.
+ICCs keep their documented variable-wise finite-row samples and are not
+changed by this matrix-oriented option.
+With a single coefficient method (\code{"pearson"} or \code{"spearman"}) and common
+weights, the resulting complete correlation matrix is positive
+semidefinite up to numerical tolerance. \code{method = "auto"} can mix Pearson
+and Spearman entries, so listwise deletion alone cannot guarantee that its
+combined matrix is positive semidefinite; diagnostics are still reported.
+
+Under pairwise handling,
 \code{centering_rows = "pairwise_complete"} also estimates cluster means from this
 same complete-pair row set. This keeps the within residuals centered for the
 actual pairwise sample and makes the between correlation a correlation of
 matched pair-specific cluster means.
+
+Detailed tables always retain one row for every requested unordered pair.
+\code{n_obs} is the number of jointly observed raw rows with a nonmissing cluster
+identifier, and \code{n_clusters} is the number of clusters contributing at least
+one such row. Under \code{centering_rows = "all_available"}, additional unpaired
+rows can contribute to the variable-specific means, but \code{n_obs} remains the
+joint pair-row count. \code{status} describes coefficient estimability (\code{"ok"} or
+\code{"not_estimable"}) and \code{reason} gives a stable failure code.
+\code{inference_status} separately records \code{"not_requested"}, \code{"ok"},
+\code{"partial"}, or \code{"unavailable"}, with details in \code{inference_reason}.
+A descriptive coefficient requires two analysis units with positive
+variance; inferential output can require more.
 
 With \code{centering_rows = "all_available"}, each variable's cluster mean is
 estimated from all available rows for that variable before the pairwise
@@ -127,23 +185,67 @@ residuals. For Pearson within-cluster correlations, analytic inference uses
 \code{N_pair - k_pair - 1} degrees of freedom, where \code{N_pair} is the number of
 complete observation pairs and \code{k_pair} is the number of clusters
 contributing at least one complete pair. This analytic test is a working
-approximation because residual pairs can still be dependent within clusters;
-for publication-level inference in intensive longitudinal data, prefer
+approximation because residual pairs can still be dependent within clusters.
+For resampling intervals that preserve the top-level dependence, use
 \code{inference = "cluster_bootstrap"}.
 
 The between-cluster correlation is computed from pair-specific cluster means.
 With \code{between_weighting = "equal_clusters"}, every cluster contributes one
 equally weighted mean. With \code{between_weighting = "cluster_size"}, cluster
 means are weighted by the number of complete observation pairs in that
-cluster. Analytic p-values and confidence intervals for cluster-size weighted
-between correlations are approximate; use \code{between_inference = "none"} to
-report only the weighted coefficient.
+cluster. The ordinary Pearson t test and Fisher-z interval are not valid for
+a weighted correlation. Therefore analytic p-values and confidence intervals
+are omitted for cluster-size-weighted between correlations. Use
+\code{inference = "cluster_bootstrap"} when inference is required.
+
+Pearson analytic confidence intervals use Fisher's z transformation. If
+\code{df} denotes the corresponding t-test degrees of freedom, the Fisher-z
+standard error is \code{1 / sqrt(df - 1)}. The interval is unavailable when
+\code{df <= 1}.
+
+With \code{method = "spearman"}, the within coefficient is Spearman's correlation
+of the pairwise mean-centered scores and the between coefficient is
+Spearman's correlation of the pairwise cluster means. These are descriptive
+mean-based decompositions, not the conditional-ridit and median-centroid
+clustered rank parameters of Tu, Li, and Shepherd (2025), and need not be
+invariant to monotone transformations of the original observations. wbCorr
+therefore does not attach analytic p-values or confidence intervals to these
+coefficients. Whole-cluster bootstrap confidence intervals are available.
+
+For each variable, wbCorr also reports the one-way random-effects,
+single-measure ICC(1,1). It is estimated from all finite observations for
+that variable using the ANOVA method of moments and an effective cluster size
+when clusters are unbalanced. Negative sample ICCs are retained; they occur
+when the between-cluster mean square is smaller than the within-cluster mean
+square and, for severely unbalanced samples, the raw ANOVA estimate can be
+less than -1. Its population interpretation assumes the one-way random-effects
+model: independent clusters, a common within-cluster variance, and
+noninformative cluster size and missingness. The ICC is \code{NA} when the data do
+not contain enough clusters or within-cluster replication, or when total
+variability is zero.
 
 With \code{inference = "cluster_bootstrap"}, wbCorr resamples whole top-level
 clusters, recomputes the selected within- and between-cluster correlations,
-and reports percentile bootstrap confidence intervals. This keeps the
-package's descriptive estimands while avoiding row-level independence
-assumptions.
+and reports first-order percentile bootstrap confidence intervals. This
+keeps the package's descriptive estimands while avoiding row-level
+independence assumptions. Interval accuracy assumes independent clusters
+and adequate numbers of clusters and bootstrap replicates; the technical
+minimum of 10 valid replicates is not a recommendation for substantive
+analyses. \code{n_boot_attempted} and \code{n_boot_valid} report Monte Carlo yield.
+Bootstrap is skipped when fewer than three clusters contribute. An interval
+is unavailable with fewer than 10 finite replicate coefficients, and is
+marked \code{"partial"} when invalid replicates had to be excluded. No bootstrap
+p-value is reported because wbCorr does not currently implement a validated
+null-resampling test for these clustered estimands.
+
+Correlation-matrix diagonals are 1 only when the variable has at least two
+usable values and positive variance at that level; otherwise they are \code{NA}.
+P-value diagonals are always \code{NA}. Merged summary matrices continue to show
+the variable's ICC on the diagonal instead of a level-specific self-
+correlation.
+A matrix with any unavailable coefficient cannot be assessed as a complete
+positive-semidefinite correlation matrix and is reported as
+\code{"not_assessable"} rather than silently treated as valid.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 extract, and plot within- and between-cluster correlations for further
@@ -192,9 +294,30 @@ to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 
 
 }
+\references{
+Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
+within-cluster Spearman rank correlations. \emph{Statistics in Medicine}.
+\doi{10.1002/sim.10326}
+
+Hall, P., & Wilson, S. R. (1991). Two guidelines for bootstrap hypothesis
+testing. \emph{Biometrics, 47}(2), 757-762. \doi{10.2307/2532163}
+
+Martin, M. A. (2007). Bootstrap hypothesis testing for some common
+statistical problems: A critical evaluation of size and power properties.
+\emph{Computational Statistics & Data Analysis, 51}(12), 6321-6342.
+\doi{10.1016/j.csda.2007.01.020}
+
+Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
+the number of bootstrap repetitions. \emph{Econometrica, 68}(1), 23-51.
+\doi{10.1111/1468-0262.00092}
+
+R Core Team. Correlation, variance and covariance matrices. R statistical
+software documentation. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cor.html}
+}
 \seealso{
 \code{\link[=get_table]{get_table}},
 \code{\link[=summary.wbCorr]{summary}},
+\code{\link[=get_matrix_diagnostics]{get_matrix_diagnostics}},
 \code{\link[=get_ICC]{get_ICC}},
 \code{\link[=plot.wbCorr]{plot}},
 \code{\link[=to_excel]{to_excel}}
