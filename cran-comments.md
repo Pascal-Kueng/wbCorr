@@ -1,6 +1,9 @@
-## Submission
+## Update
 
 This is an update to wbCorr 0.3.1.
+It corrects Pearson analytic inference and the unequal-cluster-size ICC(1,1)
+calculation, strengthens validation and diagnostics, and expands tests and
+documentation.
 
 ## Test environments
 
