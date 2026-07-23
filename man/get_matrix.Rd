@@ -7,11 +7,21 @@
 \alias{summary.wbCorr}
 \title{Return matrices for within- and/or between-cluster correlations.}
 \usage{
-get_matrix(object, which = c("within", "between", "merge"), ...)
+get_matrix(
+  object,
+  which = c("within", "between", "merge"),
+  numeric = FALSE,
+  ...
+)
 
-get_matrices(object, which = c("within", "between", "merge"), ...)
+get_matrices(
+  object,
+  which = c("within", "between", "merge"),
+  numeric = FALSE,
+  ...
+)
 
-\S4method{summary}{wbCorr}(object, which = c("within", "between", "merge"), ...)
+\S4method{summary}{wbCorr}(object, which = c("within", "between", "merge"), numeric = FALSE, ...)
 }
 \arguments{
 \item{object}{A wbCorr object, created by the wbCorr() function.}
@@ -21,15 +31,27 @@ Options are 'within' or 'w', 'between' or 'b', and various merge options
 like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'.
 Default is c('within', 'between', 'merge').}
 
+\item{numeric}{A non-missing logical value. If \code{FALSE} (the default), return
+presentation-formatted character matrices with two decimal places and any
+available significance stars. If \code{TRUE}, return unrounded numeric
+correlation matrices. Numeric merged matrices contain unrounded ICCs on the
+diagonal.}
+
 \item{...}{Additional arguments passed to the base summary method}
 }
 \value{
-A list containing the selected matrices of within- and/or between-cluster correlations, and ICCs on the diagonals for merged matrices.
+A list containing the selected matrices of within- and/or
+between-cluster correlations, and ICCs on the diagonals for merged matrices.
+With \code{numeric = FALSE}, matrix entries are presentation-formatted character
+values. With \code{numeric = TRUE}, matrix columns are numeric and retain the
+full stored precision.
 }
 \description{
 You can use summary(), get_matrices(), or get_matrix() interchangeably.
 Merged matrices include the ICC on the diagonal.
-For more detailed statistics, use get_table().
+For more detailed statistics, use get_table(). By default, matrices are
+presentation-formatted with two decimal places and significance stars. Set
+\code{numeric = TRUE} to retrieve the stored, unrounded numeric coefficients.
 }
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -50,6 +72,10 @@ matrices$within
 within_matrix <- summary(correlations, which = 'w') # or use 'within'
 merged_within_between <- summary(correlations, which = 'wb')
 print(within_matrix) # could be saved to an excel or csv file (e.g., write.csv)
+
+# Retrieve unrounded numeric coefficients for downstream calculations:
+numeric_matrices <- get_matrix(correlations, numeric = TRUE)
+numeric_matrices$within
 
 }
 \seealso{

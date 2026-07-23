@@ -56,6 +56,12 @@
 #' are observed. `"all_available"` estimates each variable's cluster mean from
 #' all available rows for that variable, then correlates the pair on complete
 #' rows.
+#' @param missing_data A string specifying whether correlations use all
+#' available pairs (`"pairwise"`, the default) or first retain only rows that
+#' are complete across every supported analysis variable and the cluster
+#' identifier (`"listwise"`). Listwise deletion provides a common multivariate
+#' sample for users who require a coherent correlation matrix, at the cost of
+#' discarding partially observed rows.
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 #' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
@@ -76,8 +82,25 @@
 #' variables or dummy-code nominal variables. Numeric `Inf`, `-Inf`, and `NaN`
 #' values are treated as missing before centering and estimation.
 #'
-#' For every variable pair, correlations are computed on rows where both
-#' variables and the cluster variable are observed. By default,
+#' By default, `missing_data = "pairwise"`, and every variable-pair correlation
+#' is computed on rows where both variables and the cluster variable are
+#' observed. Because different pairs can then use different rows, a completed
+#' pairwise correlation matrix need not be positive semidefinite. wbCorr checks
+#' both unrounded level-specific matrices, warns when a matrix is not positive
+#' semidefinite, and exposes the result through [get_matrix_diagnostics()].
+#'
+#' With `missing_data = "listwise"`, rows missing any supported analysis
+#' variable or the cluster identifier are removed before correlation
+#' decomposition and inference. This gives all pairs a common raw-row sample.
+#' ICCs keep their documented variable-wise finite-row samples and are not
+#' changed by this matrix-oriented option.
+#' With a single coefficient method (`"pearson"` or `"spearman"`) and common
+#' weights, the resulting complete correlation matrix is positive
+#' semidefinite up to numerical tolerance. `method = "auto"` can mix Pearson
+#' and Spearman entries, so listwise deletion alone cannot guarantee that its
+#' combined matrix is positive semidefinite; diagnostics are still reported.
+#'
+#' Under pairwise handling,
 #' `centering_rows = "pairwise_complete"` also estimates cluster means from this
 #' same complete-pair row set. This keeps the within residuals centered for the
 #' actual pairwise sample and makes the between correlation a correlation of
@@ -171,6 +194,9 @@
 #' P-value diagonals are always `NA`. Merged summary matrices continue to show
 #' the variable's ICC on the diagonal instead of a level-specific self-
 #' correlation.
+#' A matrix with any unavailable coefficient cannot be assessed as a complete
+#' positive-semidefinite correlation matrix and is reported as
+#' `"not_assessable"` rather than silently treated as valid.
 #'
 #' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 #' extract, and plot within- and between-cluster correlations for further
@@ -192,9 +218,13 @@
 #' the number of bootstrap repetitions. *Econometrica, 68*(1), 23-51.
 #' \doi{10.1111/1468-0262.00092}
 #'
+#' R Core Team. Correlation, variance and covariance matrices. R statistical
+#' software documentation. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cor.html}
+#'
 #' @seealso
 #' \code{\link[=get_table]{get_table}},
 #' \code{\link[=summary.wbCorr]{summary}},
+#' \code{\link[=get_matrix_diagnostics]{get_matrix_diagnostics}},
 #' \code{\link[=get_ICC]{get_ICC}},
 #' \code{\link[=plot.wbCorr]{plot}},
 #' \code{\link[=to_excel]{to_excel}}
@@ -251,12 +281,14 @@ wbCorr <- function(data, cluster,
                    weighted_between_statistics = NULL,
                    between_weighting = c("equal_clusters", "cluster_size"),
                    between_inference = c("analytic", "none"),
-                   centering_rows = c("pairwise_complete", "all_available")) {
+                   centering_rows = c("pairwise_complete", "all_available"),
+                   missing_data = c("pairwise", "listwise")) {
 
   inference_missing <- missing(inference)
   between_weighting_missing <- missing(between_weighting)
   between_inference_missing <- missing(between_inference)
   centering_rows_missing <- missing(centering_rows)
+  missing_data_missing <- missing(missing_data)
 
   # input validation and preparation
   input_data <- data
@@ -312,6 +344,21 @@ wbCorr <- function(data, cluster,
     "centering_rows",
     centering_rows_missing
   )
+  missing_data <- resolve_wbcorr_choice(
+    missing_data,
+    c("pairwise", "listwise"),
+    "missing_data",
+    missing_data_missing
+  )
+
+  if (missing_data == "listwise" && centering_rows == "all_available") {
+    warning(paste0(
+      "centering_rows = 'all_available' is equivalent to ",
+      "'pairwise_complete' after listwise deletion; using ",
+      "'pairwise_complete'."
+    ), call. = FALSE)
+    centering_rows <- "pairwise_complete"
+  }
 
   if (inference == "cluster_bootstrap" && method == "spearman-jackknife") {
     stop("Use method = 'spearman' with inference = 'cluster_bootstrap'.")
@@ -351,11 +398,40 @@ wbCorr <- function(data, cluster,
                                            inference == "cluster_bootstrap")
   input_data <- remove_cluster_columns(input_data, cluster)
 
-  cluster <- 'cluster'
-
   # Split variance into between- and within
   centered_df <- wbCenter(input_data, cluster_var, method,
                           cluster_size_between)
+  icc_input_data <- centered_df$input_data_cleaned
+  icc_cluster_var <- cluster_var
+  validated_var_type <- centered_df$var_type
+  validated_warnings <- centered_df$warnings
+
+  if (missing_data == "listwise") {
+    cleaned_data <- centered_df$input_data_cleaned
+    complete_rows <- complete.cases(cleaned_data, cluster_var)
+    cleaned_data <- cleaned_data[complete_rows, , drop = FALSE]
+    cluster_var <- droplevels(as.factor(cluster_var[complete_rows]))
+
+    if (nrow(cleaned_data) > 0L) {
+      centered_df <- wbCenter(cleaned_data,
+                              cluster_var,
+                              method,
+                              cluster_size_between)
+    } else {
+      # Preserve the validated variables and warnings while allowing the normal
+      # pair-retention machinery to report every coefficient as unavailable.
+      empty_level_data <- data.frame(cluster = cluster_var,
+                                     cleaned_data,
+                                     check.names = FALSE)
+      centered_df$within <- empty_level_data
+      centered_df$between <- empty_level_data
+      centered_df$input_data_cleaned <- cleaned_data
+    }
+    # Coercion and assumption diagnostics describe the validated inputs, not
+    # only the subset that happened to survive global deletion.
+    centered_df$var_type <- validated_var_type
+    centered_df$warnings <- validated_warnings
+  }
 
   within_df <- centered_df$within[-1]
   between_df <- centered_df$between[-1]
@@ -363,7 +439,10 @@ wbCorr <- function(data, cluster,
   var_type <- centered_df$var_type
   warnings <- centered_df$warnings
 
-  centered_data <- list(within_df = within_df, between_df = between_df)
+  centered_data <- list(within_df = within_df,
+                        between_df = between_df,
+                        analysis_data = input_data_cleaned,
+                        cluster_var = cluster_var)
 
   if (method == 'auto') {
     auto_type <- TRUE
@@ -414,20 +493,41 @@ wbCorr <- function(data, cluster,
   within_table <- within_cors$result_table
   between_table <- between_cors$result_table
 
+  within_methods <- unique(within_table$method[within_table$status == "ok"])
+  between_methods <- unique(between_table$method[between_table$status == "ok"])
+  within_matrix_diagnostics <- correlation_matrix_diagnostics(
+    within_corr_coefs,
+    level = "within",
+    missing_data = missing_data,
+    guaranteed_by_construction = missing_data == "listwise" &&
+      length(within_methods) <= 1L
+  )
+  between_matrix_diagnostics <- correlation_matrix_diagnostics(
+    between_corr_coefs,
+    level = "between",
+    missing_data = missing_data,
+    guaranteed_by_construction = missing_data == "listwise" &&
+      length(between_methods) <= 1L
+  )
+  warn_non_psd_matrix(within_matrix_diagnostics)
+  warn_non_psd_matrix(between_matrix_diagnostics)
+
 
   # Calculate ICCs
-  ICC <- compute_icc1(input_data_cleaned, cluster_var)
+  ICC <- compute_icc1(icc_input_data, icc_cluster_var)
 
 
   # Store everything in three sections of the object
   within <- list(correlations = within_corr_coefs,
                  p_values = within_p_values,
                  confidence_intervals = within_confidence_intervals,
-                 table = within_table)
+                 table = within_table,
+                 matrix_diagnostics = within_matrix_diagnostics)
   between <- list(correlations = between_corr_coefs,
                   p_values = between_p_values,
                   confidence_intervals = between_confidence_intervals,
-                  table = between_table)
+                  table = between_table,
+                  matrix_diagnostics = between_matrix_diagnostics)
 
   # Store settings
   settings <- list(data = data, cluster = cluster,
@@ -441,6 +541,7 @@ wbCorr <- function(data, cluster,
                    between_weighting = between_weighting,
                    between_inference = between_inference,
                    centering_rows = centering_rows,
+                   missing_data = missing_data,
                    auto_type = auto_type,
                    var_type = var_type)
 
@@ -585,16 +686,20 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @title Plot within- and between associations
 #' @description Plots the centered variables of the provided data frame against
 #' each other. Choose either cluster means (`"between"`) or deviations from
-#' cluster means (`"within"`). Pearson plots include a regression line and
-#' slope; Spearman plots report rho without a linear-regression overlay.
+#' cluster means (`"within"`). Every panel uses the same pair-specific rows,
+#' centering rule, method, and between-cluster weights as the fitted object.
+#' Pearson plots draw a corresponding regression line and annotate the stored
+#' correlation; weighted between-cluster panels use weighted least squares.
+#' Spearman plots report the stored rho without a linear-regression overlay.
 #' Significance stars are shown only when the fitted wbCorr object contains a
 #' p-value for that pair.
 #' @param x A wbCorr object to be plotted.
 #' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
 #' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.
 #' @param plot_NA Boolean. Whether variables that have no variation on the selected level should be plotted or not.
-#' @param standardize Boolean. Whether the dataset should be standardized. If TRUE, the regression coefficient is equivalent to the pearson
-#' correlation.
+#' @param standardize Boolean. Whether each plotted pair should be standardized
+#' using the same weights as its fitted coefficient. For Pearson panels, this
+#' makes the displayed regression slope equal to the stored correlation.
 #' @param outlier_detection If FALSE, outliers will not be marked in red. Otherwise you may provide the method. Choose from: 'zscore', 'mad', or 'tukey'.
 #' @param outlier_threshold If 'recommended', the threshold for 'zscore' and 'mad' will be set to 3, and for 'tukey' to 1.5. You can provide and other numeric here.
 #' @param type points, lines, etc. see ?base::plot for available types).

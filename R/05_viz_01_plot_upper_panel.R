@@ -7,49 +7,25 @@ custom_upper_panel <- function(x, y,
                                df,
                                standardize,
                                plot_NA,
+                               plot_pairs = NULL,
                                ...) {
+  pair <- panel_pair_data(x, y, df, plot_pairs)
+  x_name <- pair$x_name
+  y_name <- pair$y_name
+  pair_method <- if (is.null(pair$method)) method else pair$method
 
-  # Find out variable names
-  x_idx <- x[1] * 100
-  y_idx <- y[1] * 100
-
-  x_name <- colnames(df)[x_idx]
-  y_name <- colnames(df)[y_idx]
-
-  # Find out type code
-  x_type <- decode_type(x[3])
-  y_type <- decode_type(y[3])
-
-  # remove coding from variables
-  x <- x[-c(1,2,3,4)]
-  y <- y[-c(1,2,3,4)]
-
-
-  # Valid pairs.
-  valid_pairs <- is.finite(x) & is.finite(y)
-  x <- x[valid_pairs]
-  y <- y[valid_pairs]
-
-  # prepare Tile
-  if (length(x) < 3L || var(x) == 0 | var(y) == 0 | is.na(var(x)) | is.na(var(y))) {
-    msg = "NA"
+  # The fitted object is authoritative for the annotation. Recomputing a
+  # regression coefficient here can silently switch estimands when centering
+  # is pair-specific or between-cluster means are weighted.
+  coefficient <- wbCorrObject$correlations[x_name, y_name]
+  if (length(coefficient) != 1L || !is.finite(coefficient)) {
+    msg <- "NA"
   } else {
     p_value <- wbCorrObject$p_values[x_name, y_name]
     stars <- p_value_to_asterisks(p_value)
-
-    if (method == "spearman") {
-      coefficient <- wbCorrObject$correlations[x_name, y_name]
-      msg <- paste0("rho = ", sprintf("%.2f", coefficient), stars)
-    } else {
-      linear_regression <- lm(y ~ x, na.action = 'na.omit')
-      coefficient <- coef(linear_regression)[2]
-      coefficient <- sprintf("%.2f", coefficient)
-      if (standardize) {
-        msg <- paste0("beta = ", coefficient, stars)
-      } else {
-        msg <- paste0("b = ", coefficient, stars)
-      }
-    }
+    coefficient_label <- if (pair_method == "spearman") "rho" else "r"
+    msg <- paste0(coefficient_label, " = ",
+                  sprintf("%.2f", coefficient), stars)
   }
 
   usr_coords <- par("usr")

@@ -16,7 +16,8 @@ wbCorr(
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
-  centering_rows = c("pairwise_complete", "all_available")
+  centering_rows = c("pairwise_complete", "all_available"),
+  missing_data = c("pairwise", "listwise")
 )
 
 wbcorr(
@@ -30,7 +31,8 @@ wbcorr(
   weighted_between_statistics = NULL,
   between_weighting = c("equal_clusters", "cluster_size"),
   between_inference = c("analytic", "none"),
-  centering_rows = c("pairwise_complete", "all_available")
+  centering_rows = c("pairwise_complete", "all_available"),
+  missing_data = c("pairwise", "listwise")
 )
 }
 \arguments{
@@ -96,6 +98,13 @@ cluster means for within- and between-cluster decomposition.
 are observed. \code{"all_available"} estimates each variable's cluster mean from
 all available rows for that variable, then correlates the pair on complete
 rows.}
+
+\item{missing_data}{A string specifying whether correlations use all
+available pairs (\code{"pairwise"}, the default) or first retain only rows that
+are complete across every supported analysis variable and the cluster
+identifier (\code{"listwise"}). Listwise deletion provides a common multivariate
+sample for users who require a coherent correlation matrix, at the cost of
+discarding partially observed rows.}
 }
 \value{
 A wbCorr object that contains within- and between-cluster statistics.
@@ -122,8 +131,25 @@ factors are not accepted; use meaningful numeric scores for ordered
 variables or dummy-code nominal variables. Numeric \code{Inf}, \code{-Inf}, and \code{NaN}
 values are treated as missing before centering and estimation.
 
-For every variable pair, correlations are computed on rows where both
-variables and the cluster variable are observed. By default,
+By default, \code{missing_data = "pairwise"}, and every variable-pair correlation
+is computed on rows where both variables and the cluster variable are
+observed. Because different pairs can then use different rows, a completed
+pairwise correlation matrix need not be positive semidefinite. wbCorr checks
+both unrounded level-specific matrices, warns when a matrix is not positive
+semidefinite, and exposes the result through \code{\link[=get_matrix_diagnostics]{get_matrix_diagnostics()}}.
+
+With \code{missing_data = "listwise"}, rows missing any supported analysis
+variable or the cluster identifier are removed before correlation
+decomposition and inference. This gives all pairs a common raw-row sample.
+ICCs keep their documented variable-wise finite-row samples and are not
+changed by this matrix-oriented option.
+With a single coefficient method (\code{"pearson"} or \code{"spearman"}) and common
+weights, the resulting complete correlation matrix is positive
+semidefinite up to numerical tolerance. \code{method = "auto"} can mix Pearson
+and Spearman entries, so listwise deletion alone cannot guarantee that its
+combined matrix is positive semidefinite; diagnostics are still reported.
+
+Under pairwise handling,
 \code{centering_rows = "pairwise_complete"} also estimates cluster means from this
 same complete-pair row set. This keeps the within residuals centered for the
 actual pairwise sample and makes the between correlation a correlation of
@@ -217,6 +243,9 @@ usable values and positive variance at that level; otherwise they are \code{NA}.
 P-value diagonals are always \code{NA}. Merged summary matrices continue to show
 the variable's ICC on the diagonal instead of a level-specific self-
 correlation.
+A matrix with any unavailable coefficient cannot be assessed as a complete
+positive-semidefinite correlation matrix and is reported as
+\code{"not_assessable"} rather than silently treated as valid.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
 extract, and plot within- and between-cluster correlations for further
@@ -281,10 +310,14 @@ statistical problems: A critical evaluation of size and power properties.
 Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
 the number of bootstrap repetitions. \emph{Econometrica, 68}(1), 23-51.
 \doi{10.1111/1468-0262.00092}
+
+R Core Team. Correlation, variance and covariance matrices. R statistical
+software documentation. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cor.html}
 }
 \seealso{
 \code{\link[=get_table]{get_table}},
 \code{\link[=summary.wbCorr]{summary}},
+\code{\link[=get_matrix_diagnostics]{get_matrix_diagnostics}},
 \code{\link[=get_ICC]{get_ICC}},
 \code{\link[=plot.wbCorr]{plot}},
 \code{\link[=to_excel]{to_excel}}

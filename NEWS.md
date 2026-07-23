@@ -27,14 +27,25 @@
   bootstrap yield diagnostics are reported.
 * Correlation-matrix diagonals are 1 only for variables with positive variance
   at the relevant level; otherwise they are `NA`.
-* Plotting now respects the selected between-cluster weighting and avoids
-  misleading significance legends when p-values were not requested or are not
-  available.
+* Added positive-semidefinite diagnostics for the unrounded within- and
+  between-cluster matrices. Pairwise matrices that are not positive
+  semidefinite now trigger a targeted warning, and `missing_data = "listwise"`
+  provides an optional common-row analysis.
+* `get_matrix(..., numeric = TRUE)` now returns unrounded numeric within,
+  between, and merged matrices, including unrounded ICC diagonals.
+* Plot panels now use the exact pair-specific rows, centering rule, method, and
+  between-cluster weights used by the fitted object. Annotations come from the
+  stored coefficient and p-value, and significance legends are omitted when
+  p-values were not requested or are unavailable.
+* `to_excel()` now accepts a data frame or matrix directly, supports mixed
+  lists of tabular objects, and errors clearly when there is nothing to write.
 
 ## Development and release preparation
 
 * Added reference tests against `psych::ICC()` and expanded automated R CMD
   check coverage.
+* Corrected the bundled-data documentation to report 5,000 observations from
+  100 participants measured over 50 days.
 * Added repository citation metadata and a DOI badge that use the permanent
   Zenodo concept DOI, `10.5281/zenodo.20357592`, rather than a release-specific
   DOI.

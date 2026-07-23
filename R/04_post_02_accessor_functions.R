@@ -61,16 +61,27 @@ get_tables <- get_table
 #' @title Return matrices for within- and/or between-cluster correlations.
 #' @description You can use summary(), get_matrices(), or get_matrix() interchangeably.
 #' Merged matrices include the ICC on the diagonal.
-#' For more detailed statistics, use get_table().
+#' For more detailed statistics, use get_table(). By default, matrices are
+#' presentation-formatted with two decimal places and significance stars. Set
+#' `numeric = TRUE` to retrieve the stored, unrounded numeric coefficients.
 #'
 #' @param object A wbCorr object, created by the wbCorr() function.
 #' @param which A string or a character vector indicating which summaries to return.
 #' Options are 'within' or 'w', 'between' or 'b', and various merge options
 #' like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'.
 #' Default is c('within', 'between', 'merge').
+#' @param numeric A non-missing logical value. If `FALSE` (the default), return
+#' presentation-formatted character matrices with two decimal places and any
+#' available significance stars. If `TRUE`, return unrounded numeric
+#' correlation matrices. Numeric merged matrices contain unrounded ICCs on the
+#' diagonal.
 #' @param ... Additional arguments passed to the base summary method
 #'
-#' @return A list containing the selected matrices of within- and/or between-cluster correlations, and ICCs on the diagonals for merged matrices.
+#' @return A list containing the selected matrices of within- and/or
+#' between-cluster correlations, and ICCs on the diagonals for merged matrices.
+#' With `numeric = FALSE`, matrix entries are presentation-formatted character
+#' values. With `numeric = TRUE`, matrix columns are numeric and retain the
+#' full stored precision.
 #' @seealso \code{\link[=get_table]{get_tables}}, \code{\link[=wbCorr]{wbCorr}}
 #' @examples
 #' # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -92,28 +103,56 @@ get_tables <- get_table
 #' merged_within_between <- summary(correlations, which = 'wb')
 #' print(within_matrix) # could be saved to an excel or csv file (e.g., write.csv)
 #'
+#' # Retrieve unrounded numeric coefficients for downstream calculations:
+#' numeric_matrices <- get_matrix(correlations, numeric = TRUE)
+#' numeric_matrices$within
+#'
 #' @export
-get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
+get_matrix <- function(object, which = c('within', 'between', 'merge'),
+                       numeric = FALSE, ...) {
+  if (!is.logical(numeric) || length(numeric) != 1L || is.na(numeric)) {
+    stop("numeric must be one non-missing logical value.", call. = FALSE)
+  }
+
   which <- match.arg(which, choices = c('within', 'w',
                                         'between', 'b',
                                         'merge','m', 'merged',
                                         'merge_bw', 'bw',
                                         'merge_wb', 'wb'), several.ok = TRUE) # Check for valid inputs
 
-  df_summary_within <- summarize_table(
-    object@within$p_values,
-    object@within$correlations)
+  if (numeric) {
+    df_summary_within <- numeric_correlation_data_frame(
+      object@within$correlations
+    )
+    df_summary_between <- numeric_correlation_data_frame(
+      object@between$correlations
+    )
+    combined_df_wb <- combine_numeric_matrices(
+      df_summary_within,
+      df_summary_between,
+      object@ICC
+    )
+    combined_df_bw <- combine_numeric_matrices(
+      df_summary_between,
+      df_summary_within,
+      object@ICC
+    )
+  } else {
+    df_summary_within <- summarize_table(
+      object@within$p_values,
+      object@within$correlations)
 
-  df_summary_between <- summarize_table(
-    object@between$p_values,
-    object@between$correlations)
+    df_summary_between <- summarize_table(
+      object@between$p_values,
+      object@between$correlations)
 
-  combined_df_wb <- combine_matrices(as.matrix(df_summary_within),
-                                     as.matrix(df_summary_between),
-                                     object@ICC)
-  combined_df_bw <- combine_matrices(as.matrix(df_summary_between),
-                                     as.matrix(df_summary_within),
-                                     object@ICC)
+    combined_df_wb <- combine_matrices(as.matrix(df_summary_within),
+                                       as.matrix(df_summary_between),
+                                       object@ICC)
+    combined_df_bw <- combine_matrices(as.matrix(df_summary_between),
+                                       as.matrix(df_summary_within),
+                                       object@ICC)
+  }
 
   return_list <- list()
   if ('within' %in% which | 'w' %in% which) {
@@ -138,11 +177,36 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),...) {
     diag(p_matrix) <- NA_real_
     any(is.finite(p_matrix))
   }
-  if (has_off_diagonal_p(object@within$p_values) ||
-      has_off_diagonal_p(object@between$p_values)) {
+  if (!numeric &&
+      (has_off_diagonal_p(object@within$p_values) ||
+       has_off_diagonal_p(object@between$p_values))) {
     return_list[['note']] <- '***p < 0.001, **p < 0.01, *p < 0.05'
   }
   return(return_list)
+}
+
+
+numeric_correlation_data_frame <- function(correlations) {
+  correlation_matrix <- as.matrix(correlations)
+  storage.mode(correlation_matrix) <- "double"
+  as.data.frame(correlation_matrix, check.names = FALSE)
+}
+
+
+combine_numeric_matrices <- function(upper_matrix, lower_matrix, ICC) {
+  combined_matrix <- as.matrix(upper_matrix)
+  lower_values <- as.matrix(lower_matrix)
+  combined_matrix[lower.tri(combined_matrix)] <-
+    lower_values[lower.tri(lower_values)]
+
+  icc_match <- match(rownames(combined_matrix), ICC$variable)
+  diagonal_values <- diag(combined_matrix)
+  has_icc <- !is.na(icc_match)
+  diagonal_values[has_icc] <- ICC$ICC[icc_match[has_icc]]
+  diag(combined_matrix) <- diagonal_values
+
+  storage.mode(combined_matrix) <- "double"
+  as.data.frame(combined_matrix, check.names = FALSE)
 }
 
 

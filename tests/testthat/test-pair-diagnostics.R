@@ -262,6 +262,12 @@ test_that("bootstrap diagnostics distinguish attempted, valid, and skipped draws
                    "unavailable")
   expect_identical(too_few_valid@between$table$inference_reason,
                    "fewer_than_ten_valid_bootstrap_replicates")
+  point_estimate <- wbCorr(dat, "id", inference = "none")
+  expect_equal(too_few_valid@between$correlations["x", "y"],
+               point_estimate@between$correlations["x", "y"])
+  expect_match(too_few_valid@between$table$warning,
+               "7 of 10 cluster-bootstrap replicates")
+  expect_true(is.na(too_few_valid@between$p_values["x", "y"]))
   expect_true(is.na(too_few_valid@between$confidence_intervals$CI_lower))
   expect_true(is.na(too_few_valid@between$confidence_intervals$CI_upper))
 
