@@ -42,6 +42,7 @@ to_excel <- function(SummaryObject,
 
   sheets <- prepare_excel_sheets(SummaryObject)
   writexl::write_xlsx(sheets, path)
+  invisible(path)
 }
 
 
