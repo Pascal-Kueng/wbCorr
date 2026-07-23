@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use wbCorr, please cite it using the metadata below."
+title: "wbCorr: Bivariate Within- and Between-Cluster Correlations"
+type: software
+authors:
+  - family-names: "Küng"
+    given-names: "Pascal"
+    orcid: "https://orcid.org/0000-0001-7346-9414"
+doi: "10.5281/zenodo.20357592"
+version: "0.3.1.9000"
+repository-code: "https://github.com/Pascal-Kueng/wbCorr"
+url: "https://pascal-kueng.github.io/wbCorr/"
+license: MIT
+keywords:
+  - correlation
+  - clustered data
+  - longitudinal data
+  - multilevel analysis
+  - within-cluster correlation
+  - between-cluster correlation
