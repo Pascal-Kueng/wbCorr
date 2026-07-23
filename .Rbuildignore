@@ -5,3 +5,4 @@
 ^wbCorr_.*\.tar\.gz$
 ^.*\.Rcheck$
 ^\.github$
+^CITATION\.cff$

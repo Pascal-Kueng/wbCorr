@@ -235,7 +235,7 @@ prepare_wb_plot_data <- function(wbCorrObject,
 
 
 #' @importFrom graphics abline pairs par points text
-#' @importFrom stats coef lm median sd
+#' @importFrom stats coef lm median sd setNames
 wb_plot <- function(x, y, which = NULL,
                     plot_NA = TRUE,
                     standardize = TRUE,
