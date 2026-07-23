@@ -1,22 +1,20 @@
-## Resubmission
+## Update
 
-This is a resubmission. In this version I have:
+This is an update to wbCorr 0.3.1.
+It corrects Pearson analytic inference and the unequal-cluster-size ICC(1,1)
+calculation, strengthens validation and diagnostics, and expands tests and
+documentation.
 
-* Removed the redundant phrase "The wbCorr package" from the Description field.
-* Added methodological references to the Description field:
-  Tu et al. (2025) <doi:10.1002/sim.10326>,
-  Curran and Bauer (2011) <doi:10.1146/annurev.psych.093008.100356>, and
-  Hamaker (2024) <doi:10.1080/00273171.2022.2155930>.
-* Added missing \value documentation for exported plot, print, and show
-  methods.
-* Replaced \dontrun{} with \donttest{} in the wbCorr examples.
-* Removed internal set.seed() calls from jackknife and bootstrap helper
-  functions.
+## Test environments
+
+* Fedora Linux 44, R 4.6.1 (`R CMD check --as-cran --run-donttest`)
+* GitHub Actions: macOS, Windows, and Ubuntu; R-devel, release, and oldrel-1
+* win-builder: R-devel (submitted; result pending)
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 notes
 
-* New submission
+## Downstream dependencies
 
-The NOTE is expected because this package is not yet on CRAN.
+There are currently no downstream dependencies for wbCorr.

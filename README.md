@@ -153,7 +153,7 @@ Alternatively, `centering_rows = "all_available"` estimates each variable's clus
 
 Please cite the CRAN release as:
 
-> Küng, P. (2026). *wbCorr: Bivariate Within- and Between-Cluster Correlations* (R package version 0.3.1). [https://doi.org/10.32614/CRAN.package.wbCorr](https://doi.org/10.32614/CRAN.package.wbCorr)
+> Küng, P. (2026). *wbCorr: Bivariate Within- and Between-Cluster Correlations* (R package version 0.3.2). [https://doi.org/10.32614/CRAN.package.wbCorr](https://doi.org/10.32614/CRAN.package.wbCorr)
 
 The version-independent Zenodo concept DOI for the repository is
 [10.5281/zenodo.20357592](https://doi.org/10.5281/zenodo.20357592). It resolves
