@@ -24,6 +24,7 @@ Depends:
     R (>= 3.5.0)
 Suggests: 
     httr,
+    psych,
     spelling,
     testthat (>= 3.0.0)
 Imports:

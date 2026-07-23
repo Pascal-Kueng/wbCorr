@@ -17,6 +17,7 @@ corAndPValues <- function(input_data,
                           level = c('plain', 'within', 'between'),
                           between_weighting = c('equal_clusters', 'cluster_size'),
                           between_inference = c('analytic', 'none'),
+                          weighted_analytic_requested = FALSE,
                           centering_rows = c('pairwise_complete', 'all_available'),
                           inference = c('analytic', 'none', 'cluster_bootstrap')) {
   level <- match.arg(level)
@@ -131,8 +132,14 @@ corAndPValues <- function(input_data,
       statistic_type <- NA
     }
 
+    weighted_between_analytic <- level == 'between' &&
+      between_weighting == 'cluster_size' &&
+      inference == 'analytic' &&
+      (between_inference == 'analytic' || weighted_analytic_requested)
+
     if (inference == 'none' ||
-        (level == 'between' && between_inference == 'none')) {
+        (level == 'between' && between_inference == 'none') ||
+        weighted_between_analytic) {
       cor_method <- if (method_selected == 'spearman-jackknife') {
         'spearman'
       } else {
@@ -187,13 +194,9 @@ corAndPValues <- function(input_data,
     lower_bound <- correlations_statistics_list$lower_bound
     upper_bound <- correlations_statistics_list$upper_bound
 
-    if (level == 'between' &&
-        between_weighting == 'cluster_size' &&
-        inference == 'analytic' &&
-        between_inference == 'analytic' &&
-        method_selected != 'spearman-jackknife') {
+    if (weighted_between_analytic) {
       auto_warning <- append_cor_warning(auto_warning,
-                                         'weighted between inference approximate')
+                                         'weighted between analytic inference unavailable; coefficient only')
     }
 
     if (centering_rows == 'all_available' &&

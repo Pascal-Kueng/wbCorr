@@ -10,7 +10,8 @@
 #' @param method A string indicating the correlation method to be used.
 #' Supported methods are 'pearson', 'spearman', and 'spearman-jackknife'.
 #' (default: 'pearson'). 'pearson': Pearson correlation method uses t-statistics
-#' to determine confidence intervals and p-values.'spearman': Spearman correlation
+#' for p-values and Fisher's z transformation for confidence intervals.
+#' 'spearman': Spearman correlation
 #' method uses the Fisher z-transformation for confidence intervals and p-values.
 #' 'spearman-jackknife': Employs the Euclidean jackknife technique to compute
 #' confidence intervals, providing more robust confidence intervals in the presence of
@@ -34,10 +35,11 @@
 #' observation pairs in each cluster as weights.
 #' @param between_inference A string specifying whether between-cluster
 #' p-values and confidence intervals are calculated analytically (`"analytic"`)
-#' or omitted (`"none"`). Analytic inference for `"cluster_size"` weighted
-#' between correlations uses `k - 2` cluster-level degrees of freedom for
-#' Pearson correlations and is approximate. Ignored when
-#' `inference = "none"` or `inference = "cluster_bootstrap"`.
+#' or omitted (`"none"`). Analytic inference is unavailable for
+#' `between_weighting = "cluster_size"`; wbCorr preserves the weighted
+#' coefficient but omits its p-value and confidence interval. Use
+#' `inference = "cluster_bootstrap"` for weighted between-cluster inference.
+#' Ignored when `inference = "none"` or `inference = "cluster_bootstrap"`.
 #' @param centering_rows A string specifying which rows are used to estimate
 #' cluster means for within- and between-cluster decomposition.
 #' `"pairwise_complete"` uses only rows where both variables in the current pair
@@ -47,7 +49,7 @@
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
 #' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
-#' Use  get_ICC() in order to get all intra class correlations (ICC(1,1)).
+#' Use get_ICC() to retrieve all intraclass correlations (ICC(1,1)).
 #' Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
 #'
 #' @description
@@ -89,9 +91,27 @@
 #' With `between_weighting = "equal_clusters"`, every cluster contributes one
 #' equally weighted mean. With `between_weighting = "cluster_size"`, cluster
 #' means are weighted by the number of complete observation pairs in that
-#' cluster. Analytic p-values and confidence intervals for cluster-size weighted
-#' between correlations are approximate; use `between_inference = "none"` to
-#' report only the weighted coefficient.
+#' cluster. The ordinary Pearson t test and Fisher-z interval are not valid for
+#' a weighted correlation. Therefore analytic p-values and confidence intervals
+#' are omitted for cluster-size-weighted between correlations. Use
+#' `inference = "cluster_bootstrap"` when inference is required.
+#'
+#' Pearson analytic confidence intervals use Fisher's z transformation. If
+#' `df` denotes the corresponding t-test degrees of freedom, the Fisher-z
+#' standard error is `1 / sqrt(df - 1)`. The interval is unavailable when
+#' `df <= 1`.
+#'
+#' For each variable, wbCorr also reports the one-way random-effects,
+#' single-measure ICC(1,1). It is estimated from all finite observations for
+#' that variable using the ANOVA method of moments and an effective cluster size
+#' when clusters are unbalanced. Negative sample ICCs are retained; they occur
+#' when the between-cluster mean square is smaller than the within-cluster mean
+#' square and, for severely unbalanced samples, the raw ANOVA estimate can be
+#' less than -1. Its population interpretation assumes the one-way random-effects
+#' model: independent clusters, a common within-cluster variance, and
+#' noninformative cluster size and missingness. The ICC is `NA` when the data do
+#' not contain enough clusters or within-cluster replication, or when total
+#' variability is zero.
 #'
 #' With `inference = "cluster_bootstrap"`, wbCorr resamples whole top-level
 #' clusters, recomputes the selected within- and between-cluster correlations,
@@ -199,6 +219,17 @@ wbCorr <- function(data, cluster,
   between_weighting <- match.arg(between_weighting)
   between_inference <- match.arg(between_inference)
   centering_rows <- match.arg(centering_rows)
+
+  weighted_analytic_requested <- inference == "analytic" &&
+    between_weighting == "cluster_size" &&
+    between_inference == "analytic"
+
+  if (weighted_analytic_requested) {
+    warning("Analytic inference is not supported for cluster-size-weighted between correlations; returning the weighted coefficient without a p-value or confidence interval. Use inference = 'cluster_bootstrap' for weighted inference.",
+            call. = FALSE)
+    between_inference <- "none"
+  }
+
   cluster_size_between <- between_weighting == "cluster_size"
 
   cluster_var <- input_validation_and_prep(input_data, cluster, method,
@@ -251,6 +282,7 @@ wbCorr <- function(data, cluster,
                                 level = 'between',
                                 between_weighting = between_weighting,
                                 between_inference = between_inference,
+                                weighted_analytic_requested = weighted_analytic_requested,
                                 centering_rows = centering_rows,
                                 inference = inference)
 
@@ -268,7 +300,7 @@ wbCorr <- function(data, cluster,
 
 
   # Calculate ICCs
-  ICC <- compute_ICC1_alt(within_df, input_data)
+  ICC <- compute_icc1(input_data_cleaned, cluster_var)
 
 
   # Store everything in three sections of the object
@@ -312,7 +344,7 @@ wbCorr <- function(data, cluster,
 #######################################################
 #' @importFrom methods show
 #' @importFrom methods new
-#' @importFrom stats ave complete.cases cor pt qt
+#' @importFrom stats ave complete.cases cor pt
 #' @importFrom utils combn head
 #' @title wbCorr Class
 #'

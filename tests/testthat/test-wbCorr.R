@@ -69,9 +69,10 @@ test_that("between weighting option is explicit and backwards compatible", {
   expect_equal(equal@settings$centering_rows, "pairwise_complete")
   expect_equal(weighted@settings$between_weighting, "cluster_size")
   expect_equal(alias@settings$between_weighting, "cluster_size")
+  expect_equal(weighted@settings$between_inference, "none")
   expect_equal(weighted@between$correlations, alias@between$correlations)
   expect_match(weighted@between$table$warning[4],
-               "weighted between inference approximate")
+               "weighted between analytic inference unavailable")
 })
 
 test_that("between inference can be omitted", {
@@ -85,6 +86,9 @@ test_that("between inference can be omitted", {
   expect_false(is.na(cors@between$correlations["var1", "var2"]))
   expect_true(is.na(cors@between$p_values["var1", "var2"]))
   expect_true(is.na(cors@between$confidence_intervals$CI_lower[4]))
+  expect_false(any(grepl("analytic inference unavailable",
+                         cors@between$table$warning,
+                         fixed = TRUE)))
 })
 
 test_that("analytic inference warns and cluster bootstrap returns bootstrap intervals", {

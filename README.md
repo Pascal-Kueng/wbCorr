@@ -104,13 +104,13 @@ $within
   Parameter1 Parameter2    r       95% CI t(1598)         p
 1       Var1       Var2 0.08 [0.03, 0.13]    3.25   0.001**
 2       Var1       Var3 0.25 [0.21, 0.30]   10.44 < .001***
-3       Var2       Var3 0.79 [0.76, 0.82]   50.89 < .001***
+3       Var2       Var3 0.79 [0.77, 0.80]   50.89 < .001***
 
 $between
   Parameter1 Parameter2     r         95% CI t(78)         p
-1       Var1       Var2 -0.59 [-0.77, -0.41] -6.48 < .001***
-2       Var1       Var3 -0.38 [-0.59, -0.17] -3.65 < .001***
-3       Var2       Var3 -0.03  [-0.25, 0.20] -0.24     0.814
+1       Var1       Var2 -0.59 [-0.72, -0.43] -6.48 < .001***
+2       Var1       Var3 -0.38 [-0.56, -0.18] -3.65 < .001***
+3       Var2       Var3 -0.03  [-0.25, 0.19] -0.24     0.814
 ```
 
 #### Sample output from `summary()` or `get_matrix()`
@@ -149,9 +149,11 @@ Var3 0.25***  0.79***     1.00
 
 For every variable pair, wbCorr computes the correlation on rows where both variables and the cluster variable are observed. This means missing data are handled pairwise for the bivariate association.
 
-The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair. These analytic tests are working approximations for clustered data because residual pairs may still be dependent within clusters.
+The within-cluster correlation is the pooled residual correlation: each observed value is centered around its cluster mean for that same variable pair, and the correlation is computed on those residuals. For Pearson within-cluster correlations, analytic tests use `N_pair - k_pair - 1` degrees of freedom, where `N_pair` is the number of complete observation pairs and `k_pair` is the number of clusters contributing at least one complete pair. Pearson p-values use the corresponding t test, while confidence intervals use Fisher's z transformation and are always bounded by -1 and 1. These analytic results are working approximations for clustered data because residual pairs may still be dependent within clusters.
 
-The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster.
+The between-cluster correlation is computed from cluster means. By default, `between_weighting = "equal_clusters"` gives every cluster the same weight. Use `between_weighting = "cluster_size"` to compute a sample-size weighted correlation of cluster means, where the weight is the number of complete observation pairs in each cluster. The ordinary Pearson t test and Fisher-z interval do not apply to this weighted coefficient, so wbCorr omits analytic p-values and confidence intervals for it. Use `inference = "cluster_bootstrap"` when weighted inference is required.
+
+The ICC shown for each variable is the one-way random-effects, single-measure ICC(1,1). wbCorr estimates it from all finite observations for that variable with the ANOVA method of moments, including the unequal-cluster-size adjustment. A sample ICC can be negative when the between-cluster mean square is smaller than the within-cluster mean square; wbCorr retains that information instead of truncating it to zero. Under severe imbalance the raw ANOVA estimate can be less than -1. Its population interpretation assumes independent clusters, a common within-cluster variance, and noninformative cluster size and missingness. The ICC is `NA` when there are too few clusters, no within-cluster replication, or no variability.
 
 For publication-level inference in intensive longitudinal data, prefer `inference = "cluster_bootstrap"`. This resamples whole top-level clusters, recomputes the selected decomposition in each bootstrap sample, and reports percentile bootstrap confidence intervals. Use `inference = "none"` to report coefficients without p-values or confidence intervals.
 

@@ -49,7 +49,7 @@ test_that("between weighting is explicit and based on pair-specific cluster mean
   expect_equal(alias@between$correlations, weighted@between$correlations)
   expect_equal(equal@between$table$df, nrow(means) - 2)
   expect_match(weighted@between$table$warning,
-               "weighted between inference approximate")
+               "weighted between analytic inference unavailable")
 })
 
 test_that("all_available centering uses variable-specific cluster mean rows", {
