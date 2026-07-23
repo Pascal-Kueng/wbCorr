@@ -50,13 +50,15 @@
   are unavailable.
 - [`to_excel()`](https://pascal-kueng.github.io/wbCorr/reference/to_excel.md)
   now accepts a data frame or matrix directly, supports mixed lists of
-  tabular objects, and errors clearly when there is nothing to write.
+  tabular objects, errors clearly when there is nothing to write, and
+  invisibly returns the supplied output path.
 
 ### Development and release preparation
 
 - Added reference tests against
-  [`psych::ICC()`](https://rdrr.io/pkg/psych/man/ICC.html) and expanded
-  automated R CMD check coverage.
+  [`psych::statsBy()`](https://rdrr.io/pkg/psych/man/statsBy.html) for
+  within- and between-cluster correlations and ICC(1,1), and expanded
+  automated regression-test coverage.
 - Added a pkgdown website workflow and a vignette introducing the
   distinction between within- and between-cluster correlations.
 - Removed obsolete self-generated test fixtures, a generated plot file,

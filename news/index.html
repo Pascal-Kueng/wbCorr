@@ -57,11 +57,11 @@
 <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> now provides concise, executable guidance for inspecting summaries and extracting full tables, numeric matrices, and ICCs.</li>
 <li>Plot panels now use the exact pair-specific rows, centering rule, method, and between-cluster weights used by the fitted object. Annotations come from the stored coefficient and p-value, and significance legends are omitted when p-values were not requested or are unavailable.</li>
 <li>
-<code><a href="../reference/to_excel.html">to_excel()</a></code> now accepts a data frame or matrix directly, supports mixed lists of tabular objects, and errors clearly when there is nothing to write.</li>
+<code><a href="../reference/to_excel.html">to_excel()</a></code> now accepts a data frame or matrix directly, supports mixed lists of tabular objects, errors clearly when there is nothing to write, and invisibly returns the supplied output path.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="development-and-release-preparation-0-3-2">Development and release preparation<a class="anchor" aria-label="anchor" href="#development-and-release-preparation-0-3-2"></a></h3>
-<ul><li>Added reference tests against <code><a href="https://rdrr.io/pkg/psych/man/ICC.html" class="external-link">psych::ICC()</a></code> and expanded automated R CMD check coverage.</li>
+<ul><li>Added reference tests against <code><a href="https://rdrr.io/pkg/psych/man/statsBy.html" class="external-link">psych::statsBy()</a></code> for within- and between-cluster correlations and ICC(1,1), and expanded automated regression-test coverage.</li>
 <li>Added a pkgdown website workflow and a vignette introducing the distinction between within- and between-cluster correlations.</li>
 <li>Removed obsolete self-generated test fixtures, a generated plot file, and tracked R session history. Added safeguards against including regenerated session or graphics artifacts in the repository and source package.</li>
 <li>Corrected the bundled-data documentation to report 5,000 observations from 100 participants measured over 50 days.</li>
