@@ -117,6 +117,34 @@ resolve_wbcorr_choice <- function(value, choices, argument, was_missing) {
 }
 
 
+exact_cluster_factor <- function(cluster_values) {
+  ordinary_factor <- as.factor(cluster_values)
+  observed <- !is.na(cluster_values)
+  exact_values <- unique(cluster_values[observed])
+
+  # Preserve the historical factor representation whenever it keeps every
+  # distinct identifier. Numeric values that print identically need exact
+  # match-based codes instead, or factor() silently merges their clusters.
+  if (length(exact_values) ==
+      nlevels(droplevels(ordinary_factor))) {
+    return(ordinary_factor)
+  }
+
+  codes <- rep.int(NA_integer_, length(cluster_values))
+  codes[observed] <- match(cluster_values[observed], exact_values)
+  labels <- as.character(exact_values)
+  if (anyDuplicated(labels)) {
+    labels <- paste0("cluster-", seq_along(exact_values))
+  }
+
+  factor(
+    codes,
+    levels = seq_along(exact_values),
+    labels = labels
+  )
+}
+
+
 input_validation_and_prep <- function(input_data, cluster, method, weighted_between_statistics, bootstrap) {
   # Input validation and error handling
 
@@ -134,10 +162,10 @@ input_validation_and_prep <- function(input_data, cluster, method, weighted_betw
   }
 
   if (is.character(cluster) && length(cluster) == 1L) {
-    return(as.factor(input_data[[cluster]]))
+    return(exact_cluster_factor(input_data[[cluster]]))
   }
 
-  as.factor(cluster)
+  exact_cluster_factor(cluster)
 }
 
 remove_cluster_columns <- function(input_data, cluster) {

@@ -7,8 +7,8 @@ Authors@R:
              comment = c(ORCID = "0000-0001-7346-9414")))
 Description: Separates supplied variables into level-specific components and
     calculates bivariate correlations for each level. It supports both ordinary
-    two-level clustered data and strictly nested three-level data. For Pearson
-    correlations, the centered-score
+    two-level clustered data and strictly nested three-level data. For
+    two-level Pearson correlations, the centered-score
     decomposition corresponds to commonly used between- and within-cluster
     correlations reviewed by Tu et al. (2025) <doi:10.1002/sim.10326>.
     The package's descriptive Spearman option is distinct from the clustered

@@ -1041,6 +1041,75 @@ test_that("top-level bootstrap matches an independent duplicated-draw oracle", {
 })
 
 
+test_that("bootstrap results match exact non-syntactic variable pairs", {
+  set.seed(41)
+  upper <- rep(seq_len(5L), each = 9L)
+  lower <- interaction(
+    upper,
+    rep(rep(seq_len(3L), each = 3L), times = 5L),
+    drop = TRUE
+  )
+  n <- length(upper)
+  data <- data.frame(
+    lower = lower,
+    upper = upper,
+    first = rnorm(n) + upper,
+    second = rnorm(n) - upper,
+    third = rnorm(n) + rep(seq_len(15L), each = 3L),
+    fourth = rnorm(n) + sin(seq_len(n)),
+    check.names = FALSE
+  )
+  names(data)[3:6] <- c("a", "b\rc", "a\rb", "c")
+
+  variables <- names(data)[3:6]
+  combinations <- utils::combn(seq_along(variables), 2L)
+  bootstrap_pair <- getFromNamespace(
+    "bootstrap_nested_three_level_pair",
+    "wbCorr"
+  )
+  expected <- vector("list", ncol(combinations))
+  set.seed(99)
+  for (pair_index in seq_len(ncol(combinations))) {
+    index1 <- combinations[1L, pair_index]
+    index2 <- combinations[2L, pair_index]
+    expected[[pair_index]] <- bootstrap_pair(
+      x = data[[variables[[index1]]]],
+      y = data[[variables[[index2]]]],
+      lower_id = data$lower,
+      upper_id = data$upper,
+      nboot = 10L,
+      confidence_level = 0.95
+    )
+    expected[[pair_index]]$Parameter1 <- variables[[index1]]
+    expected[[pair_index]]$Parameter2 <- variables[[index2]]
+  }
+  expected <- do.call(rbind, expected)
+
+  set.seed(99)
+  result <- wbCorr(
+    data,
+    cluster = list(lower = "lower", upper = "upper"),
+    inference = "cluster_bootstrap",
+    nboot = 10L
+  )
+
+  for (level in c("level1", "level2", "level3")) {
+    actual_level <- result@levels[[level]]$confidence_intervals
+    expected_level <- expected[expected$level == level, , drop = FALSE]
+    rownames(expected_level) <- NULL
+    expect_identical(
+      actual_level[c("Parameter1", "Parameter2")],
+      expected_level[c("Parameter1", "Parameter2")]
+    )
+    expect_equal(
+      actual_level[c("CI_lower", "CI_upper")],
+      expected_level[c("CI_lower", "CI_upper")],
+      tolerance = 0
+    )
+  }
+})
+
+
 test_that("three-level matrices and tables export without reshaping", {
   data <- three_level_additive_data()
   result <- wbCorr(

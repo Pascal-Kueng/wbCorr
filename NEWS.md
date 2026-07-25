@@ -24,8 +24,12 @@
 * Added strict validation for globally unique nesting, complete hierarchy
   paths, supported v1 options, pairwise/listwise missing-data handling, and
   pair-specific `n_obs`, `n_level2`, and `n_level3` diagnostics.
+* Made internal variable-pair identities collision-proof for legal
+  non-syntactic names, preventing bootstrap or plot pair mix-ups.
 * Preserved the existing scalar column-name and external-vector API, numerical
   results, accessors, and object layout for ordinary two-level analyses.
+* Preserved distinct ordinary two-level numeric cluster identifiers even when
+  their default factor labels are identical.
 
 # wbCorr 0.3.2
 

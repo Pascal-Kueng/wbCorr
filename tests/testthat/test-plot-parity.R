@@ -14,6 +14,37 @@ get_prepared_plot_pair <- function(prepared, x_name, y_name) {
 }
 
 
+test_that("plot pair keys distinguish legal control characters", {
+  pair_key <- getFromNamespace("plot_pair_key", "wbCorr")
+  utf8_name <- enc2utf8("\u00e9")
+  latin1_name <- iconv(utf8_name, from = "UTF-8", to = "latin1")
+
+  expect_false(identical(
+    pair_key("a", "b\rc"),
+    pair_key("a\rb", "c")
+  ))
+  expect_identical(
+    pair_key(latin1_name, "z"),
+    pair_key(utf8_name, "z")
+  )
+
+  data <- data.frame(
+    id = rep(seq_len(3L), each = 3L),
+    first = seq_len(9L),
+    z = c(2, 1, 3, 4, 8, 5, 7, 6, 9),
+    check.names = FALSE
+  )
+  names(data)[2L] <- latin1_name
+  result <- wbCorr(data, "id", inference = "none")
+  prepare_plot <- getFromNamespace("prepare_wb_plot_data", "wbCorr")
+  prepared <- prepare_plot(result, "within", standardize = FALSE)
+
+  expect_false(is.null(
+    get_prepared_plot_pair(prepared, utf8_name, "z")
+  ))
+})
+
+
 test_that("plot data use exact pairwise rows and centering policy", {
   dat <- plot_parity_fixture()
   prepare_plot <- getFromNamespace("prepare_wb_plot_data", "wbCorr")

@@ -308,13 +308,20 @@ build_nested_three_level_sections <- function(core,
         ,
         drop = FALSE
       ]
-      pair_key <- paste(level_table$Parameter1, level_table$Parameter2, sep = "\r")
-      bootstrap_key <- paste(
-        level_bootstrap$Parameter1,
-        level_bootstrap$Parameter2,
-        sep = "\r"
-      )
-      matched <- match(pair_key, bootstrap_key)
+      matched <- integer(nrow(level_table))
+      for (index in seq_len(nrow(level_table))) {
+        pair_match <- which(
+          level_bootstrap$Parameter1 == level_table$Parameter1[[index]] &
+            level_bootstrap$Parameter2 == level_table$Parameter2[[index]]
+        )
+        if (length(pair_match) != 1L) {
+          stop(
+            "Internal error while matching three-level bootstrap results.",
+            call. = FALSE
+          )
+        }
+        matched[[index]] <- pair_match
+      }
       level_table$n_boot_attempted <-
         level_bootstrap$n_boot_attempted[matched]
       level_table$n_boot_valid <- level_bootstrap$n_boot_valid[matched]
