@@ -3,7 +3,8 @@
 \name{plot,wbCorr-method}
 \alias{plot,wbCorr-method}
 \alias{plot.wbCorr}
-\title{Plot within- and between associations}
+\alias{plot,wbCorrNested-method}
+\title{Plot level-specific associations}
 \usage{
 \method{plot}{wbCorr}(x, y, ...)
 
@@ -21,15 +22,34 @@
   reg_lwd = 2,
   ...
 )
+
+\S4method{plot}{wbCorrNested}(
+  x,
+  y = NULL,
+  which = NULL,
+  plot_NA = TRUE,
+  standardize = TRUE,
+  outlier_detection = "zscore",
+  outlier_threshold = "recommended",
+  type = "p",
+  pch = 20,
+  dot_lwd = 2,
+  reg_lwd = 2,
+  ...
+)
 }
 \arguments{
-\item{x}{A wbCorr object to be plotted.}
+\item{x}{A \code{wbCorr} or \code{wbCorrNested} object to be plotted.}
 
-\item{y}{Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.}
+\item{y}{Choose which correlations to plot. Use \code{"within"}/\code{"w"} or
+\code{"between"}/\code{"b"} for a two-level object, and \code{"level1"}/\code{"l1"},
+\code{"level2"}/\code{"l2"}, or \code{"level3"}/\code{"l3"} for a three-level object. This can
+be supplied positionally.}
 
 \item{...}{further options to be passed to the base plot (pairs) function.}
 
-\item{which}{Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.}
+\item{which}{An alternative to \code{y} that takes precedence when both are
+supplied.}
 
 \item{plot_NA}{Boolean. Whether variables that have no variation on the selected level should be plotted or not.}
 
@@ -50,15 +70,15 @@ makes the displayed regression slope equal to the stored correlation.}
 \item{reg_lwd}{Graphical parameter. Set thickness of the regression line.}
 }
 \value{
-Invisibly returns the supplied \code{wbCorr} object. Called for the
-side effect of drawing a pairs plot of the selected within- or
-between-cluster centered variables.
+Invisibly returns the supplied object. Called for the side effect of
+drawing a pairs plot of the selected level-specific variables.
 }
 \description{
-Plots the centered variables of the provided data frame against
-each other. Choose either cluster means (\code{"between"}) or deviations from
-cluster means (\code{"within"}). Every panel uses the same pair-specific rows,
-centering rule, method, and between-cluster weights as the fitted object.
+Plots the level-specific variables against each other. For a
+two-level object, choose cluster means (\code{"between"}) or deviations from
+cluster means (\code{"within"}). For a three-level object, choose \code{"level1"}/
+\code{"l1"}, \code{"level2"}/\code{"l2"}, or \code{"level3"}/\code{"l3"}. Every panel uses the same
+pair-specific rows, decomposition, method, and weights as the fitted object.
 Pearson plots draw a corresponding regression line and annotate the stored
 correlation; weighted between-cluster panels use weighted least squares.
 Spearman plots report the stored rho without a linear-regression overlay.

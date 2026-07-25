@@ -57,11 +57,15 @@ warn_non_psd_matrix <- function(diagnostic) {
     return(invisible(NULL))
   }
 
-  level_label <- if (diagnostic$level[[1L]] == "within") {
-    "within-cluster"
-  } else {
-    "between-cluster"
-  }
+  level_label <- switch(
+    diagnostic$level[[1L]],
+    within = "within-cluster",
+    between = "between-cluster",
+    level1 = "level-1",
+    level2 = "level-2",
+    level3 = "level-3",
+    diagnostic$level[[1L]]
+  )
   remedy <- if (diagnostic$missing_data[[1L]] == "pairwise") {
     paste0(
       "Pair-specific missing-data samples can cause this; use ",
@@ -93,12 +97,17 @@ warn_non_psd_matrix <- function(diagnostic) {
 #' Inspect positive-semidefinite diagnostics for correlation matrices
 #'
 #' @description Returns matrix-level diagnostics computed from the unrounded
-#' within- and between-cluster correlation matrices stored in a [wbCorr()]
-#' object. Pairwise-complete correlations can be non-positive-semidefinite when
-#' different pairs use different rows. A diagnostic is not assessable when the
-#' corresponding matrix contains an unavailable (`NA`) coefficient.
+#' correlation matrices stored in a [wbCorr()] object, including all three
+#' levels of a `wbCorrNested` object. Pairwise-complete correlations can be
+#' non-positive-semidefinite when different pairs use different rows. A
+#' diagnostic is not assessable when the corresponding matrix contains an
+#' unavailable (`NA`) coefficient.
 #'
-#' @param object A `wbCorr` object.
+#' @param object A `wbCorr` or three-level `wbCorrNested` object.
+#' @param which For a `wbCorrNested` object, a character vector selecting
+#' 'level1' or 'l1', 'level2' or 'l2', and 'level3' or 'l3'. All three levels
+#' are returned by default. This argument is not used for two-level `wbCorr`
+#' objects.
 #'
 #' @return A data frame with one row for each level and columns identifying the
 #' diagnostic status, positive-semidefinite result, minimum eigenvalue,
@@ -108,7 +117,37 @@ warn_non_psd_matrix <- function(diagnostic) {
 #'
 #' @seealso [wbCorr()], [get_matrix()]
 #' @export
-get_matrix_diagnostics <- function(object) {
+get_matrix_diagnostics <- function(object, which = NULL) {
+  if (methods::is(object, "wbCorrNested")) {
+    if (missing(which) || is.null(which)) {
+      which <- c("level1", "level2", "level3")
+    }
+    levels <- match_nested_levels(which)
+
+    diagnostics <- lapply(levels, function(level) {
+      section <- object@levels[[level]]
+      diagnostic <- section$matrix_diagnostics
+      if (is.null(diagnostic)) {
+        diagnostic <- data.frame(
+          level = level,
+          status = "not_available",
+          is_complete = FALSE,
+          is_psd = NA,
+          min_eigenvalue = NA_real_,
+          tolerance = NA_real_,
+          n_variables = as.integer(nrow(section$correlations)),
+          missing_data = NA_character_,
+          guaranteed_by_construction = FALSE,
+          reason = "object_created_without_matrix_diagnostics",
+          stringsAsFactors = FALSE
+        )
+      }
+      diagnostic$level <- level
+      diagnostic
+    })
+    return(do.call(rbind, diagnostics))
+  }
+
   if (!methods::is(object, "wbCorr")) {
     stop("object must be a wbCorr object.", call. = FALSE)
   }

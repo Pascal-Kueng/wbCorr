@@ -59,6 +59,14 @@ validate_wbcorr_inputs <- function(input_data,
          call. = FALSE)
   }
 
+  if (is.list(cluster)) {
+    hierarchy_info <- validate_nested_three_level_hierarchy(
+      input_data,
+      cluster
+    )
+    return(invisible(hierarchy_info))
+  }
+
   named_cluster <- is.character(cluster) &&
     length(cluster) == 1L &&
     !is.na(cluster)

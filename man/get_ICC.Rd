@@ -13,7 +13,9 @@ get_ICCs(object)
 get_icc(object)
 }
 \arguments{
-\item{object}{A wbCorr object, created by the wbCorr() function.}
+\item{object}{A wbCorr object, created by the wbCorr() function.
+Three-level \code{wbCorrNested} objects do not have a single ICC table and are
+therefore unsupported by this accessor.}
 }
 \value{
 A data frame with the one-way random-effects, single-measure

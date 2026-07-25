@@ -1,3 +1,32 @@
+# wbCorr 0.4.0
+
+## Strictly nested three-level correlations
+
+* Added a backward-compatible three-level decomposition for observations
+  nested in lower-level units nested in upper-level units. Supply a fully
+  named list ordered lower-to-higher, for example
+  `cluster = list(person = "person_id", dyad = "dyad_id")`.
+* The three manifest Pearson estimands are now explicit: observation
+  deviations from pair-specific lower-unit means (`level1`), lower-unit means
+  centered around equal-lower-unit upper means (`level2`), and those
+  equal-lower-unit upper means (`level3`). Observations, lower units, and upper
+  units contribute equally at their respective levels. With unequal numbers of
+  observations per lower unit, this equal-lower-unit upper mean deliberately
+  differs from the conventional mean of all observations in an upper unit.
+* Added a dedicated `wbCorrNested` result with separate tables, matrices,
+  positive-semidefinite diagnostics, and plots for all three levels. Merged
+  triangle matrices and a single ICC are deliberately unavailable because
+  neither has an unambiguous three-level meaning.
+* Added whole-upper-cluster percentile bootstrap intervals that preserve all
+  descendant observations, retain pairwise missingness in the sampling frame,
+  and re-key duplicated hierarchy paths. Analytic three-level inference remains
+  unavailable.
+* Added strict validation for globally unique nesting, complete hierarchy
+  paths, supported v1 options, pairwise/listwise missing-data handling, and
+  pair-specific `n_obs`, `n_level2`, and `n_level3` diagnostics.
+* Preserved the existing scalar column-name and external-vector API, numerical
+  results, accessors, and object layout for ordinary two-level analyses.
+
 # wbCorr 0.3.2
 
 ## Statistical correctness

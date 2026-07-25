@@ -1,18 +1,25 @@
 #' wbCorr
 #'
-#' Calculates bivariate within- and between-cluster correlations for clustered
-#' data, such as repeated measures nested in persons, dyads, teams, or other
-#' groups. Only recommended for continuous or binary variables.
+#' Calculates bivariate level-specific correlations for clustered data,
+#' including observations nested in one cluster level and strictly nested
+#' three-level structures. Only recommended for continuous or binary
+#' variables.
 #'
 #' @param data A data frame containing numeric variables, logical variables, or
 #' two-level factors for which correlations will be calculated.
-#' @param cluster An atomic vector with exactly one value per data row, or one
-#' string naming the cluster column in `data`. Missing identifiers are allowed,
+#' @param cluster For a two-level analysis, an atomic vector with exactly one
+#' value per data row or one string naming the cluster column in `data`. For a
+#' strictly nested three-level analysis, a fully named list of exactly two
+#' scalar column names ordered lower-to-higher, for example
+#' `list(person = "person_id", dyad = "dyad_id")`. List names label the
+#' grouping levels; list values identify columns in `data`. Three-level
+#' hierarchy IDs must be globally unique at the lower level and each lower ID
+#' must map to exactly one upper ID. Missing two-level identifiers are allowed,
 #' but at least one identifier must be observed; numeric identifiers cannot be
-#' `Inf`, `-Inf`, or `NaN`. When a vector is supplied, data columns containing
-#' the same identifiers and missing-value pattern are treated as duplicate
-#' cluster columns and excluded; pass a column name when the identifier is
-#' already in `data` to avoid ambiguity.
+#' `Inf`, `-Inf`, or `NaN`. When an external two-level vector is supplied, data
+#' columns containing the same identifiers and missing-value pattern are
+#' treated as duplicate cluster columns and excluded; pass a column name when
+#' the identifier is already in `data` to avoid ambiguity.
 #' @param confidence_level A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).
 #' @param method A string indicating the correlation method to be used.
 #' Supported methods are `"pearson"`, `"spearman"`, and `"auto"` (default:
@@ -22,6 +29,7 @@
 #' Spearman inference is unavailable; use `inference = "cluster_bootstrap"` for
 #' a whole-cluster bootstrap interval. The former `"spearman-jackknife"` option
 #' is rejected because deleting individual rows does not respect clustering.
+#' Three-level decomposition currently supports only `"pearson"`.
 #' @param bootstrap Deprecated logical alias for
 #' `inference = "cluster_bootstrap"`.
 #' @param nboot A whole number of bootstrap samples, at least 10 (default:
@@ -32,7 +40,9 @@
 #' confidence intervals. `"none"` returns coefficients only.
 #' `"cluster_bootstrap"` resamples top-level clusters with replacement,
 #' recomputes the full decomposition, and reports percentile confidence
-#' intervals. Bootstrap p-values are not reported.
+#' intervals. Bootstrap p-values are not reported. When this argument is
+#' omitted, two-level Pearson output defaults to `"analytic"` and three-level
+#' output defaults to `"none"`.
 #' @param weighted_between_statistics Deprecated logical alias for
 #' `between_weighting`. If TRUE, `between_weighting = "cluster_size"`; if
 #' FALSE, `between_weighting = "equal_clusters"`.
@@ -62,16 +72,18 @@
 #' identifier (`"listwise"`). Listwise deletion provides a common multivariate
 #' sample for users who require a coherent correlation matrix, at the cost of
 #' discarding partially observed rows.
-#' @return A wbCorr object that contains within- and between-cluster statistics.
-#' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
-#' Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
-#' Use get_ICC() to retrieve all intraclass correlations (ICC(1,1)).
-#' Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
+#' @return A `wbCorr` object containing within- and between-cluster statistics
+#' for a two-level analysis, or a `wbCorrNested` object containing separate
+#' `level1`, `level2`, and `level3` sections for a three-level analysis. Use
+#' [get_table()] for full tables and [summary()] or [get_matrix()] for matrices.
+#' Merged matrices and [get_ICC()] are available only for two-level objects.
+#' Use [to_excel()] on a table, matrix, or list returned by an accessor.
 #'
 #' @description
-#' The wbCorr function creates a wbCorr object containing within- and
-#' between-cluster correlations, p-values, and confidence intervals for a given
-#' dataset and clustering variable. The object can be plotted.
+#' The `wbCorr()` function creates either a two-level `wbCorr` object or a
+#' three-level `wbCorrNested` object containing level-specific correlations and
+#' the requested inferential output. Both object types can be inspected,
+#' extracted, exported, and plotted.
 #'
 #' @details
 #' Logical variables are encoded as 0/1. Factors must declare exactly two
@@ -92,8 +104,8 @@
 #' With `missing_data = "listwise"`, rows missing any supported analysis
 #' variable or the cluster identifier are removed before correlation
 #' decomposition and inference. This gives all pairs a common raw-row sample.
-#' ICCs keep their documented variable-wise finite-row samples and are not
-#' changed by this matrix-oriented option.
+#' For a two-level object, ICCs keep their documented variable-wise finite-row
+#' samples and are not changed by this matrix-oriented option.
 #' With a single coefficient method (`"pearson"` or `"spearman"`) and common
 #' weights, the resulting complete correlation matrix is positive
 #' semidefinite up to numerical tolerance. `method = "auto"` can mix Pearson
@@ -106,6 +118,44 @@
 #' actual pairwise sample and makes the between correlation a correlation of
 #' matched pair-specific cluster means.
 #'
+#' A fully named two-element list selects the strictly nested three-level mode.
+#' For each variable pair, `level1` is the pooled Pearson correlation of
+#' observation deviations from their lower-unit means. `level2` is the
+#' correlation of lower-unit means after subtracting the mean of the
+#' contributing lower-unit means in their upper unit. `level3` is the
+#' correlation of those upper-unit means. Thus observations contribute equally
+#' at level 1, lower units contribute equally at level 2 and when constructing
+#' level-3 means, and upper units contribute equally at level 3. All means are
+#' estimated from the same pair-specific complete rows. Correlations across
+#' levels are distinct estimands and are not additive. With unequal numbers of
+#' observations per lower unit, the equal-lower-unit upper mean deliberately
+#' differs from the observation-weighted upper mean used in conventional
+#' manifest contextual-model decompositions; the two coincide when lower-unit
+#' observation counts are balanced. These are descriptive correlations, not
+#' estimates of the cited papers' regression, R-squared, or latent parameters.
+#'
+#' Three-level IDs must describe a strict global nesting. A lower ID reused
+#' under more than one upper ID is rejected; construct an explicit globally
+#' unique composite lower ID first. Rows with both hierarchy IDs missing are
+#' excluded, whereas a row with only part of its hierarchy path missing is an
+#' error. In the first three-level implementation, only
+#' `method = "pearson"`, equal-unit weighting,
+#' `centering_rows = "pairwise_complete"`, and `inference = "none"` or
+#' `"cluster_bootstrap"` are supported. When `inference` is omitted,
+#' three-level output defaults to coefficients only. The bootstrap resamples
+#' intact upper units and re-keys every duplicated upper unit and its
+#' descendants. An interval is attempted only when at least three upper units
+#' contribute to the observed variable pair. Every upper unit with a complete
+#' hierarchy path then remains in the sampling frame even when it has no
+#' complete observations for that pair; such draws can reduce `n_boot_valid`.
+#'
+#' A `wbCorrNested` object exposes all three levels through `get_table()`,
+#' `get_matrix()`, `summary()`, `get_matrix_diagnostics()`, and `plot()` using
+#' selectors `"level1"`/`"l1"`, `"level2"`/`"l2"`, and
+#' `"level3"`/`"l3"`. It does not provide a merged-triangle matrix or silently
+#' reuse the one-way ICC. Level-specific variance-partition coefficients require
+#' separately defined variance estimands and are outside this version's scope.
+#'
 #' Detailed tables always retain one row for every requested unordered pair.
 #' `n_obs` is the number of jointly observed raw rows with a nonmissing cluster
 #' identifier, and `n_clusters` is the number of clusters contributing at least
@@ -116,7 +166,15 @@
 #' `inference_status` separately records `"not_requested"`, `"ok"`,
 #' `"partial"`, or `"unavailable"`, with details in `inference_reason`.
 #' A descriptive coefficient requires two analysis units with positive
-#' variance; inferential output can require more.
+#' variance; inferential output can require more. Three-level tables replace
+#' `n_clusters` with `n_units`, `n_level2`, and `n_level3`, while retaining the
+#' same status fields. `n_units` is the number of values correlated at the
+#' selected level: `n_obs` at level 1, `n_level2` at level 2, and `n_level3` at
+#' level 3. `n_level2` and `n_level3` count the represented lower and upper
+#' units in the pair-complete sample. `n_informative_units` counts lower units
+#' with at least two complete observations at level 1, upper units with at
+#' least two contributing lower units at level 2, and contributing upper units
+#' at level 3.
 #'
 #' With `centering_rows = "all_available"`, each variable's cluster mean is
 #' estimated from all available rows for that variable before the pairwise
@@ -163,8 +221,8 @@
 #' therefore does not attach analytic p-values or confidence intervals to these
 #' coefficients. Whole-cluster bootstrap confidence intervals are available.
 #'
-#' For each variable, wbCorr also reports the one-way random-effects,
-#' single-measure ICC(1,1). It is estimated from all finite observations for
+#' For each variable in a two-level object, wbCorr also reports the one-way
+#' random-effects, single-measure ICC(1,1). It is estimated from all finite observations for
 #' that variable using the ANOVA method of moments and an effective cluster size
 #' when clusters are unbalanced. Negative sample ICCs are retained; they occur
 #' when the between-cluster mean square is smaller than the within-cluster mean
@@ -176,8 +234,8 @@
 #' variability is zero.
 #'
 #' With `inference = "cluster_bootstrap"`, wbCorr resamples whole top-level
-#' clusters, recomputes the selected within- and between-cluster correlations,
-#' and reports first-order percentile bootstrap confidence intervals. This
+#' clusters, recomputes the selected level-specific correlations, and reports
+#' first-order percentile bootstrap confidence intervals. This
 #' keeps the package's descriptive estimands while avoiding row-level
 #' independence assumptions. Interval accuracy assumes independent clusters
 #' and adequate numbers of clusters and bootstrap replicates; the technical
@@ -191,16 +249,15 @@
 #'
 #' Correlation-matrix diagonals are 1 only when the variable has at least two
 #' usable values and positive variance at that level; otherwise they are `NA`.
-#' P-value diagonals are always `NA`. Merged summary matrices continue to show
-#' the variable's ICC on the diagonal instead of a level-specific self-
-#' correlation.
+#' P-value diagonals are always `NA`. For two-level objects, merged summary
+#' matrices continue to show the variable's ICC on the diagonal instead of a
+#' level-specific self-correlation.
 #' A matrix with any unavailable coefficient cannot be assessed as a complete
 #' positive-semidefinite correlation matrix and is reported as
 #' `"not_assessable"` rather than silently treated as valid.
 #'
 #' Inspired by the psych::statsBy function, wbCorr allows you to calculate,
-#' extract, and plot within- and between-cluster correlations for further
-#' analysis.
+#' extract, and plot level-specific correlations for further analysis.
 #'
 #' @references Tu, S., Li, C., & Shepherd, B. E. (2025). Between- and
 #' within-cluster Spearman rank correlations. *Statistics in Medicine*.
@@ -217,6 +274,19 @@
 #' Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
 #' the number of bootstrap repetitions. *Econometrica, 68*(1), 23-51.
 #' \doi{10.1111/1468-0262.00092}
+#'
+#' Rights, J. D., & Sterba, S. K. (2023). R-squared measures for multilevel
+#' models with three or more levels. *Multivariate Behavioral Research, 58*(2),
+#' 340-367. \doi{10.1080/00273171.2021.1985948}
+#'
+#' Kerkhoff, D., & Nussbeck, F. W. (2023). Estimation quality and required
+#' sample sizes in three-level contextual analysis models. *Methodology, 19*(2),
+#' 133-151.
+#' \doi{10.5964/meth.9775}
+#'
+#' Field, C. A., & Welsh, A. H. (2007). Bootstrapping clustered data.
+#' *Journal of the Royal Statistical Society: Series B, 69*(3), 369-390.
+#' \doi{10.1111/j.1467-9868.2007.00593.x}
 #'
 #' R Core Team. Correlation, variance and covariance matrices. R statistical
 #' software documentation. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cor.html}
@@ -270,6 +340,21 @@
 #' # Store the list of correlation matrices to excel
 #' to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 #'
+#' # Strict three-level decomposition: occasions within people within dyads.
+#' nested_data <- data.frame(
+#'   person = rep(seq_len(12), each = 3),
+#'   dyad = rep(seq_len(6), each = 6),
+#'   x = rep(c(-2, 0, 2), 12) + rep(seq_len(12), each = 3),
+#'   y = rep(c(1, -2, 1), 12) +
+#'     rep(rep(c(-1, 1), 6), each = 3) +
+#'     rep(c(2, 1, 3, 6, 4, 5), each = 6)
+#' )
+#' nested_correlations <- wbCorr(
+#'   nested_data,
+#'   cluster = list(person = "person", dyad = "dyad"),
+#'   inference = "none"
+#' )
+#' get_matrix(nested_correlations, "l2")
 #'
 #' @export
 wbCorr <- function(data, cluster,
@@ -289,6 +374,29 @@ wbCorr <- function(data, cluster,
   between_inference_missing <- missing(between_inference)
   centering_rows_missing <- missing(centering_rows)
   missing_data_missing <- missing(missing_data)
+
+  if (is.list(cluster)) {
+    return(wbCorr_three_level(
+      data = data,
+      cluster = cluster,
+      confidence_level = confidence_level,
+      method = method,
+      bootstrap = bootstrap,
+      nboot = nboot,
+      inference = inference,
+      weighted_between_statistics = weighted_between_statistics,
+      between_weighting = between_weighting,
+      between_inference = between_inference,
+      centering_rows = centering_rows,
+      missing_data = missing_data,
+      inference_missing = inference_missing,
+      between_weighting_missing = between_weighting_missing,
+      between_inference_missing = between_inference_missing,
+      centering_rows_missing = centering_rows_missing,
+      missing_data_missing = missing_data_missing,
+      supplied_call = match.call()
+    ))
+  }
 
   # input validation and preparation
   input_data <- data
@@ -581,6 +689,18 @@ methods::setClass("wbCorr", representation(within = "list",
                                            centered_data = "list",
                                            settings = 'list'))
 
+#' @rdname wbCorr-class
+#' @description `wbCorrNested` extends `wbCorr` with separate result sections
+#' for a strictly nested three-level decomposition.
+#' @slot levels A named list containing `level1`, `level2`, and `level3`
+#' correlation results.
+#' @export
+methods::setClass(
+  "wbCorrNested",
+  contains = "wbCorr",
+  slots = c(levels = "list")
+)
+
 #' @rdname wbCorr
 #' @export
 wbcorr <- wbCorr
@@ -590,13 +710,14 @@ wbcorr <- wbCorr
 #######################################################
 
 # Set method for printing
-#' @title Print Method for the wbCorr Class
-#' @description Prints a summary of the \code{wbCorr} object.
-#' @param x A \code{wbCorr} object.
+#' @title Print a wbCorr result
+#' @description Prints a compact summary of a two-level `wbCorr` or
+#' three-level `wbCorrNested` object.
+#' @param x A `wbCorr` or `wbCorrNested` object.
 #' @param ... Additional arguments, currently unused.
-#' @return Invisibly returns the supplied \code{wbCorr} object. Called for the
-#' side effect of printing a compact summary of the within-cluster table,
-#' between-cluster table, and ICC table.
+#' @return Invisibly returns the supplied object. Ordinary `wbCorr` objects
+#' print the within-cluster, between-cluster, and ICC tables; `wbCorrNested`
+#' objects print separate level-1, level-2, and level-3 tables.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
 #' @aliases print.wbCorr
 #' @rdname print.wbCorr
@@ -637,6 +758,30 @@ methods::setMethod("print", signature("wbCorr"), function(x, ...) {
   cat("\nAccess full tables with get_tables(object, which = c('within', 'between'))")
   cat("\nAccess matrices programmatically with get_matrix(object, numeric = TRUE)")
   cat("\nAccess the full ICC table with get_ICC(object)\n")
+  invisible(x)
+})
+
+#' @rdname print.wbCorr
+#' @export
+methods::setMethod("print", signature("wbCorrNested"), function(x, ...) {
+  cat("\n---- wbCorr Three-Level Object ----\n")
+  cat("Call: ", deparse(x@call), "\n")
+
+  level_labels <- x@settings$level_labels
+  for (level in c("level1", "level2", "level3")) {
+    title <- sprintf("%s correlations:", level_labels[[level]])
+    cat("\n", title, "\n", sep = "")
+    cat(strrep("-", nchar(title)), "\n")
+    table <- x@levels[[level]]$table
+    print(utils::head(table))
+    if (nrow(table) > 6L) {
+      cat("... ", nrow(table) - 6L, " more rows\n", sep = "")
+    }
+  }
+
+  cat("\nInspect matrices with summary(object, which = c('l1', 'l2', 'l3'))")
+  cat("\nAccess full tables with get_table(object)")
+  cat("\nA single three-level ICC and merged three-level matrix are not defined.\n")
   invisible(x)
 })
 
@@ -686,19 +831,24 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 # plot()
 #######################################################
 
-#' @title Plot within- and between associations
-#' @description Plots the centered variables of the provided data frame against
-#' each other. Choose either cluster means (`"between"`) or deviations from
-#' cluster means (`"within"`). Every panel uses the same pair-specific rows,
-#' centering rule, method, and between-cluster weights as the fitted object.
+#' @title Plot level-specific associations
+#' @description Plots the level-specific variables against each other. For a
+#' two-level object, choose cluster means (`"between"`) or deviations from
+#' cluster means (`"within"`). For a three-level object, choose `"level1"`/
+#' `"l1"`, `"level2"`/`"l2"`, or `"level3"`/`"l3"`. Every panel uses the same
+#' pair-specific rows, decomposition, method, and weights as the fitted object.
 #' Pearson plots draw a corresponding regression line and annotate the stored
 #' correlation; weighted between-cluster panels use weighted least squares.
 #' Spearman plots report the stored rho without a linear-regression overlay.
 #' Significance stars are shown only when the fitted wbCorr object contains a
 #' p-value for that pair.
-#' @param x A wbCorr object to be plotted.
-#' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
-#' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.
+#' @param x A `wbCorr` or `wbCorrNested` object to be plotted.
+#' @param y Choose which correlations to plot. Use `"within"`/`"w"` or
+#' `"between"`/`"b"` for a two-level object, and `"level1"`/`"l1"`,
+#' `"level2"`/`"l2"`, or `"level3"`/`"l3"` for a three-level object. This can
+#' be supplied positionally.
+#' @param which An alternative to `y` that takes precedence when both are
+#' supplied.
 #' @param plot_NA Boolean. Whether variables that have no variation on the selected level should be plotted or not.
 #' @param standardize Boolean. Whether each plotted pair should be standardized
 #' using the same weights as its fitted coefficient. For Pearson panels, this
@@ -710,9 +860,8 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @param dot_lwd Graphical parameter. Set size of the points.
 #' @param reg_lwd Graphical parameter. Set thickness of the regression line.
 #' @param ... further options to be passed to the base plot (pairs) function.
-#' @return Invisibly returns the supplied \code{wbCorr} object. Called for the
-#' side effect of drawing a pairs plot of the selected within- or
-#' between-cluster centered variables.
+#' @return Invisibly returns the supplied object. Called for the side effect of
+#' drawing a pairs plot of the selected level-specific variables.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
 #' @name plot,wbCorr-method
 #' @method plot wbCorr
@@ -724,3 +873,11 @@ plot.wbCorr <- function(x, y, ...) {
 #' @rdname plot-wbCorr-method
 #' @export
 methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)
+
+#' @rdname plot-wbCorr-method
+#' @export
+methods::setMethod(
+  "plot",
+  signature(x = "wbCorrNested", y = "ANY"),
+  wb_plot_nested
+)

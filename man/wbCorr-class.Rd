@@ -3,14 +3,25 @@
 \docType{class}
 \name{wbCorr-class}
 \alias{wbCorr-class}
+\alias{wbCorrNested-class}
 \title{wbCorr Class}
 \description{
 A class representing within- and between-cluster correlations.
+
+\code{wbCorrNested} extends \code{wbCorr} with separate result sections
+for a strictly nested three-level decomposition.
 }
 \details{
 The \code{wbCorr} class is used to store within- and between-cluster correlations
 and provides methods for printing and summarizing the correlations.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{levels}}{A named list containing \code{level1}, \code{level2}, and \code{level3}
+correlation results.}
+}}
+
 \seealso{
 \code{\link[=wbCorr]{wbCorr}}
 }

@@ -7,11 +7,14 @@ Fleiss
 Hamaker
 ICCs
 Intraclass
+Kerkhoff
 Listwise
+Nussbeck
 Ohyama
 PSD
 Reimplemented
 Shrout
+Sterba
 Yandell
 Zenodo
 al
@@ -19,6 +22,7 @@ annurev
 assessable
 bw
 doi
+dyad
 dyads
 estimability
 estimand
@@ -29,6 +33,7 @@ listwise
 noninformative
 nonmissing
 pkgdown
+positionally
 ridit
 statsBy
 tukey

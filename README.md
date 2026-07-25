@@ -5,7 +5,10 @@
 [![R-CMD-check](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20357592-blue.svg)](https://doi.org/10.5281/zenodo.20357592)
 
-The wbCorr package computes bivariate within- and between-cluster correlations for clustered data, such as repeated measures nested in persons, dyads, teams, or other groups. Results can be inspected as tables, matrices, and plots.
+The wbCorr package computes bivariate level-specific correlations for clustered
+data, including observations nested in one cluster level and strictly nested
+three-level structures. Results can be inspected as tables, matrices, and
+plots.
 
 [Read the introductory vignette: within- and between-cluster correlations](https://pascal-kueng.github.io/wbCorr/articles/within-between-correlations.html)
 
@@ -52,6 +55,27 @@ plot(correlations, "between")
 3. Retrieve full tables with `get_table()` or `get_tables()`.
 4. Retrieve unrounded matrices for downstream calculations with `get_matrix(object, numeric = TRUE)`.
 5. Plot within- or between-cluster correlations with `plot()`.
+
+For a strict three-level hierarchy, use a named list whose names label the
+grouping levels and whose values name data columns. Order it lower-to-higher:
+
+```r
+nested_correlations <- wbCorr(
+  data = my_data,
+  cluster = list(person = "person_id", dyad = "dyad_id"),
+  inference = "none"
+)
+
+summary(nested_correlations, "l1") # observations within people
+summary(nested_correlations, "l2") # people within dyads
+summary(nested_correlations, "l3") # dyads
+
+get_table(nested_correlations)
+plot(nested_correlations, "l2")
+```
+
+Three-level output is kept in three separate matrices. A merged triangle and a
+single ICC are not defined for this object.
 
 ### Check documentation
 
@@ -127,6 +151,23 @@ Use `missing_data = "listwise"` to retain one row set that is complete across ev
 The detailed within and between tables always keep one row per requested pair, including pairs that cannot be estimated. `n_obs` counts jointly observed raw rows with a nonmissing cluster ID, while `n_clusters` counts clusters contributing at least one such row. `status`/`reason` describe coefficient estimability; `inference_status`/`inference_reason` separately distinguish complete, partial, unavailable, and unrequested inference. A coefficient needs two varying analysis units, while p-values or intervals can require more. Correlation-matrix diagonals are 1 only when the variable has positive variance at that level; otherwise they and all p-value diagonals are `NA`.
 
 When the cluster identifier is a column in the analysis data, prefer `cluster = "column_name"`. If a separate vector is supplied, wbCorr excludes any data column containing the same identifiers and missing-value pattern, allowing common integer, numeric, factor, or character representations; a named column avoids ambiguity with a genuine outcome that happens to contain the same values.
+
+For three-level data, `cluster = list(lower = "lower_id", upper = "upper_id")`
+selects a sequential manifest decomposition. For each variable pair, level 1
+correlates observations after subtracting pair-specific lower-unit means; level
+2 correlates lower-unit means after subtracting their upper-unit mean; and
+level 3 correlates those upper-unit means. Observations, lower units, and upper
+units contribute equally at their respective levels. Lower IDs must be
+globally unique and map to exactly one upper ID. The initial implementation
+supports Pearson coefficients with `inference = "none"` or whole-upper-cluster
+bootstrap intervals, pairwise-complete centering, equal-unit weighting, and
+pairwise or listwise missing-data handling.
+
+When lower units contribute different numbers of observations, this
+equal-lower-unit upper mean is not the conventional mean of all observations
+in the upper unit. The two definitions coincide when lower-unit observation
+counts are balanced. This is a package-defined descriptive target, not a
+latent multilevel parameter.
 
 Logical inputs are encoded as 0/1. Factors must declare exactly two levels and are encoded as 0/1 in their declared level order; character inputs must first be converted to factors so that this orientation is explicit. Other categorical factors are not accepted: use meaningful numeric scores for ordered variables or dummy-code nominal variables. Numeric `Inf`, `-Inf`, and `NaN` values are treated as missing before estimation.
 
