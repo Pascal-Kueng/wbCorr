@@ -5,7 +5,7 @@ status](https://www.r-pkg.org/badges/version/wbCorr)](https://CRAN.R-project.org
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/wbCorr)](https://CRAN.R-project.org/package=wbCorr)
 [![R-CMD-check](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20357592.svg)](https://doi.org/10.5281/zenodo.20357592)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20357592-blue.svg)](https://doi.org/10.5281/zenodo.20357592)
 
 The wbCorr package computes bivariate within- and between-cluster
 correlations for clustered data, such as repeated measures nested in
@@ -28,8 +28,7 @@ Install the development version from GitHub:
 
 ``` r
 
-# install.packages("pak")
-pak::pak("Pascal-Kueng/wbCorr")
+install.packages('wbCorr', repos = c('https://pascal-kueng.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 ## Quick start

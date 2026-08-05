@@ -2,6 +2,8 @@
 
 ## wbCorr 0.3.2
 
+CRAN release: 2026-07-23
+
 ### Statistical correctness
 
 - Reimplemented the one-way random-effects, single-measure ICC(1,1) with
