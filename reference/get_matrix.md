@@ -24,6 +24,9 @@ get_matrices(
   ...
 )
 
+# S3 method for class 'wbCorr'
+summary(object, ...)
+
 # S4 method for class 'wbCorr'
 summary(object, which = c("within", "between", "merge"), numeric = FALSE, ...)
 ```
