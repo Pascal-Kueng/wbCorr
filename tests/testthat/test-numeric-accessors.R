@@ -75,8 +75,14 @@ test_that("numeric access is available through aliases and summary", {
   direct <- get_matrix(result, which = "within", numeric = TRUE)
   alias <- get_matrices(result, which = "within", numeric = TRUE)
   via_summary <- summary(result, which = "within", numeric = TRUE)
+  via_base_summary <- base::summary(
+    result,
+    which = "within",
+    numeric = TRUE
+  )
   expect_equal(alias, direct, tolerance = 0)
   expect_equal(via_summary, direct, tolerance = 0)
+  expect_equal(via_base_summary, direct, tolerance = 0)
 
   expect_error(get_matrix(result, numeric = NA), "numeric")
   expect_error(get_matrix(result, numeric = c(TRUE, FALSE)), "numeric")

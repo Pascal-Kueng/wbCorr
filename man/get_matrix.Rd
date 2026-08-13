@@ -3,9 +3,13 @@
 \name{get_matrix}
 \alias{get_matrix}
 \alias{get_matrices}
-\alias{summary,wbCorr-method}
 \alias{summary.wbCorr}
+<<<<<<< Updated upstream
 \title{Return matrices for within- and/or between-cluster correlations.}
+=======
+\alias{summary,wbCorr-method}
+\title{Return correlation matrices from a wbCorr result.}
+>>>>>>> Stashed changes
 \usage{
 get_matrix(
   object,
@@ -20,6 +24,8 @@ get_matrices(
   numeric = FALSE,
   ...
 )
+
+\method{summary}{wbCorr}(object, ...)
 
 \S4method{summary}{wbCorr}(object, which = c("within", "between", "merge"), numeric = FALSE, ...)
 }

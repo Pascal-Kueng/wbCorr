@@ -433,6 +433,12 @@ test_that("public plotting succeeds for exact within and weighted-between data",
     within
   )
   expect_identical(
+    suppressMessages(
+      graphics::plot(within, "within", outlier_detection = FALSE)
+    ),
+    within
+  )
+  expect_identical(
     suppressMessages(plot(weighted, "between", outlier_detection = FALSE)),
     weighted
   )

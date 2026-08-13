@@ -3,8 +3,18 @@
 \name{plot,wbCorr-method}
 \alias{plot,wbCorr-method}
 \alias{plot.wbCorr}
+<<<<<<< Updated upstream
 \title{Plot within- and between associations}
+=======
+\alias{plot.wbCorrNested}
+\alias{plot,wbCorrNested-method}
+\title{Plot level-specific associations}
+>>>>>>> Stashed changes
 \usage{
+\method{plot}{wbCorr}(x, y, ...)
+
+\method{plot}{wbCorrNested}(x, y, ...)
+
 \S4method{plot}{wbCorr}(
   x,
   y,
@@ -25,7 +35,14 @@
 
 \item{y}{Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.}
 
+<<<<<<< Updated upstream
 \item{which}{Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.}
+=======
+\item{...}{further options to be passed to the base plot (pairs) function.}
+
+\item{which}{An alternative to \code{y} that takes precedence when both are
+supplied.}
+>>>>>>> Stashed changes
 
 \item{plot_NA}{Boolean. Whether variables that have no variation on the selected level should be plotted or not.}
 
@@ -44,8 +61,6 @@ makes the displayed regression slope equal to the stored correlation.}
 \item{dot_lwd}{Graphical parameter. Set size of the points.}
 
 \item{reg_lwd}{Graphical parameter. Set thickness of the regression line.}
-
-\item{...}{further options to be passed to the base plot (pairs) function.}
 }
 \value{
 Invisibly returns the supplied \code{wbCorr} object. Called for the

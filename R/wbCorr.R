@@ -669,9 +669,14 @@ setMethod("show", signature("wbCorr"), function(object) {
 # summary()
 #######################################################
 
+#' @rdname get_matrix
+#' @method summary wbCorr
+#' @exportS3Method summary wbCorr
+summary.wbCorr <- function(object, ...) {
+  get_matrices(object, ...)
+}
+
 #' @rdname  get_matrix
-#' @aliases get_matrices
-#' @aliases summary.wbCorr
 #' @importFrom methods setMethod
 #' @export
 methods::setMethod("summary", signature("wbCorr"), get_matrices)
@@ -709,6 +714,20 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' side effect of drawing a pairs plot of the selected within- or
 #' between-cluster centered variables.
 #' @seealso \code{\link[=wbCorr]{wbCorr}}
+#' @name plot,wbCorr-method
+#' @method plot wbCorr
+#' @exportS3Method plot wbCorr
+plot.wbCorr <- function(x, y, ...) {
+  wb_plot(x, y, ...)
+}
+
+#' @rdname plot-wbCorr-method
+#' @method plot wbCorrNested
+#' @exportS3Method plot wbCorrNested
+plot.wbCorrNested <- function(x, y, ...) {
+  wb_plot_nested(x, y, ...)
+}
+
+#' @rdname plot-wbCorr-method
 #' @export
-#' @aliases plot.wbCorr
 methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)
