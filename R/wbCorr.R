@@ -722,12 +722,5 @@ plot.wbCorr <- function(x, y, ...) {
 }
 
 #' @rdname plot-wbCorr-method
-#' @method plot wbCorrNested
-#' @exportS3Method plot wbCorrNested
-plot.wbCorrNested <- function(x, y, ...) {
-  wb_plot_nested(x, y, ...)
-}
-
-#' @rdname plot-wbCorr-method
 #' @export
 methods::setMethod("plot", signature(x = "wbCorr", y = "ANY"), wb_plot)
