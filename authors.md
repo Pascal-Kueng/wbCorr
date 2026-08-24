@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/Pascal-Kueng/wbCorr/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/Pascal-Kueng/wbCorr/blob/v0.3.2/inst/CITATION)
 
 Küng, P. (2026). wbCorr: Bivariate Within- and Between-Cluster
 Correlations (R package version 0.3.2).

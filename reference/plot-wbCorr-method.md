@@ -13,9 +13,6 @@ fitted wbCorr object contains a p-value for that pair.
 ## Usage
 
 ``` r
-# S3 method for class 'wbCorr'
-plot(x, y, ...)
-
 # S4 method for class 'wbCorr'
 plot(
   x,
@@ -43,10 +40,6 @@ plot(
 
   Choose which correlations to plot ('within' / 'w' or 'between' / 'b');
   can be used as a positional argument.
-
-- ...:
-
-  further options to be passed to the base plot (pairs) function.
 
 - which:
 
@@ -89,6 +82,10 @@ plot(
 - reg_lwd:
 
   Graphical parameter. Set thickness of the regression line.
+
+- ...:
+
+  further options to be passed to the base plot (pairs) function.
 
 ## Value
 
