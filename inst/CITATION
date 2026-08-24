@@ -6,13 +6,13 @@ if (is.null(date)) {
 }
 year <- if (is.null(date)) "2026" else substr(date, 1, 4)
 note <- sprintf("R package version %s", meta$Version)
-url <- "https://CRAN.R-project.org/package=wbCorr"
-doi <- "10.32614/CRAN.package.wbCorr"
+url <- "https://pascal-kueng.github.io/wbCorr/"
+doi <- "10.5281/zenodo.20357592"
 
 bibentry(bibtype = "Manual",
          title = "wbCorr: Bivariate Within- and Between-Cluster Correlations",
          author = c(person("Pascal", "Küng")),
-         organization = "University of Zürich",
+         organization = "University of Zurich",
          year = year,
          note = note,
          url = url,
