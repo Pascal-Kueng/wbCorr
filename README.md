@@ -10,6 +10,10 @@ data, including observations nested in one cluster level and strictly nested
 three-level structures. Results can be inspected as tables, matrices, and
 plots.
 
+Developed by [Pascal Küng](https://pascalkueng.com/), Postdoctoral Researcher
+at the [University of Zurich](https://www.psychology.uzh.ch/en/areas/sob/angsoz/team/kueng.html).
+[OSF profile](https://osf.io/r2qdg/).
+
 [Read the introductory vignette: within- and between-cluster correlations](https://pascal-kueng.github.io/wbCorr/articles/within-between-correlations.html)
 
 ## Installation

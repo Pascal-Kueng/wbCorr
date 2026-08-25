@@ -6,6 +6,7 @@ authors:
   - family-names: "Küng"
     given-names: "Pascal"
     orcid: "https://orcid.org/0000-0001-7346-9414"
+    affiliation: "University of Zurich"
 doi: "10.5281/zenodo.20357592"
 version: "0.3.2"
 date-released: "2026-07-23"
