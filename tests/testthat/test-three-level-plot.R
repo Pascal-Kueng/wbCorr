@@ -123,6 +123,12 @@ test_that("nested plotting accepts all level selectors and returns its object", 
   )
   expect_identical(
     suppressMessages(
+      graphics::plot(object, "l1", outlier_detection = FALSE)
+    ),
+    object
+  )
+  expect_identical(
+    suppressMessages(
       plot(object, which = "l2", outlier_detection = FALSE)
     ),
     object

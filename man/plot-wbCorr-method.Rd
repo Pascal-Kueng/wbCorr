@@ -3,10 +3,13 @@
 \name{plot,wbCorr-method}
 \alias{plot,wbCorr-method}
 \alias{plot.wbCorr}
+\alias{plot.wbCorrNested}
 \alias{plot,wbCorrNested-method}
 \title{Plot level-specific associations}
 \usage{
 \method{plot}{wbCorr}(x, y, ...)
+
+\method{plot}{wbCorrNested}(x, y, ...)
 
 \S4method{plot}{wbCorr}(
   x,

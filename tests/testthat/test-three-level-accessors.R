@@ -100,9 +100,11 @@ test_that("nested matrix accessors return formatted or numeric level matrices", 
   }, logical(1))))
 
   via_summary <- summary(object, which = "l1", numeric = TRUE)
+  via_base_summary <- base::summary(object, which = "l1", numeric = TRUE)
   expect_named(via_summary, "level1")
   expect_equal(via_summary$level1, object@levels$level1$correlations,
                tolerance = 0)
+  expect_equal(via_base_summary, via_summary, tolerance = 0)
   expect_named(
     get_matrix(object, which = NULL),
     c("level1", "level2", "level3", "note")
