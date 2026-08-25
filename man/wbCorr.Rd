@@ -39,13 +39,19 @@ wbcorr(
 \item{data}{A data frame containing numeric variables, logical variables, or
 two-level factors for which correlations will be calculated.}
 
-\item{cluster}{An atomic vector with exactly one value per data row, or one
-string naming the cluster column in \code{data}. Missing identifiers are allowed,
+\item{cluster}{For a two-level analysis, an atomic vector with exactly one
+value per data row or one string naming the cluster column in \code{data}. For a
+strictly nested three-level analysis, a fully named list of exactly two
+scalar column names ordered lower-to-higher, for example
+\code{list(person = "person_id", dyad = "dyad_id")}. List names label the
+grouping levels; list values identify columns in \code{data}. Three-level
+hierarchy IDs must be globally unique at the lower level and each lower ID
+must map to exactly one upper ID. Missing two-level identifiers are allowed,
 but at least one identifier must be observed; numeric identifiers cannot be
-\code{Inf}, \code{-Inf}, or \code{NaN}. When a vector is supplied, data columns containing
-the same identifiers and missing-value pattern are treated as duplicate
-cluster columns and excluded; pass a column name when the identifier is
-already in \code{data} to avoid ambiguity.}
+\code{Inf}, \code{-Inf}, or \code{NaN}. When an external two-level vector is supplied, data
+columns containing the same identifiers and missing-value pattern are
+treated as duplicate cluster columns and excluded; pass a column name when
+the identifier is already in \code{data} to avoid ambiguity.}
 
 \item{confidence_level}{A numeric value between 0 and 1 representing the desired level of confidence for confidence intervals (default: 0.95).}
 
@@ -56,7 +62,8 @@ Spearman reports a descriptive correlation of mean-centered scores within
 clusters and a correlation of cluster means between clusters. Analytic
 Spearman inference is unavailable; use \code{inference = "cluster_bootstrap"} for
 a whole-cluster bootstrap interval. The former \code{"spearman-jackknife"} option
-is rejected because deleting individual rows does not respect clustering.}
+is rejected because deleting individual rows does not respect clustering.
+Three-level decomposition currently supports only \code{"pearson"}.}
 
 \item{bootstrap}{Deprecated logical alias for
 \code{inference = "cluster_bootstrap"}.}
@@ -70,7 +77,9 @@ the documented correlation-test approximation for Pearson p-values and
 confidence intervals. \code{"none"} returns coefficients only.
 \code{"cluster_bootstrap"} resamples top-level clusters with replacement,
 recomputes the full decomposition, and reports percentile confidence
-intervals. Bootstrap p-values are not reported.}
+intervals. Bootstrap p-values are not reported. When this argument is
+omitted, two-level Pearson output defaults to \code{"analytic"} and three-level
+output defaults to \code{"none"}.}
 
 \item{weighted_between_statistics}{Deprecated logical alias for
 \code{between_weighting}. If TRUE, \code{between_weighting = "cluster_size"}; if
@@ -107,21 +116,24 @@ sample for users who require a coherent correlation matrix, at the cost of
 discarding partially observed rows.}
 }
 \value{
-A wbCorr object that contains within- and between-cluster statistics.
-Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
-Use the summary() or get_matrix() function on the wbCorr object to retrieve various correlation matrices, including ICCs in the merged ones.
-Use get_ICC() to retrieve all intraclass correlations (ICC(1,1)).
-Finally, use to_excel() on a table or matrix (or list of matrices) to save them.
+A \code{wbCorr} object containing within- and between-cluster statistics
+for a two-level analysis, or a \code{wbCorrNested} object containing separate
+\code{level1}, \code{level2}, and \code{level3} sections for a three-level analysis. Use
+\code{\link[=get_table]{get_table()}} for full tables and \code{\link[=summary]{summary()}} or \code{\link[=get_matrix]{get_matrix()}} for matrices.
+Merged matrices and \code{\link[=get_ICC]{get_ICC()}} are available only for two-level objects.
+Use \code{\link[=to_excel]{to_excel()}} on a table, matrix, or list returned by an accessor.
 }
 \description{
-The wbCorr function creates a wbCorr object containing within- and
-between-cluster correlations, p-values, and confidence intervals for a given
-dataset and clustering variable. The object can be plotted.
+The \code{wbCorr()} function creates either a two-level \code{wbCorr} object or a
+three-level \code{wbCorrNested} object containing level-specific correlations and
+the requested inferential output. Both object types can be inspected,
+extracted, exported, and plotted.
 }
 \details{
-Calculates bivariate within- and between-cluster correlations for clustered
-data, such as repeated measures nested in persons, dyads, teams, or other
-groups. Only recommended for continuous or binary variables.
+Calculates bivariate level-specific correlations for clustered data,
+including observations nested in one cluster level and strictly nested
+three-level structures. Only recommended for continuous or binary
+variables.
 
 Logical variables are encoded as 0/1. Factors must declare exactly two
 levels and are encoded as 0/1 in declared factor-level order, so reversing
@@ -141,8 +153,8 @@ semidefinite, and exposes the result through \code{\link[=get_matrix_diagnostics
 With \code{missing_data = "listwise"}, rows missing any supported analysis
 variable or the cluster identifier are removed before correlation
 decomposition and inference. This gives all pairs a common raw-row sample.
-ICCs keep their documented variable-wise finite-row samples and are not
-changed by this matrix-oriented option.
+For a two-level object, ICCs keep their documented variable-wise finite-row
+samples and are not changed by this matrix-oriented option.
 With a single coefficient method (\code{"pearson"} or \code{"spearman"}) and common
 weights, the resulting complete correlation matrix is positive
 semidefinite up to numerical tolerance. \code{method = "auto"} can mix Pearson
@@ -155,6 +167,44 @@ same complete-pair row set. This keeps the within residuals centered for the
 actual pairwise sample and makes the between correlation a correlation of
 matched pair-specific cluster means.
 
+A fully named two-element list selects the strictly nested three-level mode.
+For each variable pair, \code{level1} is the pooled Pearson correlation of
+observation deviations from their lower-unit means. \code{level2} is the
+correlation of lower-unit means after subtracting the mean of the
+contributing lower-unit means in their upper unit. \code{level3} is the
+correlation of those upper-unit means. Thus observations contribute equally
+at level 1, lower units contribute equally at level 2 and when constructing
+level-3 means, and upper units contribute equally at level 3. All means are
+estimated from the same pair-specific complete rows. Correlations across
+levels are distinct estimands and are not additive. With unequal numbers of
+observations per lower unit, the equal-lower-unit upper mean deliberately
+differs from the observation-weighted upper mean used in conventional
+manifest contextual-model decompositions; the two coincide when lower-unit
+observation counts are balanced. These are descriptive correlations, not
+estimates of the cited papers' regression, R-squared, or latent parameters.
+
+Three-level IDs must describe a strict global nesting. A lower ID reused
+under more than one upper ID is rejected; construct an explicit globally
+unique composite lower ID first. Rows with both hierarchy IDs missing are
+excluded, whereas a row with only part of its hierarchy path missing is an
+error. In the first three-level implementation, only
+\code{method = "pearson"}, equal-unit weighting,
+\code{centering_rows = "pairwise_complete"}, and \code{inference = "none"} or
+\code{"cluster_bootstrap"} are supported. When \code{inference} is omitted,
+three-level output defaults to coefficients only. The bootstrap resamples
+intact upper units and re-keys every duplicated upper unit and its
+descendants. An interval is attempted only when at least three upper units
+contribute to the observed variable pair. Every upper unit with a complete
+hierarchy path then remains in the sampling frame even when it has no
+complete observations for that pair; such draws can reduce \code{n_boot_valid}.
+
+A \code{wbCorrNested} object exposes all three levels through \code{get_table()},
+\code{get_matrix()}, \code{summary()}, \code{get_matrix_diagnostics()}, and \code{plot()} using
+selectors \code{"level1"}/\code{"l1"}, \code{"level2"}/\code{"l2"}, and
+\code{"level3"}/\code{"l3"}. It does not provide a merged-triangle matrix or silently
+reuse the one-way ICC. Level-specific variance-partition coefficients require
+separately defined variance estimands and are outside this version's scope.
+
 Detailed tables always retain one row for every requested unordered pair.
 \code{n_obs} is the number of jointly observed raw rows with a nonmissing cluster
 identifier, and \code{n_clusters} is the number of clusters contributing at least
@@ -165,7 +215,15 @@ joint pair-row count. \code{status} describes coefficient estimability (\code{"o
 \code{inference_status} separately records \code{"not_requested"}, \code{"ok"},
 \code{"partial"}, or \code{"unavailable"}, with details in \code{inference_reason}.
 A descriptive coefficient requires two analysis units with positive
-variance; inferential output can require more.
+variance; inferential output can require more. Three-level tables replace
+\code{n_clusters} with \code{n_units}, \code{n_level2}, and \code{n_level3}, while retaining the
+same status fields. \code{n_units} is the number of values correlated at the
+selected level: \code{n_obs} at level 1, \code{n_level2} at level 2, and \code{n_level3} at
+level 3. \code{n_level2} and \code{n_level3} count the represented lower and upper
+units in the pair-complete sample. \code{n_informative_units} counts lower units
+with at least two complete observations at level 1, upper units with at
+least two contributing lower units at level 2, and contributing upper units
+at level 3.
 
 With \code{centering_rows = "all_available"}, each variable's cluster mean is
 estimated from all available rows for that variable before the pairwise
@@ -212,8 +270,8 @@ invariant to monotone transformations of the original observations. wbCorr
 therefore does not attach analytic p-values or confidence intervals to these
 coefficients. Whole-cluster bootstrap confidence intervals are available.
 
-For each variable, wbCorr also reports the one-way random-effects,
-single-measure ICC(1,1). It is estimated from all finite observations for
+For each variable in a two-level object, wbCorr also reports the one-way
+random-effects, single-measure ICC(1,1). It is estimated from all finite observations for
 that variable using the ANOVA method of moments and an effective cluster size
 when clusters are unbalanced. Negative sample ICCs are retained; they occur
 when the between-cluster mean square is smaller than the within-cluster mean
@@ -225,8 +283,8 @@ not contain enough clusters or within-cluster replication, or when total
 variability is zero.
 
 With \code{inference = "cluster_bootstrap"}, wbCorr resamples whole top-level
-clusters, recomputes the selected within- and between-cluster correlations,
-and reports first-order percentile bootstrap confidence intervals. This
+clusters, recomputes the selected level-specific correlations, and reports
+first-order percentile bootstrap confidence intervals. This
 keeps the package's descriptive estimands while avoiding row-level
 independence assumptions. Interval accuracy assumes independent clusters
 and adequate numbers of clusters and bootstrap replicates; the technical
@@ -240,16 +298,15 @@ null-resampling test for these clustered estimands.
 
 Correlation-matrix diagonals are 1 only when the variable has at least two
 usable values and positive variance at that level; otherwise they are \code{NA}.
-P-value diagonals are always \code{NA}. Merged summary matrices continue to show
-the variable's ICC on the diagonal instead of a level-specific self-
-correlation.
+P-value diagonals are always \code{NA}. For two-level objects, merged summary
+matrices continue to show the variable's ICC on the diagonal instead of a
+level-specific self-correlation.
 A matrix with any unavailable coefficient cannot be assessed as a complete
 positive-semidefinite correlation matrix and is reported as
 \code{"not_assessable"} rather than silently treated as valid.
 
 Inspired by the psych::statsBy function, wbCorr allows you to calculate,
-extract, and plot within- and between-cluster correlations for further
-analysis.
+extract, and plot level-specific correlations for further analysis.
 }
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations
@@ -292,6 +349,21 @@ plot(correlations, which = 'b')
 # Store the list of correlation matrices to excel
 to_excel(matrices, path = tempfile(fileext = ".xlsx"))
 
+# Strict three-level decomposition: occasions within people within dyads.
+nested_data <- data.frame(
+  person = rep(seq_len(12), each = 3),
+  dyad = rep(seq_len(6), each = 6),
+  x = rep(c(-2, 0, 2), 12) + rep(seq_len(12), each = 3),
+  y = rep(c(1, -2, 1), 12) +
+    rep(rep(c(-1, 1), 6), each = 3) +
+    rep(c(2, 1, 3, 6, 4, 5), each = 6)
+)
+nested_correlations <- wbCorr(
+  nested_data,
+  cluster = list(person = "person", dyad = "dyad"),
+  inference = "none"
+)
+get_matrix(nested_correlations, "l2")
 
 }
 \references{
@@ -310,6 +382,19 @@ statistical problems: A critical evaluation of size and power properties.
 Andrews, D. W. K., & Buchinsky, M. (2000). A three-step method for choosing
 the number of bootstrap repetitions. \emph{Econometrica, 68}(1), 23-51.
 \doi{10.1111/1468-0262.00092}
+
+Rights, J. D., & Sterba, S. K. (2023). R-squared measures for multilevel
+models with three or more levels. \emph{Multivariate Behavioral Research, 58}(2),
+340-367. \doi{10.1080/00273171.2021.1985948}
+
+Kerkhoff, D., & Nussbeck, F. W. (2023). Estimation quality and required
+sample sizes in three-level contextual analysis models. \emph{Methodology, 19}(2),
+133-151.
+\doi{10.5964/meth.9775}
+
+Field, C. A., & Welsh, A. H. (2007). Bootstrapping clustered data.
+\emph{Journal of the Royal Statistical Society: Series B, 69}(3), 369-390.
+\doi{10.1111/j.1467-9868.2007.00593.x}
 
 R Core Team. Correlation, variance and covariance matrices. R statistical
 software documentation. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cor.html}

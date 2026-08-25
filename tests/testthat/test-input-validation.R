@@ -106,6 +106,40 @@ test_that("cluster vectors have a strict shape and do not delete code-equivalent
 })
 
 
+test_that("distinct close numeric cluster IDs remain separate", {
+  numeric_ids <- rep(c(1, 1 + 1e-15, 2), each = 3L)
+  data <- data.frame(
+    id = numeric_ids,
+    x = c(-2, -1, 0, 0, 2, 5, 6, 7, 9),
+    y = c(3, 1, 0, -4, -1, 3, 2, 5, 8)
+  )
+  labelled_data <- data
+  labelled_data$id <- rep(c("a", "b", "c"), each = 3L)
+
+  by_name <- wbCorr(data, "id", inference = "none")
+  by_vector <- wbCorr(
+    data[c("x", "y")],
+    numeric_ids,
+    inference = "none"
+  )
+  labelled <- wbCorr(labelled_data, "id", inference = "none")
+
+  expect_length(unique(numeric_ids), 3L)
+  expect_identical(nlevels(by_name@centered_data$cluster_var), 3L)
+  expect_equal(
+    get_matrix(by_name, numeric = TRUE),
+    get_matrix(labelled, numeric = TRUE),
+    tolerance = 0
+  )
+  expect_equal(
+    get_matrix(by_vector, numeric = TRUE),
+    get_matrix(labelled, numeric = TRUE),
+    tolerance = 0
+  )
+  expect_equal(get_ICC(by_name), get_ICC(labelled), tolerance = 0)
+})
+
+
 test_that("named and supplied clusters receive identical content validation", {
   dat <- validation_data()
 

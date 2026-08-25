@@ -123,6 +123,87 @@ within_matrix <- get_matrix(fit, "w", numeric = TRUE)$within
 merged_matrix <- get_matrix(fit, "wb", numeric = TRUE)$merged_wb
 ```
 
+## Add a third nested level
+
+For observations nested in lower-level units nested in upper-level units, pass
+a fully named list ordered lower-to-higher. The names describe the grouping
+levels; the values name columns in the data. The example below has occasions
+within people within dyads.
+
+```{r simulate-three-level}
+set.seed(2027)
+
+n_dyads <- 30
+n_people_per_dyad <- 2
+n_occasions_per_person <- 8
+n_people <- n_dyads * n_people_per_dyad
+n_rows <- n_people * n_occasions_per_person
+
+dyad <- rep(seq_len(n_dyads),
+            each = n_people_per_dyad * n_occasions_per_person)
+person <- rep(seq_len(n_people), each = n_occasions_per_person)
+
+dyad_x <- rnorm(n_dyads)
+dyad_y <- 0.7 * dyad_x + rnorm(n_dyads, sd = 0.7)
+person_x <- rnorm(n_people)
+person_y <- -0.5 * person_x + rnorm(n_people, sd = 0.8)
+occasion_x <- rnorm(n_rows)
+occasion_y <- 0.4 * occasion_x + rnorm(n_rows)
+
+nested_dat <- data.frame(
+  dyad = dyad,
+  person = person,
+  x = rep(dyad_x, each = n_people_per_dyad * n_occasions_per_person) +
+    rep(person_x, each = n_occasions_per_person) + occasion_x,
+  y = rep(dyad_y, each = n_people_per_dyad * n_occasions_per_person) +
+    rep(person_y, each = n_occasions_per_person) + occasion_y
+)
+```
+
+```{r fit-three-level}
+nested_fit <- wbCorr(
+  data = nested_dat,
+  cluster = list(person = "person", dyad = "dyad"),
+  inference = "none"
+)
+
+summary(nested_fit, "l1")
+summary(nested_fit, "l2")
+summary(nested_fit, "l3")
+```
+
+`level1` correlates occasion deviations from person means. `level2` correlates
+person means after subtracting the corresponding dyad mean. `level3`
+correlates dyad means. All quantities are computed separately for each
+variable pair: observations contribute equally at level 1, people contribute
+equally at level 2 and to each dyad mean, and dyads contribute equally at
+level 3.
+
+With unequal numbers of observations per person, this equal-person dyad mean
+is deliberately different from the observation-weighted upper mean used in
+conventional manifest contextual-model decompositions
+([Kerkhoff & Nussbeck, 2023](https://doi.org/10.5964/meth.9775)). The two
+coincide when people contribute the same number of observations. These are
+descriptive correlations, not estimates of a multilevel regression, R-squared,
+or latent parameter.
+
+The three matrices answer three different questions and are therefore not
+combined into a two-triangle display. Likewise, a single one-way ICC is not
+reported for a three-level object.
+
+```{r extract-three-level}
+nested_tables <- get_table(nested_fit)
+nested_matrices <- get_matrix(nested_fit, numeric = TRUE)
+
+nested_tables$level2
+nested_matrices$level3
+```
+
+The first implementation requires globally unique lower-level IDs, strict
+nesting, Pearson correlations, pairwise-complete centering, and equal-unit
+weighting. Use `missing_data = "listwise"` when all matrices should use one
+common row sample.
+
 ## Add uncertainty when needed
 
 By default, Pearson correlations include analytic tests and confidence
@@ -144,3 +225,20 @@ Use substantially more than the technical minimum number of bootstrap
 replicates for substantive analyses, and inspect `n_boot_valid` in the detailed
 tables. See `?wbCorr` for weighting, centering, missing-data, Spearman, and
 diagnostic options.
+
+For a three-level fit, the same inference selector resamples intact upper-level
+units and preserves all of their lower units and observations:
+
+```{r bootstrap-three-level, eval = FALSE}
+set.seed(2027)
+
+nested_boot <- wbCorr(
+  data = nested_dat,
+  cluster = list(person = "person", dyad = "dyad"),
+  inference = "cluster_bootstrap",
+  nboot = 1000
+)
+```
+
+Analytic three-level inference is not supplied because its operating
+characteristics have not been justified for these descriptive estimands.

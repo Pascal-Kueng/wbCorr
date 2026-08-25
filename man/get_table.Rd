@@ -3,27 +3,30 @@
 \name{get_table}
 \alias{get_table}
 \alias{get_tables}
-\title{Retrieve full tables for both within- and/or between-cluster correlations for a wbCorr object.}
+\title{Retrieve detailed correlation tables from a wbCorr result.}
 \usage{
 get_table(object, which = c("within", "between"))
 
 get_tables(object, which = c("within", "between"))
 }
 \arguments{
-\item{object}{A wbCorr object, created by the wbCorr() function.}
+\item{object}{A wbCorr object, created by the wbCorr() function, or a
+three-level \code{wbCorrNested} object.}
 
 \item{which}{A character vector indicating which correlation table to return.
-Options are 'within' or 'w', and 'between' or 'b'.}
+For a \code{wbCorr} object, options are 'within' or 'w', and 'between' or 'b'.
+For a \code{wbCorrNested} object, options are 'level1' or 'l1', 'level2' or
+'l2', and 'level3' or 'l3'; all three levels are returned by default.}
 }
 \value{
-A list containing the selected detailed tables of within- and/or
-between-cluster correlations. Each table retains every requested pair and
+A list containing the selected detailed correlation tables. Each
+table retains every requested pair and
 includes raw pair-row, contributing-cluster, bootstrap-yield, coefficient-
 status, and inference-status diagnostics; see \code{\link[=wbCorr]{wbCorr()}} for definitions.
 }
 \description{
 This function has an alias get_tables() which can be used interchangeably.
-For correlations matrices, see the summary() function.
+For correlation matrices, see the summary() function.
 }
 \examples{
 # importing our simulated example dataset with pre-specified within- and between- correlations

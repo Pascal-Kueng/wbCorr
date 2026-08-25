@@ -5,7 +5,7 @@
 \alias{get_matrices}
 \alias{summary.wbCorr}
 \alias{summary,wbCorr-method}
-\title{Return matrices for within- and/or between-cluster correlations.}
+\title{Return correlation matrices from a wbCorr result.}
 \usage{
 get_matrix(
   object,
@@ -26,12 +26,16 @@ get_matrices(
 \S4method{summary}{wbCorr}(object, which = c("within", "between", "merge"), numeric = FALSE, ...)
 }
 \arguments{
-\item{object}{A wbCorr object, created by the wbCorr() function.}
+\item{object}{A wbCorr object, created by the wbCorr() function, or a
+three-level \code{wbCorrNested} object.}
 
 \item{which}{A string or a character vector indicating which summaries to return.
-Options are 'within' or 'w', 'between' or 'b', and various merge options
-like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'.
-Default is c('within', 'between', 'merge').}
+For a \code{wbCorr} object, options are 'within' or 'w', 'between' or 'b', and
+various merge options like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw',
+'bw'. Default is c('within', 'between', 'merge'). For a \code{wbCorrNested}
+object, options are 'level1' or 'l1', 'level2' or 'l2', and 'level3' or
+'l3'; all three levels are returned by default. Merged matrices are not
+defined for three-level objects.}
 
 \item{numeric}{A non-missing logical value. If \code{FALSE} (the default), return
 presentation-formatted character matrices with two decimal places and any
@@ -42,15 +46,15 @@ diagonal.}
 \item{...}{Additional arguments passed to the base summary method}
 }
 \value{
-A list containing the selected matrices of within- and/or
-between-cluster correlations, and ICCs on the diagonals for merged matrices.
+A list containing the selected correlation matrices, and ICCs on the
+diagonals for merged two-level matrices.
 With \code{numeric = FALSE}, matrix entries are presentation-formatted character
 values. With \code{numeric = TRUE}, matrix columns are numeric and retain the
 full stored precision.
 }
 \description{
 You can use summary(), get_matrices(), or get_matrix() interchangeably.
-Merged matrices include the ICC on the diagonal.
+Merged two-level matrices include the ICC on the diagonal.
 For more detailed statistics, use get_table(). By default, matrices are
 presentation-formatted with two decimal places and significance stars. Set
 \code{numeric = TRUE} to retrieve the stored, unrounded numeric coefficients.

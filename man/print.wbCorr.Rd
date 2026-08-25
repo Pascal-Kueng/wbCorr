@@ -3,22 +3,26 @@
 \name{print,wbCorr-method}
 \alias{print,wbCorr-method}
 \alias{print.wbCorr}
-\title{Print Method for the wbCorr Class}
+\alias{print,wbCorrNested-method}
+\title{Print a wbCorr result}
 \usage{
 \S4method{print}{wbCorr}(x, ...)
+
+\S4method{print}{wbCorrNested}(x, ...)
 }
 \arguments{
-\item{x}{A \code{wbCorr} object.}
+\item{x}{A \code{wbCorr} or \code{wbCorrNested} object.}
 
 \item{...}{Additional arguments, currently unused.}
 }
 \value{
-Invisibly returns the supplied \code{wbCorr} object. Called for the
-side effect of printing a compact summary of the within-cluster table,
-between-cluster table, and ICC table.
+Invisibly returns the supplied object. Ordinary \code{wbCorr} objects
+print the within-cluster, between-cluster, and ICC tables; \code{wbCorrNested}
+objects print separate level-1, level-2, and level-3 tables.
 }
 \description{
-Prints a summary of the \code{wbCorr} object.
+Prints a compact summary of a two-level \code{wbCorr} or
+three-level \code{wbCorrNested} object.
 }
 \examples{
 # Example

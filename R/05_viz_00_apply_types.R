@@ -47,7 +47,13 @@ decode_type <- function(num_type) {
 
 
 plot_pair_key <- function(x_name, y_name) {
-  paste0(x_name, "\r", y_name)
+  x_name <- enc2utf8(x_name)
+  y_name <- enc2utf8(y_name)
+  paste0(
+    nchar(x_name, type = "bytes"), ":", x_name,
+    "|",
+    nchar(y_name, type = "bytes"), ":", y_name
+  )
 }
 
 

@@ -4,10 +4,15 @@
 \alias{get_matrix_diagnostics}
 \title{Inspect positive-semidefinite diagnostics for correlation matrices}
 \usage{
-get_matrix_diagnostics(object)
+get_matrix_diagnostics(object, which = NULL)
 }
 \arguments{
-\item{object}{A \code{wbCorr} object.}
+\item{object}{A \code{wbCorr} or three-level \code{wbCorrNested} object.}
+
+\item{which}{For a \code{wbCorrNested} object, a character vector selecting
+'level1' or 'l1', 'level2' or 'l2', and 'level3' or 'l3'. All three levels
+are returned by default. This argument is not used for two-level \code{wbCorr}
+objects.}
 }
 \value{
 A data frame with one row for each level and columns identifying the
@@ -18,10 +23,11 @@ assessment was unavailable.
 }
 \description{
 Returns matrix-level diagnostics computed from the unrounded
-within- and between-cluster correlation matrices stored in a \code{\link[=wbCorr]{wbCorr()}}
-object. Pairwise-complete correlations can be non-positive-semidefinite when
-different pairs use different rows. A diagnostic is not assessable when the
-corresponding matrix contains an unavailable (\code{NA}) coefficient.
+correlation matrices stored in a \code{\link[=wbCorr]{wbCorr()}} object, including all three
+levels of a \code{wbCorrNested} object. Pairwise-complete correlations can be
+non-positive-semidefinite when different pairs use different rows. A
+diagnostic is not assessable when the corresponding matrix contains an
+unavailable (\code{NA}) coefficient.
 }
 \seealso{
 \code{\link[=wbCorr]{wbCorr()}}, \code{\link[=get_matrix]{get_matrix()}}

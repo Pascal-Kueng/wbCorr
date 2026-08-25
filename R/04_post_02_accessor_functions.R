@@ -2,16 +2,19 @@
 # get_table / get_tables
 ################################
 
-#' @title Retrieve full tables for both within- and/or between-cluster correlations for a wbCorr object.
+#' @title Retrieve detailed correlation tables from a wbCorr result.
 #' @description This function has an alias get_tables() which can be used interchangeably.
-#' For correlations matrices, see the summary() function.
+#' For correlation matrices, see the summary() function.
 #'
-#' @param object A wbCorr object, created by the wbCorr() function.
+#' @param object A wbCorr object, created by the wbCorr() function, or a
+#' three-level `wbCorrNested` object.
 #' @param which A character vector indicating which correlation table to return.
-#' Options are 'within' or 'w', and 'between' or 'b'.
+#' For a `wbCorr` object, options are 'within' or 'w', and 'between' or 'b'.
+#' For a `wbCorrNested` object, options are 'level1' or 'l1', 'level2' or
+#' 'l2', and 'level3' or 'l3'; all three levels are returned by default.
 #'
-#' @return A list containing the selected detailed tables of within- and/or
-#' between-cluster correlations. Each table retains every requested pair and
+#' @return A list containing the selected detailed correlation tables. Each
+#' table retains every requested pair and
 #' includes raw pair-row, contributing-cluster, bootstrap-yield, coefficient-
 #' status, and inference-status diagnostics; see [wbCorr()] for definitions.
 #'
@@ -37,6 +40,18 @@
 #'
 #' @export
 get_table <- function(object, which = c('within', 'between')) {
+  if (methods::is(object, "wbCorrNested")) {
+    if (missing(which) || is.null(which)) {
+      which <- c("level1", "level2", "level3")
+    }
+    levels <- match_nested_levels(which)
+    output_list <- list()
+    for (level in levels) {
+      output_list[[level]] <- object@levels[[level]]$table
+    }
+    return(output_list)
+  }
+
   which <- match.arg(which, choices = c('within', 'w', 'between', 'b'),
                      several.ok = TRUE) # Check for valid inputs
   output_list <- list()
@@ -54,22 +69,52 @@ get_table <- function(object, which = c('within', 'between')) {
 #' @export
 get_tables <- get_table
 
+match_nested_levels <- function(which) {
+  merge_choices <- c("merge", "m", "merged", "merge_bw", "bw",
+                     "merge_wb", "wb")
+  if (any(which %in% merge_choices)) {
+    stop(
+      paste0(
+        "Merged matrices are not available for wbCorrNested objects; ",
+        "select 'level1', 'level2', or 'level3'."
+      ),
+      call. = FALSE
+    )
+  }
+
+  which <- match.arg(
+    which,
+    choices = c("level1", "l1", "level2", "l2", "level3", "l3"),
+    several.ok = TRUE
+  )
+  aliases <- c(
+    level1 = "level1", l1 = "level1",
+    level2 = "level2", l2 = "level2",
+    level3 = "level3", l3 = "level3"
+  )
+  unique(unname(aliases[which]))
+}
+
 ##############################################
 # Summary / get_matrix / get_matrices
 ##############################################
 
-#' @title Return matrices for within- and/or between-cluster correlations.
+#' @title Return correlation matrices from a wbCorr result.
 #' @description You can use summary(), get_matrices(), or get_matrix() interchangeably.
-#' Merged matrices include the ICC on the diagonal.
+#' Merged two-level matrices include the ICC on the diagonal.
 #' For more detailed statistics, use get_table(). By default, matrices are
 #' presentation-formatted with two decimal places and significance stars. Set
 #' `numeric = TRUE` to retrieve the stored, unrounded numeric coefficients.
 #'
-#' @param object A wbCorr object, created by the wbCorr() function.
+#' @param object A wbCorr object, created by the wbCorr() function, or a
+#' three-level `wbCorrNested` object.
 #' @param which A string or a character vector indicating which summaries to return.
-#' Options are 'within' or 'w', 'between' or 'b', and various merge options
-#' like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw', 'bw'.
-#' Default is c('within', 'between', 'merge').
+#' For a `wbCorr` object, options are 'within' or 'w', 'between' or 'b', and
+#' various merge options like 'merge', 'm', 'merge_wb', 'wb', 'merge_bw',
+#' 'bw'. Default is c('within', 'between', 'merge'). For a `wbCorrNested`
+#' object, options are 'level1' or 'l1', 'level2' or 'l2', and 'level3' or
+#' 'l3'; all three levels are returned by default. Merged matrices are not
+#' defined for three-level objects.
 #' @param numeric A non-missing logical value. If `FALSE` (the default), return
 #' presentation-formatted character matrices with two decimal places and any
 #' available significance stars. If `TRUE`, return unrounded numeric
@@ -77,8 +122,8 @@ get_tables <- get_table
 #' diagonal.
 #' @param ... Additional arguments passed to the base summary method
 #'
-#' @return A list containing the selected matrices of within- and/or
-#' between-cluster correlations, and ICCs on the diagonals for merged matrices.
+#' @return A list containing the selected correlation matrices, and ICCs on the
+#' diagonals for merged two-level matrices.
 #' With `numeric = FALSE`, matrix entries are presentation-formatted character
 #' values. With `numeric = TRUE`, matrix columns are numeric and retain the
 #' full stored precision.
@@ -112,6 +157,38 @@ get_matrix <- function(object, which = c('within', 'between', 'merge'),
                        numeric = FALSE, ...) {
   if (!is.logical(numeric) || length(numeric) != 1L || is.na(numeric)) {
     stop("numeric must be one non-missing logical value.", call. = FALSE)
+  }
+
+  if (methods::is(object, "wbCorrNested")) {
+    if (missing(which) || is.null(which)) {
+      which <- c("level1", "level2", "level3")
+    }
+    levels <- match_nested_levels(which)
+    return_list <- list()
+    has_off_diagonal_p <- FALSE
+
+    for (level in levels) {
+      section <- object@levels[[level]]
+      if (numeric) {
+        return_list[[level]] <- numeric_correlation_data_frame(
+          section$correlations
+        )
+      } else {
+        return_list[[level]] <- summarize_table(
+          section$p_values,
+          section$correlations
+        )
+        p_matrix <- as.matrix(section$p_values)
+        diag(p_matrix) <- NA_real_
+        has_off_diagonal_p <- has_off_diagonal_p ||
+          any(is.finite(p_matrix))
+      }
+    }
+
+    if (!numeric && has_off_diagonal_p) {
+      return_list[['note']] <- '***p < 0.001, **p < 0.01, *p < 0.05'
+    }
+    return(return_list)
   }
 
   which <- match.arg(which, choices = c('within', 'w',
@@ -223,6 +300,8 @@ get_matrices <- get_matrix
 #' @description You can use get_ICC() or get_ICCs() interchangeably.
 #'
 #' @param object A wbCorr object, created by the wbCorr() function.
+#' Three-level `wbCorrNested` objects do not have a single ICC table and are
+#' therefore unsupported by this accessor.
 #' @return A data frame with the one-way random-effects, single-measure
 #' ICC(1,1) for every variable. Each ICC is estimated separately from all finite
 #' observations with a non-missing cluster identifier. The ANOVA
@@ -261,6 +340,9 @@ get_matrices <- get_matrix
 #'
 #' @export
 get_ICC <- function(object) {
+  if (methods::is(object, "wbCorrNested")) {
+    stop("ICCs are not supported for wbCorrNested objects.", call. = FALSE)
+  }
   return(object@ICC)
 }
 
