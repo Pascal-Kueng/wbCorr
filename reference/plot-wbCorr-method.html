@@ -49,7 +49,7 @@ p-value for that pair.'></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Plot within- and between associations</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Pascal-Kueng/wbCorr/blob/v0.3.2/R/wbCorr.R" class="external-link"><code>R/wbCorr.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Pascal-Kueng/wbCorr/blob/main/R/wbCorr.R" class="external-link"><code>R/wbCorr.R</code></a></small>
       <div class="d-none name"><code>plot-wbCorr-method.Rd</code></div>
     </div>
 
@@ -67,7 +67,10 @@ p-value for that pair.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'wbCorr'</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'wbCorr'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'wbCorr'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
@@ -94,6 +97,10 @@ p-value for that pair.</p>
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>further options to be passed to the base plot (pairs) function.</p></dd>
 
 
 <dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
@@ -132,10 +139,6 @@ makes the displayed regression slope equal to the stored correlation.</p></dd>
 
 <dt id="arg-reg-lwd">reg_lwd<a class="anchor" aria-label="anchor" href="#arg-reg-lwd"></a></dt>
 <dd><p>Graphical parameter. Set thickness of the regression line.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>further options to be passed to the base plot (pairs) function.</p></dd>
 
 </dl></div>
     <div class="section level2">

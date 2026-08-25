@@ -5,7 +5,7 @@ status](https://www.r-pkg.org/badges/version/wbCorr)](https://CRAN.R-project.org
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/wbCorr)](https://CRAN.R-project.org/package=wbCorr)
 [![R-CMD-check](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Pascal-Kueng/wbCorr/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20357592.svg)](https://doi.org/10.5281/zenodo.20357592)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20357592-blue.svg)](https://doi.org/10.5281/zenodo.20357592)
 
 The wbCorr package computes bivariate within- and between-cluster
 correlations for clustered data, such as repeated measures nested in
@@ -28,8 +28,7 @@ Install the development version from GitHub:
 
 ``` r
 
-# install.packages("pak")
-pak::pak("Pascal-Kueng/wbCorr")
+install.packages('wbCorr', repos = c('https://pascal-kueng.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 ## Quick start
@@ -275,15 +274,14 @@ approximate.
 
 ## Citation
 
-Please cite the CRAN release as:
+Please cite wbCorr as:
 
 > Küng, P. (2026). *wbCorr: Bivariate Within- and Between-Cluster
 > Correlations* (R package version 0.3.2).
-> <https://doi.org/10.32614/CRAN.package.wbCorr>
+> <https://doi.org/10.5281/zenodo.20357592>
 
-The version-independent Zenodo concept DOI for the repository is
-[10.5281/zenodo.20357592](https://doi.org/10.5281/zenodo.20357592). It
-resolves to the latest archived release; release-specific Zenodo DOIs
+This is the version-independent Zenodo concept DOI for the repository.
+It resolves to the latest archived release; release-specific Zenodo DOIs
 are intentionally not used in repository metadata.
 
 Generate the citation and BibTeX entry in R with:
