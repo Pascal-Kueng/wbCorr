@@ -10,8 +10,6 @@
   [`get_matrices()`](https://pascal-kueng.github.io/wbCorr/reference/get_matrix.md)
   [`summary(`*`<wbCorr>`*`)`](https://pascal-kueng.github.io/wbCorr/reference/get_matrix.md)
   : Return matrices for within- and/or between-cluster correlations.
-- [`get_matrix_diagnostics()`](https://pascal-kueng.github.io/wbCorr/reference/get_matrix_diagnostics.md)
-  : Inspect positive-semidefinite diagnostics for correlation matrices
 - [`get_table()`](https://pascal-kueng.github.io/wbCorr/reference/get_table.md)
   [`get_tables()`](https://pascal-kueng.github.io/wbCorr/reference/get_table.md)
   : Retrieve full tables for both within- and/or between-cluster
@@ -25,7 +23,7 @@
 - [`simdat_intensive_longitudinal`](https://pascal-kueng.github.io/wbCorr/reference/simdat_intensive_longitudinal.md)
   : Simulated Intensive Longitudinal Dataset
 - [`to_excel()`](https://pascal-kueng.github.io/wbCorr/reference/to_excel.md)
-  : Save tables or matrices to Excel
+  : Saves the passed summary or table to excel
 - [`update_wbCorr()`](https://pascal-kueng.github.io/wbCorr/reference/update_wbCorr.md)
   : Check for updates of wbCorr
 - [`wbCorr-class`](https://pascal-kueng.github.io/wbCorr/reference/wbCorr-class.md)

@@ -1,14 +1,13 @@
 # Plot within- and between associations
 
-Plots the centered variables of the provided data frame against each
-other. Choose either cluster means (`"between"`) or deviations from
-cluster means (`"within"`). Every panel uses the same pair-specific
-rows, centering rule, method, and between-cluster weights as the fitted
-object. Pearson plots draw a corresponding regression line and annotate
-the stored correlation; weighted between-cluster panels use weighted
-least squares. Spearman plots report the stored rho without a
-linear-regression overlay. Significance stars are shown only when the
-fitted wbCorr object contains a p-value for that pair.
+Plots the centered variables of the provided dataframe against each
+other. Choose whether to plot the between-centered variables
+(representing the between-cluster correlations by plotting cluster
+means) or the within-centered variables (representing the within-cluster
+correlations by plotting deviations from person-means). Panels below the
+diagonal show scatterplots with a regression line. Panels above the
+diagonal show the correlation from the wbCorr object with its
+significance stars.
 
 ## Usage
 
@@ -60,9 +59,7 @@ plot(
 
 - standardize:
 
-  Boolean. Whether each plotted pair should be standardized using the
-  same weights as its fitted coefficient. For Pearson panels, this makes
-  the displayed regression slope equal to the stored correlation.
+  Boolean. Whether the dataset should be standardized before plotting.
 
 - outlier_detection:
 
@@ -92,9 +89,8 @@ plot(
 
 ## Value
 
-Invisibly returns the supplied `wbCorr` object. Called for the side
-effect of drawing a pairs plot of the selected within- or
-between-cluster centered variables.
+Called for the side effect of drawing a pairs plot; returns `NULL`
+invisibly.
 
 ## See also
 

@@ -30,13 +30,11 @@ effect of showing the same compact summary as
 
 ``` r
 # Example using the iris dataset
-cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
-#> Warning: Analytic p-values and confidence intervals are working approximations for clustered data; use inference = 'cluster_bootstrap' for whole-cluster resampling intervals.
-#> Warning: Analytic inference is not supported for cluster-size-weighted between correlations; returning the weighted coefficient without a p-value or confidence interval. Use inference = 'cluster_bootstrap' for weighted inference.
+cors <- wbCorr(iris, iris$Species, between_weighting = 'cluster_size')
 show(cors)
 #> 
 #> ---- wbCorr Object ----
-#> Call:  wbCorr(data = iris, cluster = iris$Species, weighted_between_statistics = TRUE) 
+#> Call:  wbCorr(data = iris, cluster = iris$Species, between_weighting = "cluster_size") 
 #> 
 #>  Within-Cluster Correlations: 
 #> ---------------------------- 
@@ -47,51 +45,16 @@ show(cors)
 #> 4  Sepal.Width Petal.Length        0.38        4.93 146 [0.23, 0.51] < .001***
 #> 5  Sepal.Width  Petal.Width        0.47        6.44 146 [0.33, 0.59] < .001***
 #> 6 Petal.Length  Petal.Width        0.48        6.69 146 [0.35, 0.60] < .001***
-#>   n_obs n_clusters n_boot_attempted n_boot_valid status reason inference_status
-#> 1   150          3               NA           NA     ok   <NA>               ok
-#> 2   150          3               NA           NA     ok   <NA>               ok
-#> 3   150          3               NA           NA     ok   <NA>               ok
-#> 4   150          3               NA           NA     ok   <NA>               ok
-#> 5   150          3               NA           NA     ok   <NA>               ok
-#> 6   150          3               NA           NA     ok   <NA>               ok
-#>   inference_reason
-#> 1             <NA>
-#> 2             <NA>
-#> 3             <NA>
-#> 4             <NA>
-#> 5             <NA>
-#> 6             <NA>
 #> 
 #>  Between-Cluster Correlations: 
 #> ----------------------------- 
-#>     Parameter1   Parameter2
-#> 1 Sepal.Length  Sepal.Width
-#> 2 Sepal.Length Petal.Length
-#> 3 Sepal.Length  Petal.Width
-#> 4  Sepal.Width Petal.Length
-#> 5  Sepal.Width  Petal.Width
-#> 6 Petal.Length  Petal.Width
-#>                                                             warning pearson's r
-#> 1 weighted between analytic inference unavailable; coefficient only       -0.75
-#> 2 weighted between analytic inference unavailable; coefficient only        0.99
-#> 3 weighted between analytic inference unavailable; coefficient only        1.00
-#> 4 weighted between analytic inference unavailable; coefficient only       -0.81
-#> 5 weighted between analytic inference unavailable; coefficient only       -0.76
-#> 6 weighted between analytic inference unavailable; coefficient only        1.00
-#>   t-statistic df 95% CI  p n_obs n_clusters n_boot_attempted n_boot_valid
-#> 1          NA NA   <NA> NA   150          3               NA           NA
-#> 2          NA NA   <NA> NA   150          3               NA           NA
-#> 3          NA NA   <NA> NA   150          3               NA           NA
-#> 4          NA NA   <NA> NA   150          3               NA           NA
-#> 5          NA NA   <NA> NA   150          3               NA           NA
-#> 6          NA NA   <NA> NA   150          3               NA           NA
-#>   status reason inference_status                        inference_reason
-#> 1     ok   <NA>      unavailable weighted_analytic_inference_unsupported
-#> 2     ok   <NA>      unavailable weighted_analytic_inference_unsupported
-#> 3     ok   <NA>      unavailable weighted_analytic_inference_unsupported
-#> 4     ok   <NA>      unavailable weighted_analytic_inference_unsupported
-#> 5     ok   <NA>      unavailable weighted_analytic_inference_unsupported
-#> 6     ok   <NA>      unavailable weighted_analytic_inference_unsupported
+#>     Parameter1   Parameter2 pearson's r t-statistic df        95% CI      p
+#> 1 Sepal.Length  Sepal.Width       -0.75       -1.12  1 [-1.00, 1.00]  0.465
+#> 2 Sepal.Length Petal.Length        0.99        9.19  1 [-1.00, 1.00]  0.069
+#> 3 Sepal.Length  Petal.Width        1.00       46.45  1 [-1.00, 1.00] 0.014*
+#> 4  Sepal.Width Petal.Length       -0.81       -1.40  1 [-1.00, 1.00]  0.396
+#> 5  Sepal.Width  Petal.Width       -0.76       -1.17  1 [-1.00, 1.00]  0.451
+#> 6 Petal.Length  Petal.Width        1.00       11.49  1 [-1.00, 1.00]  0.055
 #> 
 #>  Intraclass Correlation Coefficients: 
 #> ------------------------------------ 
@@ -101,8 +64,7 @@ show(cors)
 #> 3 Petal.Length 0.9593219
 #> 4  Petal.Width 0.9504463
 #> 
-#> Inspect matrices with summary(object, which = c('w', 'b', 'wb'))
 #> Access full tables with get_tables(object, which = c('within', 'between'))
-#> Access matrices programmatically with get_matrix(object, numeric = TRUE)
-#> Access the full ICC table with get_ICC(object)
+#> Access correlation matrices with summary(object, which = c('within', 'between', 'merge'))
+#> Access full ICC list with get_ICC(object)
 ```
