@@ -1,5 +1,9 @@
 # Changelog
 
+## wbCorr (development version)
+
+- The maintainer email is now <kueng.pascal@gmail.com>.
+
 ## wbCorr 0.4.0
 
 CRAN release: 2026-10-31
