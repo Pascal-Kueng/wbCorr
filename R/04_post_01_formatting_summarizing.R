@@ -31,8 +31,7 @@ summarize_table <- function(p_values, correlations) {
   df_summary <- matrix(unlist(df_summary), nrow = nrow(correlations), byrow = TRUE)
   colnames(df_summary) <- colnames(correlations)
   rownames(df_summary) <- rownames(correlations)
-  correlation_diagonal <- diag(as.matrix(correlations))
-  diag(df_summary) <- ifelse(is.na(correlation_diagonal), "NA", "1.00")
+  diag(df_summary) <- ifelse(is.na(diag(as.matrix(correlations))), 'NA', '1')
   return(as.data.frame(df_summary))
 }
 

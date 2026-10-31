@@ -14,14 +14,7 @@ test_that("complete-data correlations agree with psych::statsBy", {
   expect_length(unique(table(dat$participantID)), 1L)
   expect_false(anyNA(dat))
 
-  ours <- suppressWarnings(
-    wbCorr(
-      dat,
-      cluster = "participantID",
-      inference = "none",
-      between_weighting = "equal_clusters"
-    )
-  )
+  ours <- wbCorr(dat, cluster = "participantID", inference = "none")
   theirs <- suppressWarnings(
     psych::statsBy(
       dat,
@@ -49,4 +42,28 @@ test_that("complete-data correlations agree with psych::statsBy", {
     unname(theirs$ICC1[variables]),
     tolerance = 1e-10
   )
+})
+
+
+test_that("unbalanced data agree with psych::statsBy", {
+  testthat::skip_if_not_installed("psych")
+
+  set.seed(3)
+  dat <- data.frame(id = rep(1:25, times = sample(2:8, 25, replace = TRUE)))
+  dat$x <- rnorm(nrow(dat)) + rnorm(25)[dat$id]
+  dat$y <- 0.3 * dat$x + rnorm(nrow(dat))
+  theirs <- suppressWarnings(psych::statsBy(dat, group = "id", cors = TRUE))
+
+  # psych::statsBy weights between-cluster correlations by cluster size.
+  ours <- wbCorr(dat, cluster = "id", inference = "none",
+                 between_weighting = "cluster_size")
+  expect_equal(ours@within$correlations["x", "y"], theirs$rwg["x.wg", "y.wg"])
+  expect_equal(ours@between$correlations["x", "y"], theirs$rbg["x.bg", "y.bg"])
+
+  # Within-cluster deviations also agree when data are missing.
+  dat$x[c(3, 10, 40)] <- NA
+  dat$y[c(5, 10, 60)] <- NA
+  theirs <- suppressWarnings(psych::statsBy(dat, group = "id", cors = TRUE))
+  ours <- wbCorr(dat, cluster = "id", inference = "none")
+  expect_equal(ours@within$correlations["x", "y"], theirs$rwg["x.wg", "y.wg"])
 })

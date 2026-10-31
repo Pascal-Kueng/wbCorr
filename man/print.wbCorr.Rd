@@ -26,8 +26,7 @@ data("simdat_intensive_longitudinal")
 correlations <- wbCorr(simdat_intensive_longitudinal,
                        cluster = 'participantID',
                        confidence_level = 0.95,
-                       method = 'spearman',
-                       weighted_between_statistics = FALSE)
+                       method = 'spearman')
 print(correlations)
 
 }

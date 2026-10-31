@@ -110,17 +110,15 @@ plot(fit, "between")
 
 ## Extract results for further work
 
-The `summary()` shortcuts are convenient for inspection. For programmatic use,
-`get_table()` returns the full results and pair-specific diagnostics, while
-`get_matrix()` returns selected matrices. Set `numeric = TRUE` when unrounded
-numeric coefficients are needed for downstream calculations.
+The `summary()` shortcuts are convenient for inspection. For further work,
+`get_table()` returns the full results, while `get_matrix()` returns selected
+matrices.
 
 ```{r extract-results}
 tables <- get_table(fit)
 within_table <- tables$within
 
-within_matrix <- get_matrix(fit, "w", numeric = TRUE)$within
-merged_matrix <- get_matrix(fit, "wb", numeric = TRUE)$merged_wb
+merged_matrix <- get_matrix(fit, "wb")$merged_wb
 ```
 
 ## Add uncertainty when needed
@@ -140,7 +138,4 @@ fit_boot <- wbCorr(
 )
 ```
 
-Use substantially more than the technical minimum number of bootstrap
-replicates for substantive analyses, and inspect `n_boot_valid` in the detailed
-tables. See `?wbCorr` for weighting, centering, missing-data, Spearman, and
-diagnostic options.
+See `?wbCorr` for weighting and Spearman options.

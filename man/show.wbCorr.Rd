@@ -19,7 +19,7 @@ Shows a summary of the \code{wbCorr} object, equivalent to the print method.
 }
 \examples{
 # Example using the iris dataset
-cors <- wbCorr(iris, iris$Species, weighted_between_statistics = TRUE)
+cors <- wbCorr(iris, iris$Species, between_weighting = 'cluster_size')
 show(cors)
 }
 \seealso{

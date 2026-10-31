@@ -8,19 +8,26 @@ custom_lower_panel <- function(x, y, type = 'p',
                                df,
                                standardize,
                                plot_NA,
-                               plot_pairs = NULL,
                                ...) {
-  pair <- panel_pair_data(x, y, df, plot_pairs)
-  x <- pair$x
-  y <- pair$y
-  weights <- pair$weights
-  pair_method <- if (is.null(pair$method)) method else pair$method
 
+  # Find out variable names
+  x_idx <- round(x[1] * 100)
+  y_idx <- round(y[1] * 100)
+
+  x_name <- colnames(df)[x_idx]
+  y_name <- colnames(df)[y_idx]
+
+  # Find out type code
+  x_type <- decode_type(x[3])
+  y_type <- decode_type(y[3])
+
+  # remove coding from variables
+  x <- x[-c(1,2,3,4)]
+  y <- y[-c(1,2,3,4)]
+
+
+  # Valid pairs.
   valid_pairs <- is.finite(x) & is.finite(y)
-  if (!is.null(weights)) {
-    valid_pairs <- valid_pairs & is.finite(weights) & weights > 0
-    weights <- weights[valid_pairs]
-  }
   x <- x[valid_pairs]
   y <- y[valid_pairs]
 
@@ -28,26 +35,16 @@ custom_lower_panel <- function(x, y, type = 'p',
   # Prepare Tile
 
   # Plot all points
-  if (length(x) > 0L) {
-    points(x, y, type = type,
-           pch = pch, lwd = dot_lwd,
-           col = "black", ...)
-  }
+  points(x, y, type = type,
+         pch = pch, lwd = dot_lwd,
+         col = "black", ...)
 
   # Create Abline (regression)
   linear_regression <- NULL
 
-  if (pair_method != "spearman" && length(x) >= 2L &&
-      is.finite(var(x)) && var(x) > 0 &&
-      is.finite(var(y)) && var(y) > 0) {
-    tryCatch({
-      linear_regression <- if (is.null(weights)) {
-        lm(y ~ x, na.action = 'na.omit')
-      } else {
-        lm(y ~ x, weights = weights, na.action = 'na.omit')
-      }
-    }, error = function(e) {})
-  }
+  tryCatch({
+    linear_regression <- lm(y ~ x, na.action = 'na.omit')
+  }, error = function(e) {})
   if (!is.null(linear_regression) && all(is.finite(coef(linear_regression)))) {
     a <-
       abline(linear_regression,
@@ -58,10 +55,7 @@ custom_lower_panel <- function(x, y, type = 'p',
 
   # Identify Outliers
   if (outlier_detection == FALSE) {
-    return(invisible(list(x = x,
-                          y = y,
-                          weights = weights,
-                          fit = linear_regression)))
+    return(NULL)
   }
   x_outliers <- wb_check_outliers(x, outlier_detection, outlier_threshold)
   y_outliers <- wb_check_outliers(y, outlier_detection, outlier_threshold)
@@ -94,9 +88,4 @@ custom_lower_panel <- function(x, y, type = 'p',
              col = "red")
     }
   }
-
-  invisible(list(x = x,
-                 y = y,
-                 weights = weights,
-                 fit = linear_regression))
 }
