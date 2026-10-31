@@ -8,10 +8,10 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/Pascal-Kueng/wbCorr/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/Pascal-Kueng/wbCorr/blob/v0.4.0/inst/CITATION)
 
 Küng, P. (2026). wbCorr: Bivariate Within- and Between-Cluster
-Correlations (R package version 0.4.0.9000).
+Correlations (R package version 0.4.0).
 https://doi.org/10.5281/zenodo.20357592
 
     @Manual{,
@@ -19,7 +19,7 @@ https://doi.org/10.5281/zenodo.20357592
       author = {Pascal Küng},
       organization = {University of Zurich},
       year = {2026},
-      note = {R package version 0.4.0.9000},
+      note = {R package version 0.4.0},
       url = {https://pascal-kueng.github.io/wbCorr/},
       doi = {10.5281/zenodo.20357592},
     }
