@@ -1,15 +1,16 @@
 ## Update
 
-This is an update to wbCorr 0.3.1.
-It corrects Pearson analytic inference and the unequal-cluster-size ICC(1,1)
-calculation, strengthens validation and diagnostics, and expands tests and
-documentation.
+This is an update to wbCorr 0.3.2.
+It simplifies the package while keeping the statistical corrections of 0.3.2.
+It restores Spearman p-values and confidence intervals, and removes some
+arguments. NEWS.md lists all changes.
 
 ## Test environments
 
-* Fedora Linux 44, R 4.6.1 (`R CMD check --as-cran --run-donttest`)
-* GitHub Actions: macOS, Windows, and Ubuntu; R-devel, release, and oldrel-1
-* win-builder: R-devel (2026-07-22 r90289, Windows Server 2022)
+* Fedora Linux 44, R 4.6.1 (`R CMD check --as-cran --run-donttest`, with
+  remote CRAN incoming checks)
+* GitHub Actions: macOS and Windows (R release); Ubuntu (R-devel, release,
+  and oldrel-1)
 
 ## R CMD check results
 
