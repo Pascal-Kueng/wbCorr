@@ -1,8 +1,8 @@
 Package: wbCorr
 Title: Bivariate Within- and Between-Cluster Correlations
-Version: 0.4.0
+Version: 0.4.0.9000
 Authors@R: 
-    c(person("Pascal", "Küng", , "pascal.kueng@psychologie.uzh.ch", 
+    c(person("Pascal", "Küng", , "kueng.pascal@gmail.com", 
              role = c("aut", "cre", "cph"),
              comment = c(ORCID = "0000-0001-7346-9414")))
 Description: Separates supplied variables into within- and
