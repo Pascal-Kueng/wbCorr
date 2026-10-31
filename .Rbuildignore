@@ -10,3 +10,5 @@
 ^docs$
 (^|/)Rplots\.(pdf|ps)$
 ^CRAN-SUBMISSION$
+^README\.Rmd$
+^\.git$

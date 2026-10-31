@@ -55,7 +55,8 @@ Called for the side effect of drawing a pairs plot; returns
 Plots the centered variables of the provided dataframe against each other.
 Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
-A regression line is provided, and the corresponding correlation with significance from the wbCorr object is displayed.
+Panels below the diagonal show scatterplots with a regression line. Panels above the diagonal show
+the correlation from the wbCorr object with its significance stars.
 }
 \seealso{
 \code{\link[=wbCorr]{wbCorr}}

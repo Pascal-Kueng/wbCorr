@@ -2,9 +2,3 @@ url: https://pascal-kueng.github.io/wbCorr/
 
 template:
   bootstrap: 5
-
-articles:
-- title: Get started
-  navbar: ~
-  contents:
-  - within-between-correlations

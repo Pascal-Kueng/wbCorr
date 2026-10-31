@@ -33,6 +33,11 @@ keeping the statistical fixes of 0.3.2.
 * The cluster bootstrap reports bias-corrected (BC) intervals, works with
   cluster-size weighting, and is much faster.
 
+## Documentation
+
+* Rewrote the README with a worked example and its output. Removed the vignette,
+  which repeated the README.
+
 # wbCorr 0.3.2
 
 ## Statistical correctness

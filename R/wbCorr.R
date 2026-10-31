@@ -17,13 +17,14 @@
 #' @param inference A string specifying how p-values and confidence intervals are computed.
 #' 'analytic' (default) uses the formulas described under `method`.
 #' 'cluster_bootstrap' resamples whole clusters and computes bias-corrected (BC)
-#' bootstrap confidence intervals and p-values. Recommended for non-normal data, but slow.
+#' bootstrap confidence intervals and p-values. Unlike the analytic tests, it
+#' accounts for dependence within clusters and does not assume normal data.
 #' Use `set.seed()` for reproducible results.
 #' 'none' returns the correlation coefficients only.
 #' @param between_weighting A string. If 'equal_clusters' (default), every cluster mean
 #' is weighted the same in between-cluster correlations, even if some clusters
 #' contributed fewer measurement points. If 'cluster_size', cluster means are
-#' weighted by the number of observations of each cluster. These methods will be equivalent in datasets
+#' weighted by the number of observations each cluster has of both variables. These methods will be equivalent in datasets
 #' without missing data and an equal number of measurements per cluster.
 #' @return A wbCorr object that contains within- and between-cluster statistics.
 #' Use the get_table() function on the wbCorr object to retrieve a list of the full correlation tables.
@@ -330,7 +331,8 @@ methods::setMethod("summary", signature("wbCorr"), get_matrices)
 #' @description Plots the centered variables of the provided dataframe against each other.
 #' Choose whether to plot the between-centered variables (representing the between-cluster correlations by plotting cluster means)
 #' or the within-centered variables (representing the within-cluster correlations by plotting deviations from person-means).
-#' A regression line is provided, and the corresponding correlation with significance from the wbCorr object is displayed.
+#' Panels below the diagonal show scatterplots with a regression line. Panels above the diagonal show
+#' the correlation from the wbCorr object with its significance stars.
 #' @param x A wbCorr object to be plotted.
 #' @param y Choose which correlations to plot ('within' / 'w' or 'between' / 'b'); can be used as a positional argument.
 #' @param which Can be used as an alternative to 'y' (e.g., which = 'w'). It has the same functionality as 'y', but takes precedence if both are specified.

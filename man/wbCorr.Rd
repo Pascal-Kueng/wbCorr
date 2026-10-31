@@ -44,14 +44,15 @@ Supported methods are 'pearson', 'spearman', and 'auto' (default: 'pearson').
 \item{inference}{A string specifying how p-values and confidence intervals are computed.
 'analytic' (default) uses the formulas described under \code{method}.
 'cluster_bootstrap' resamples whole clusters and computes bias-corrected (BC)
-bootstrap confidence intervals and p-values. Recommended for non-normal data, but slow.
+bootstrap confidence intervals and p-values. Unlike the analytic tests, it
+accounts for dependence within clusters and does not assume normal data.
 Use \code{set.seed()} for reproducible results.
 'none' returns the correlation coefficients only.}
 
 \item{between_weighting}{A string. If 'equal_clusters' (default), every cluster mean
 is weighted the same in between-cluster correlations, even if some clusters
 contributed fewer measurement points. If 'cluster_size', cluster means are
-weighted by the number of observations of each cluster. These methods will be equivalent in datasets
+weighted by the number of observations each cluster has of both variables. These methods will be equivalent in datasets
 without missing data and an equal number of measurements per cluster.}
 }
 \value{
