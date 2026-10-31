@@ -1,8 +1,8 @@
 
 
 
-format_result_table <- function(result_table, method, auto_type, var_type,
-                                confidence_level, inference, level) {
+format_result_table <- function(result_table, method, auto_type, var_type, confidence_level, inference) {
+  bootstrap <- inference == 'cluster_bootstrap'
 
   # For all
   ci_name <- paste0(confidence_level * 100, "% CI")
@@ -14,7 +14,7 @@ format_result_table <- function(result_table, method, auto_type, var_type,
   if (!auto_type) {
     if (method == 'pearson') {
       colnames(result_table)[colnames(result_table) == "coefficient"] <- "pearson's r"
-      if (inference != 'analytic') {
+      if (bootstrap) {
         result_table$statistic <- NULL
       } else {
         colnames(result_table)[colnames(result_table) == "statistic"] <- "t-statistic"
@@ -22,26 +22,14 @@ format_result_table <- function(result_table, method, auto_type, var_type,
       result_table$method <- NULL
       result_table[['statistic type']] <- NULL
     } else if (method == 'spearman') {
-      coefficient_name <- if (level == 'within') {
-        "centered-score Spearman rho"
-      } else {
-        "cluster-mean Spearman rho"
-      }
-      colnames(result_table)[colnames(result_table) == "coefficient"] <- coefficient_name
-      if (inference != 'analytic') {
+      colnames(result_table)[colnames(result_table) == "coefficient"] <- "spearman's rho"
+      if (bootstrap) {
         result_table$statistic <- NULL
       } else {
         colnames(result_table)[colnames(result_table) == "statistic"] <- "z-statistic"
       }
       result_table$method <- NULL
       result_table[['statistic type']] <- NULL
-    } else if (method == 'spearman-jackknife') {
-      colnames(result_table)[colnames(result_table) == "coefficient"] <- "spearman's rho"
-      result_table$method <- NULL
-      result_table[['statistic type']] <- NULL
-      result_table$statistic <- NULL
-      result_table$df <- NULL
-      result_table$p <- NULL
     }
   }
 
@@ -52,28 +40,25 @@ format_result_table <- function(result_table, method, auto_type, var_type,
     result_table$warning <- NULL
   }
 
-  # Format p-value
-  if (method == 'spearman-jackknife') {
-    return(result_table)
+  # coefficients only
+  if (inference == 'none') {
+    inference_columns <- c('statistic type', 'statistic', 't-statistic', 'z-statistic', 'df', ci_name, 'p')
+    return(result_table[!colnames(result_table) %in% inference_columns])
   }
+
+  # Format p-value
 
   result_table$p <- ifelse(result_table$p < .001, "< .001***",
                            ifelse(result_table$p < .01, sprintf("%.3f**", result_table$p),
                                   ifelse(result_table$p < .05, sprintf("%.3f*", result_table$p),
                                          sprintf("%.3f", result_table$p))))
 
-  if (inference != 'analytic') {
+  if (bootstrap) {
     result_table$df <- NULL
     result_table[['statistic type']] <- NULL
-    if (inference == 'cluster_bootstrap') {
-      colnames(result_table)[colnames(result_table) == ci_name] <- paste("Cluster bootstrap", ci_name)
-    }
-    optional_inference_columns <- c(
-      "statistic", "t-statistic", "z-statistic", "df", "p",
-      ci_name, paste("Cluster bootstrap", ci_name)
-    )
-    for (name in intersect(optional_inference_columns,
-                           colnames(result_table))) {
+    colnames(result_table)[colnames(result_table) == ci_name] <- paste("BC", ci_name)
+    colnames(result_table)[colnames(result_table) == "p"] <- "bootstrap p"
+    for (name in colnames(result_table)) {
       if (all(is.na(result_table[[name]]))) {
         result_table[[name]] <- NULL
       }

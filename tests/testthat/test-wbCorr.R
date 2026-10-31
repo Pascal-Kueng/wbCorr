@@ -1,174 +1,97 @@
-test_that("cluster can be passed as a column name or vector", {
-  data("simdat_intensive_longitudinal")
+data("simdat_intensive_longitudinal")
 
-  by_name <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                     cluster = "participantID",
-                                     method = "auto"))
-  by_vector <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                       cluster = simdat_intensive_longitudinal$participantID,
-                                       method = "auto"))
+test_that("cluster can be passed as a column name or vector", {
+  by_name <- wbCorr(simdat_intensive_longitudinal, cluster = "participantID")
+  by_vector <- wbCorr(simdat_intensive_longitudinal,
+                      cluster = simdat_intensive_longitudinal$participantID)
 
   expect_equal(get_table(by_name), get_table(by_vector))
-  expect_equal(get_matrix(by_name), get_matrix(by_vector))
+  expect_equal(get_ICC(by_name), get_ICC(by_vector))
   expect_false("participantID" %in% colnames(by_name@within$correlations))
-  expect_false("participantID" %in% colnames(by_name@between$correlations))
+  expect_false("participantID" %in% colnames(by_vector@within$correlations))
 })
 
-test_that("supported correlation methods return complete bundled-data output", {
-  data("simdat_intensive_longitudinal")
+test_that("methods and inference options return the expected tables", {
+  pearson <- wbCorr(simdat_intensive_longitudinal, "participantID")
+  spearman <- wbCorr(simdat_intensive_longitudinal, "participantID",
+                     method = "spearman")
+  none <- wbCorr(simdat_intensive_longitudinal, "participantID",
+                 inference = "none")
 
-  pearson <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                     cluster = "participantID"))
-  spearman <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                      cluster = "participantID",
-                                      method = "spearman"))
-
-  expect_s4_class(pearson, "wbCorr")
-  expect_s4_class(spearman, "wbCorr")
-
-  expect_equal(dim(pearson@within$correlations), c(4L, 4L))
-  expect_equal(dim(pearson@between$correlations), c(4L, 4L))
-  expect_equal(nrow(pearson@within$table), 6L)
-  expect_equal(nrow(pearson@between$table), 6L)
-
-  expect_equal(nrow(spearman@within$table), 6L)
-  expect_equal(nrow(spearman@between$table), 6L)
+  expect_equal(colnames(pearson@within$table),
+               c("Parameter1", "Parameter2", "pearson's r", "t-statistic",
+                 "df", "95% CI", "p"))
+  expect_equal(colnames(spearman@within$table),
+               c("Parameter1", "Parameter2", "spearman's rho", "z-statistic",
+                 "df", "95% CI", "p"))
+  expect_equal(colnames(none@within$table),
+               c("Parameter1", "Parameter2", "pearson's r"))
+  expect_true(all(is.na(as.matrix(none@within$p_values))))
+  expect_equal(none@within$correlations, pearson@within$correlations)
+  expect_equal(summary(none, "w")$within["var1", "var2"], "0.12")
 })
 
-test_that("within Pearson df accounts for estimated cluster means", {
-  data("simdat_intensive_longitudinal")
+test_that("accessors return tables, matrices, and ICCs", {
+  cors <- wbCorr(simdat_intensive_longitudinal, "participantID")
 
-  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID"))
+  expect_named(get_table(cors), c("within", "between"))
+  expect_named(get_tables(cors, "b"), "between")
+  expect_named(summary(cors), c("within", "between", "merged_wb", "note_wb",
+                                "merged_bw", "note_bw", "note"))
+  expect_named(get_matrix(cors, "wb"), c("merged_wb", "note"))
+  expect_equal(base::summary(cors, "w"), get_matrix(cors, "w"))
+  expect_equal(get_ICC(cors)$variable, c("day", "var1", "var2", "var3"))
 
-  expected_df <- nrow(simdat_intensive_longitudinal) -
-    length(unique(simdat_intensive_longitudinal$participantID)) - 1
-
-  expect_true(all(cors@within$table$df == expected_df))
+  # day does not vary between participants
+  between <- summary(cors, "b")$between
+  expect_equal(between["day", "day"], "NA")
+  expect_equal(between["var1", "var1"], "1")
 })
 
-test_that("between weighting option is explicit and backwards compatible", {
-  data("simdat_intensive_longitudinal")
+test_that("print, plot, and to_excel work", {
+  cors <- wbCorr(simdat_intensive_longitudinal, "participantID")
 
-  equal <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                   cluster = "participantID"))
-  weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                      cluster = "participantID",
-                                      between_weighting = "cluster_size"))
-  alias <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                   cluster = "participantID",
-                                   weighted_between_statistics = TRUE))
+  expect_output(expect_invisible(print(cors)), "Within-Cluster Correlations")
 
-  expect_equal(equal@settings$between_weighting, "equal_clusters")
-  expect_equal(equal@settings$centering_rows, "pairwise_complete")
-  expect_equal(weighted@settings$between_weighting, "cluster_size")
-  expect_equal(alias@settings$between_weighting, "cluster_size")
-  expect_equal(weighted@settings$between_inference, "none")
-  expect_equal(weighted@between$correlations, alias@between$correlations)
-  expect_match(weighted@between$table$warning[4],
-               "weighted between analytic inference unavailable")
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_message(graphics::plot(cors, "within"), "may take a while")
+  expect_message(plot(cors, which = "b"), "may take a while")
+
+  matrices_path <- to_excel(summary(cors), tempfile(fileext = ".xlsx"))
+  table_path <- to_excel(get_table(cors)$within, tempfile(fileext = ".xlsx"))
+  expect_true(file.exists(matrices_path))
+  expect_true(file.exists(table_path))
 })
 
-test_that("between inference can be omitted", {
-  data("simdat_intensive_longitudinal")
-
-  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID",
-                                  between_weighting = "cluster_size",
-                                  between_inference = "none"))
-
-  expect_false(is.na(cors@between$correlations["var1", "var2"]))
-  expect_true(is.na(cors@between$p_values["var1", "var2"]))
-  expect_true(is.na(cors@between$confidence_intervals$CI_lower[4]))
-  expect_false(any(grepl("analytic inference unavailable",
-                         cors@between$table$warning,
-                         fixed = TRUE)))
-})
-
-test_that("analytic inference warns and cluster bootstrap returns bootstrap intervals", {
-  data("simdat_intensive_longitudinal")
-
-  expect_warning(
-    wbCorr(simdat_intensive_longitudinal,
-           cluster = "participantID",
-           nboot = 20),
-    "Analytic p-values"
-  )
+test_that("cluster bootstrap resamples whole clusters", {
+  dat <- simdat_intensive_longitudinal[c("participantID", "var1", "var2")]
 
   set.seed(1)
-  boot <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID",
-                                  inference = "cluster_bootstrap",
-                                  nboot = 20))
-  analytic <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                      cluster = "participantID"))
+  boot <- wbCorr(dat, "participantID", inference = "cluster_bootstrap",
+                 nboot = 200)
+  expect_equal(colnames(boot@within$table),
+               c("Parameter1", "Parameter2", "pearson's r", "BC 95% CI",
+                 "bootstrap p"))
 
-  expect_equal(boot@settings$inference, "cluster_bootstrap")
-  expect_equal(boot@within$correlations, analytic@within$correlations)
-  expect_equal(boot@between$correlations, analytic@between$correlations)
-  expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@within$table))
-  expect_false("Cluster bootstrap p" %in% colnames(boot@within$table))
-  expect_true(all(is.na(boot@within$p_values)))
-  expect_false(is.na(boot@within$confidence_intervals$CI_lower[1]))
-})
-
-test_that("cluster bootstrap supports weighted between correlations", {
-  data("simdat_intensive_longitudinal")
-
+  # Within-cluster draws come first, so they can be reproduced by hand.
   set.seed(1)
-  boot <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID",
-                                  between_weighting = "cluster_size",
-                                  inference = "cluster_bootstrap",
-                                  nboot = 20))
-  weighted <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                      cluster = "participantID",
-                                      between_weighting = "cluster_size"))
+  within <- boot@centered_data$within_df
+  rows <- split(seq_len(nrow(dat)), dat$participantID)
+  boot_r <- replicate(200, {
+    idx <- unlist(rows[sample.int(length(rows), replace = TRUE)],
+                  use.names = FALSE)
+    cor(within$var1[idx], within$var2[idx])
+  })
+  r <- cor(within$var1, within$var2)
+  z0 <- qnorm(mean(boot_r < r))
+  expected <- quantile(boot_r, pnorm(2 * z0 + qnorm(c(0.025, 0.975))),
+                       names = FALSE)
 
-  expect_equal(boot@settings$between_weighting, "cluster_size")
-  expect_equal(boot@between$correlations, weighted@between$correlations)
-  expect_true("Cluster bootstrap 95% CI" %in% colnames(boot@between$table))
-  expect_false(is.na(boot@between$confidence_intervals$CI_lower[4]))
-})
+  ci <- boot@within$confidence_intervals
+  expect_equal(c(ci$CI_lower, ci$CI_upper), expected)
 
-test_that("deprecated bootstrap argument maps to cluster bootstrap", {
-  data("simdat_intensive_longitudinal")
-
-  expect_warning(
-    legacy <- wbCorr(simdat_intensive_longitudinal,
-                     cluster = "participantID",
-                     bootstrap = TRUE,
-                     nboot = 20),
-    "bootstrap = TRUE is deprecated"
-  )
-
-  expect_equal(legacy@settings$inference, "cluster_bootstrap")
-  expect_true("Cluster bootstrap 95% CI" %in% colnames(legacy@within$table))
-})
-
-test_that("global inference none omits inferential columns", {
-  data("simdat_intensive_longitudinal")
-
-  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID",
-                                  inference = "none"))
-
-  expect_equal(cors@settings$inference, "none")
-  expect_false("p" %in% colnames(cors@within$table))
-  expect_false(any(grepl("CI", colnames(cors@within$table))))
-  expect_true(is.na(cors@within$p_values["var1", "var2"]))
-})
-
-test_that("accessors return tables and matrices", {
-  data("simdat_intensive_longitudinal")
-
-  cors <- suppressWarnings(wbCorr(simdat_intensive_longitudinal,
-                                  cluster = "participantID"))
-
-  tables <- get_table(cors)
-  matrices <- get_matrix(cors)
-
-  expect_named(tables, c("within", "between"))
-  expect_true(all(c("within", "between", "merged_wb", "merged_bw") %in%
-                    names(matrices)))
+  weighted <- wbCorr(dat, "participantID", inference = "cluster_bootstrap",
+                     between_weighting = "cluster_size", nboot = 50)
+  expect_false(anyNA(weighted@between$confidence_intervals$CI_lower))
 })

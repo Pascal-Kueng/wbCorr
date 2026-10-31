@@ -1,3 +1,43 @@
+# wbCorr (development version)
+
+This version returns to the simpler design of earlier wbCorr versions, while
+keeping the statistical fixes of 0.3.2.
+
+## Breaking changes
+
+* Cluster means are again estimated from all available observations of each
+  variable, as in `psych::statsBy()`. The `centering_rows` argument is removed.
+  Results only change when data are missing.
+* Removed the arguments `between_inference` (use `inference = "none"`),
+  `missing_data` (use `na.omit()` for listwise deletion), and the deprecated
+  `bootstrap` and `weighted_between_statistics`.
+* Removed `get_matrix_diagnostics()` and `get_matrix(numeric = TRUE)`. Unrounded
+  coefficients are stored in the wbCorr object (e.g., `object@within$correlations`).
+* Detailed tables no longer contain the diagnostic columns `n_obs`,
+  `n_clusters`, `n_boot_attempted`, `n_boot_valid`, `status`, `reason`,
+  `inference_status`, and `inference_reason`.
+
+## Restored
+
+* Spearman correlations have p-values and confidence intervals again (Fisher z).
+* `method = "auto"` uses Spearman for ordered factors again.
+* Cluster-size weighted between-cluster correlations have analytic p-values and
+  confidence intervals again.
+* The cluster bootstrap reports p-values again.
+
+## Fixes
+
+* Correlations based on two clusters are `NA` instead of a perfect correlation.
+* `wbCorr()` no longer warns on every call that analytic p-values are
+  approximations.
+* The cluster bootstrap reports bias-corrected (BC) intervals, works with
+  cluster-size weighting, and is much faster.
+
+## Documentation
+
+* Rewrote the README with a worked example and its output. Removed the vignette,
+  which repeated the README.
+
 # wbCorr 0.3.2
 
 ## Statistical correctness

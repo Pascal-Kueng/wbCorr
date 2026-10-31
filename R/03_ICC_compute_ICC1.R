@@ -1,60 +1,29 @@
-compute_icc1 <- function(input_data, cluster_var) {
-  if (!is.data.frame(input_data)) {
-    stop("input_data must be a data frame")
-  }
-  if (length(cluster_var) != nrow(input_data)) {
-    stop("cluster_var must have one value per row of input_data")
-  }
 
-  icc <- vapply(input_data,
-                compute_icc1_anova,
-                cluster_var = cluster_var,
-                FUN.VALUE = numeric(1))
+# One-way random-effects ICC(1,1) from ANOVA mean squares.
+# n0 adjusts the cluster size when clusters are of unequal size.
+compute_ICC1 <- function(input_data, cluster_var) {
 
-  data.frame(variable = names(input_data),
-             ICC = unname(icc),
-             row.names = NULL,
-             check.names = FALSE)
-}
+  ICCs <- data.frame(variable = character(), ICC = numeric()) # Initialize an empty data frame
 
+  for (name in colnames(input_data)) {
+    observed <- !is.na(input_data[[name]])
+    x <- input_data[[name]][observed]
+    cluster <- droplevels(cluster_var[observed])
 
-compute_icc1_anova <- function(values, cluster_var) {
-  if (!is.numeric(values)) {
-    stop("ICC inputs must be numeric after wbCorr preprocessing.", call. = FALSE)
-  }
+    N <- length(x)
+    k <- nlevels(cluster)
+    ICC <- NA
+    if (k > 1 && N > k && var(x) > 0) {
+      cluster_sizes <- tabulate(cluster)
+      cluster_means <- tapply(x, cluster, mean)
+      ms_between <- sum(cluster_sizes * (cluster_means - mean(x))^2) / (k - 1)
+      ms_within <- sum((x - cluster_means[as.integer(cluster)])^2) / (N - k)
+      n0 <- (N - sum(cluster_sizes^2) / N) / (k - 1)
+      ICC <- (ms_between - ms_within) / (ms_between + (n0 - 1) * ms_within)
+    }
 
-  valid_rows <- is.finite(values) & !is.na(cluster_var)
-  values <- values[valid_rows]
-  clusters <- droplevels(as.factor(cluster_var[valid_rows]))
-
-  n_observations <- length(values)
-  n_clusters <- nlevels(clusters)
-
-  # ICC(1,1) needs at least two clusters and some within-cluster replication.
-  if (n_clusters < 2L || n_observations <= n_clusters) {
-    return(NA_real_)
+    ICCs <- rbind(ICCs, data.frame(variable = name, ICC = ICC)) # Add the result to the data frame
   }
 
-  cluster_sizes <- as.numeric(table(clusters))
-  cluster_means <- as.numeric(tapply(values, clusters, mean))
-  grand_mean <- mean(values)
-
-  ss_between <- sum(cluster_sizes * (cluster_means - grand_mean)^2)
-  ss_within <- sum((values - cluster_means[as.integer(clusters)])^2)
-
-  ms_between <- ss_between / (n_clusters - 1L)
-  ms_within <- ss_within / (n_observations - n_clusters)
-
-  # Effective cluster size for a one-way random-effects ANOVA with unequal n.
-  n_effective <- (n_observations -
-                    sum(cluster_sizes^2) / n_observations) /
-    (n_clusters - 1L)
-  denominator <- ms_between + (n_effective - 1) * ms_within
-
-  if (!is.finite(n_effective) || n_effective <= 1 ||
-        !is.finite(denominator) || denominator <= 0) {
-    return(NA_real_)
-  }
-
-  (ms_between - ms_within) / denominator
+  return(ICCs)
 }

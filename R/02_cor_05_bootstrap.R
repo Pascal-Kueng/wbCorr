@@ -1,6 +1,7 @@
 
 #' @importFrom stats quantile
-cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot) {
+cor_bootstrap <- function(col_i, col_j, cluster, method, confidence_level, nboot) {
+
   correlation_coefficient <- suppressWarnings(cor(col_i, col_j,
                                                   method = method))
   if (is.na(correlation_coefficient)) {
@@ -11,28 +12,20 @@ cor_bootstrap <- function(col_i, col_j, method, confidence_level, nboot) {
                 upper_bound = NA))
   }
 
-  # Combine data
-  df <- data.frame(x = col_i, y = col_j)
+  # Bootstrap: resample whole clusters, so dependence within clusters is kept.
+  rows_by_cluster <- split(seq_along(col_i), droplevels(as.factor(cluster)))
+  boot_corr <- replicate(nboot, {
+    rows <- unlist(rows_by_cluster[sample.int(length(rows_by_cluster), replace = TRUE)],
+                   use.names = FALSE)
+    suppressWarnings(cor(col_i[rows], col_j[rows], method = method))
+  })
+  boot_corr <- boot_corr[!is.na(boot_corr)]
 
-  # Bootstrap
-  boot_indices <- replicate(nboot,
-                            sample(nrow(df), replace = TRUE),
-                            simplify = FALSE)
-  boot_corr <- sapply(boot_indices,
-                      function(indices) cor(df[indices, 1], df[indices, 2], method = method))
-
-  # Calculate bias and acceleration
+  # Calculate the bias-corrected (BC) confidence interval
   z0 <- qnorm(mean(boot_corr < correlation_coefficient))
-  a <- sum((mean(boot_corr) - boot_corr)^3) / (6 * (sum((mean(boot_corr) - boot_corr)^2)^(3/2)))
-
-  # Calculate the adjusted critical values
   z_alpha <- qnorm(c((1 - confidence_level) / 2, 1 - (1 - confidence_level) / 2))
-  z_alpha_adj1 <- (z0 + (z0 + z_alpha[1])) / (1 - a * (z0 + z_alpha[1]))
-  z_alpha_adj2 <- (z0 + (z0 + z_alpha[2])) / (1 - a * (z0 + z_alpha[2]))
-
-  # Calculate the BCa confidence interval
-  lower_bound <- quantile(boot_corr, pnorm(z_alpha_adj1))
-  upper_bound <- quantile(boot_corr, pnorm(z_alpha_adj2))
+  lower_bound <- quantile(boot_corr, pnorm(2 * z0 + z_alpha[1]), names = FALSE)
+  upper_bound <- quantile(boot_corr, pnorm(2 * z0 + z_alpha[2]), names = FALSE)
 
   # Calculate the p-value
   p_value <- min(mean((correlation_coefficient > 0 & boot_corr < 0) |
