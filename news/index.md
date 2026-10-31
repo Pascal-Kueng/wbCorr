@@ -1,6 +1,6 @@
 # Changelog
 
-## wbCorr (development version)
+## wbCorr 0.4.0
 
 This version returns to the simpler design of earlier wbCorr versions,
 while keeping the statistical fixes of 0.3.2.
